@@ -1,4 +1,3 @@
-
 ## 🗺️ Map-Based Location Filtering System
 
 ### 📋 Description
