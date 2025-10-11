@@ -31,11 +31,11 @@ async function verifyToken(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log('[Create Order] Request received');
-    
+
     // Verify authentication
     const decoded = await verifyToken(request);
     const userId = decoded.userId;
-    
+
     console.log('[Create Order] User authenticated:', userId);
 
     await connectDB();
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { amount, currency = 'INR', bookingId, propertyId, description, notes } = body;
-    
+
     console.log('[Create Order] Request body:', { amount, currency, bookingId, propertyId });
 
     // Validate amount
@@ -62,6 +62,12 @@ export async function POST(request: NextRequest) {
     const receipt = `receipt_${Date.now()}_${userId}`;
 
     // Create Razorpay order
+    console.log('[Create Order] Creating Razorpay order with:', {
+      amountInPaise,
+      currency,
+      receipt
+    });
+
     const orderResult = await createRazorpayOrder({
       amount: amountInPaise,
       currency,
@@ -74,7 +80,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log('[Create Order] Razorpay order result:', {
+      success: orderResult.success,
+      hasData: !!orderResult.data,
+      error: orderResult.error
+    });
+
     if (!orderResult.success || !orderResult.data) {
+      console.error('[Create Order] Razorpay order creation failed:', orderResult.error);
       return NextResponse.json(
         { success: false, error: orderResult.error || 'Failed to create order' },
         { status: 500 }

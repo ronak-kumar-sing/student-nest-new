@@ -3,8 +3,9 @@ import jwt from 'jsonwebtoken';
 const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
 const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret';
 
-const ACCESS_TOKEN_EXPIRY = '15m';  // 15 minutes
-const REFRESH_TOKEN_EXPIRY = '7d';  // 7 days
+// Use environment variables for token expiry with fallbacks
+const ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN || '7d';  // Default 7 days (matches .env.local)
+const REFRESH_TOKEN_EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN || '30d';  // Default 30 days
 
 export interface TokenPayload {
   userId: string;

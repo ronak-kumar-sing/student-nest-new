@@ -64,9 +64,25 @@ export default function RazorpayCheckout({
 
       // Create order on backend
       const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+
+      console.log('[RazorpayCheckout] Token check:', {
+        hasAccessToken: !!localStorage.getItem('accessToken'),
+        hasToken: !!localStorage.getItem('token'),
+        tokenLength: token?.length || 0,
+        tokenPreview: token ? `${token.substring(0, 20)}...` : 'null'
+      });
+
       if (!token) {
+        toast.error('Please login to continue with payment');
         throw new Error('Please login to continue');
       }
+
+      console.log('[RazorpayCheckout] Creating order:', {
+        amount,
+        bookingId,
+        propertyId,
+        description
+      });
 
       const orderResponse = await fetch('/api/payments/create-order', {
         method: 'POST',
