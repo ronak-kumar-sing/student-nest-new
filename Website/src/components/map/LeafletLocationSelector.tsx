@@ -38,6 +38,11 @@ const Marker = dynamic(
   { ssr: false }
 );
 
+const Popup = dynamic(
+  () => import('react-leaflet').then((mod) => mod.Popup),
+  { ssr: false }
+);
+
 const defaultCenter: [number, number] = [28.6139, 77.2090]; // Delhi
 
 interface LocationSelectorProps {
@@ -57,11 +62,13 @@ interface LocationSelectorProps {
 function LocationMarker({
   position,
   setPosition,
-  onAddressUpdate
+  onAddressUpdate,
+  address
 }: {
   position: [number, number] | null;
   setPosition: (pos: [number, number]) => void;
   onAddressUpdate: (pos: [number, number]) => void;
+  address: string;
 }) {
   const map = useMapEvents({
     click(e: LeafletMouseEvent) {
@@ -72,7 +79,27 @@ function LocationMarker({
     },
   });
 
-  return position === null ? null : <Marker position={position} />;
+  return position === null ? null : (
+    <Marker position={position}>
+      <Popup>
+        <div className="p-2 min-w-[200px]">
+          <div className="flex items-start gap-2 mb-2">
+            <MapPin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-semibold text-sm mb-1">Selected Location</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 break-words">
+                {address || 'Loading address...'}
+              </p>
+            </div>
+          </div>
+          <div className="mt-2 pt-2 border-t text-xs text-gray-500">
+            <p>Lat: {position[0].toFixed(6)}</p>
+            <p>Lng: {position[1].toFixed(6)}</p>
+          </div>
+        </div>
+      </Popup>
+    </Marker>
+  );
 }
 
 export function LeafletLocationSelector({
@@ -238,6 +265,7 @@ export function LeafletLocationSelector({
             position={selectedPosition}
             setPosition={setSelectedPosition}
             onAddressUpdate={getAddressFromCoordinates}
+            address={address}
           />
         </MapContainer>
       </div>

@@ -13,6 +13,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { calculateDistance, filterRoomsByDistance } from '../../utils/distance';
 import { MapUpdater } from './MapUpdater';
+import { MapController } from './MapController';
 import { toast } from 'sonner';
 
 // Fix Leaflet default marker icons
@@ -99,6 +100,9 @@ export function LeafletRoomsMapView({
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedZoom, setSelectedZoom] = useState(userLocation ? 13 : 11);
 
   // Filter rooms by radius if user location and showRadius are set
   const displayedRooms = useMemo(() => {
@@ -125,27 +129,77 @@ export function LeafletRoomsMapView({
     }
   }, [displayedRooms, userLocation]);
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
+  // Fetch search suggestions as user types
+  const fetchSuggestions = async (query: string) => {
+    if (!query.trim() || query.length < 3) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`
+      );
+      const data = await response.json();
+      setSearchSuggestions(data);
+      setShowSuggestions(data.length > 0);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
+
+  // Debounce search suggestions
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery) {
+        fetchSuggestions(searchQuery);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const handleSearch = async (selectedSuggestion?: any) => {
+    const queryToSearch = selectedSuggestion || searchQuery;
+
+    if (!queryToSearch || (typeof queryToSearch === 'string' && !queryToSearch.trim())) {
       toast.error('Please enter a location to search');
       return;
     }
 
     setIsSearching(true);
+    setShowSuggestions(false);
 
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`
-      );
-      const data = await response.json();
+      let lat, lon;
 
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        setCenter([parseFloat(lat), parseFloat(lon)]);
-        toast.success('Location found on map');
+      if (selectedSuggestion && selectedSuggestion.lat && selectedSuggestion.lon) {
+        // Use selected suggestion
+        lat = selectedSuggestion.lat;
+        lon = selectedSuggestion.lon;
+        setSearchQuery(selectedSuggestion.display_name);
       } else {
-        toast.error('Location not found. Try a different search term.');
+        // Search by query
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryToSearch)}&limit=1`
+        );
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          lat = data[0].lat;
+          lon = data[0].lon;
+        } else {
+          toast.error('Location not found. Try a different search term.');
+          setIsSearching(false);
+          return;
+        }
       }
+
+      const newCenter: [number, number] = [parseFloat(lat), parseFloat(lon)];
+      setCenter(newCenter);
+      setSelectedZoom(14); // Zoom in when searching
+      toast.success('Location found on map');
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Failed to search location');
@@ -156,9 +210,12 @@ export function LeafletRoomsMapView({
 
   const handleClearSearch = () => {
     setSearchQuery('');
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
     // Reset to user location or default
     if (userLocation) {
       setCenter([userLocation.lat, userLocation.lng]);
+      setSelectedZoom(13);
     } else if (displayedRooms.length > 0) {
       const firstRoom = displayedRooms[0];
       if (firstRoom.location?.coordinates) {
@@ -166,6 +223,7 @@ export function LeafletRoomsMapView({
           firstRoom.location.coordinates.lat,
           firstRoom.location.coordinates.lng,
         ]);
+        setSelectedZoom(11);
       }
     }
   };
@@ -196,26 +254,52 @@ export function LeafletRoomsMapView({
           <CardContent className="p-3">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
                 <Input
                   type="text"
                   placeholder="Search location on map..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  onFocus={() => searchSuggestions.length > 0 && setShowSuggestions(true)}
                   className="pl-10 pr-10"
                 />
                 {searchQuery && (
                   <button
                     onClick={handleClearSearch}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 )}
+
+                {/* Search Suggestions Dropdown */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
+                    {searchSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSearch(suggestion)}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 border-b last:border-b-0 transition-colors"
+                      >
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-4 w-4 mt-1 text-primary flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {suggestion.display_name.split(',')[0]}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                              {suggestion.display_name}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <Button
-                onClick={handleSearch}
+                onClick={() => handleSearch()}
                 disabled={isSearching || !searchQuery.trim()}
                 size="default"
               >
@@ -234,15 +318,17 @@ export function LeafletRoomsMapView({
       <div style={{ height }} className="rounded-lg overflow-hidden border relative z-0">
         <MapContainer
           center={center}
-          zoom={userLocation ? 13 : 11}
+          zoom={selectedZoom}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
-          key={`${center[0]}-${center[1]}`} // Force re-render on center change
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+
+          {/* Map Controller for smooth zoom/pan */}
+          <MapController center={center} zoom={selectedZoom} />
 
           {/* Auto-fit bounds to show all rooms and user location */}
           <MapUpdater rooms={displayedRooms} userLocation={userLocation} />

@@ -2,6 +2,8 @@
 export { LeafletLocationSelector as LocationSelector } from './LeafletLocationSelector';
 export { LeafletRoomsMapView as RoomsMapView } from './LeafletRoomsMapView';
 export { LeafletRoomLocationMap as RoomLocationMap } from './LeafletRoomLocationMap';
+export { MapController } from './MapController';
+export { MapUpdater } from './MapUpdater';
 
 // Google Maps versions are still available if needed
 // export { LocationSelector } from './LocationSelector';
