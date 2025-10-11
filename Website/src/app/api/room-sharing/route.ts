@@ -163,11 +163,34 @@ export async function POST(request: NextRequest) {
       houseRules
     } = body;
 
-    if (!propertyId || !maxParticipants || !requirements || !costSharing || !description) {
+    if (!propertyId || !requirements || !costSharing || !description) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    // Validate and set defaults for maxParticipants
+    const validatedMaxParticipants = maxParticipants && maxParticipants >= 2 
+      ? Math.min(maxParticipants, 6) 
+      : 2;
+
+    // Validate and set defaults for roomConfiguration
+    const validatedRoomConfiguration = {
+      totalBeds: roomConfiguration?.totalBeds || 2,
+      bedsAvailable: roomConfiguration?.bedsAvailable || Math.max(1, validatedMaxParticipants - 1),
+      hasPrivateBathroom: roomConfiguration?.hasPrivateBathroom ?? false,
+      hasSharedKitchen: roomConfiguration?.hasSharedKitchen ?? true,
+      hasStudyArea: roomConfiguration?.hasStudyArea ?? true,
+      hasStorage: roomConfiguration?.hasStorage ?? true
+    };
+
+    // Ensure bedsAvailable is at least 1 and not more than totalBeds
+    if (validatedRoomConfiguration.bedsAvailable < 1) {
+      validatedRoomConfiguration.bedsAvailable = 1;
+    }
+    if (validatedRoomConfiguration.bedsAvailable > validatedRoomConfiguration.totalBeds) {
+      validatedRoomConfiguration.bedsAvailable = validatedRoomConfiguration.totalBeds;
     }
 
     await connectDB();
@@ -190,7 +213,7 @@ export async function POST(request: NextRequest) {
     const roomSharing = await RoomSharing.create({
       property: propertyId,
       initiator: userId,
-      maxParticipants,
+      maxParticipants: validatedMaxParticipants,
       currentParticipants: [
         {
           user: userId,
@@ -202,7 +225,7 @@ export async function POST(request: NextRequest) {
       requirements,
       costSharing,
       description,
-      roomConfiguration,
+      roomConfiguration: validatedRoomConfiguration,
       availableFrom: new Date(availableFrom),
       availableTill: body.availableTill ? new Date(body.availableTill) : null,
       houseRules: houseRules || [],

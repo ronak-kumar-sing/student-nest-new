@@ -180,41 +180,130 @@ export default function StudentNegotiationsPage() {
     }
   };
 
-  const getStatusBadge = (negotiation: Negotiation) => {
-    const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-      pending: {
-        color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        icon: <Clock className="h-3 w-3" />,
-        label: 'Pending Response'
-      },
-      countered: {
-        color: 'bg-blue-100 text-blue-800 border-blue-200',
-        icon: <RotateCcw className="h-3 w-3" />,
-        label: 'Counter Offered'
-      },
-      accepted: {
-        color: 'bg-green-100 text-green-800 border-green-200',
-        icon: <CheckCircle className="h-3 w-3" />,
-        label: 'Accepted'
-      },
-      rejected: {
-        color: 'bg-red-100 text-red-800 border-red-200',
-        icon: <XCircle className="h-3 w-3" />,
-        label: 'Rejected'
-      },
-      withdrawn: {
-        color: 'bg-gray-100 text-gray-800 border-gray-200',
-        icon: <Trash2 className="h-3 w-3" />,
-        label: 'Withdrawn'
+  const handleBookNow = async (negotiation: Negotiation) => {
+    const moveInDate = prompt('Enter move-in date (YYYY-MM-DD):');
+    if (!moveInDate) return;
+
+    const duration = prompt('Enter duration in months (e.g., 12):');
+    if (!duration) return;
+
+    const durationNum = parseInt(duration);
+    if (isNaN(durationNum) || durationNum < 1) {
+      toast.error('Please enter a valid duration');
+      return;
+    }
+
+    setActionLoading(negotiation._id);
+    try {
+      const response = await apiClient.request('/bookings', {
+        method: 'POST',
+        body: JSON.stringify({
+          roomId: negotiation.room._id,
+          negotiationId: negotiation._id,
+          moveInDate: new Date(moveInDate).toISOString(),
+          duration: durationNum
+        })
+      });
+
+      if (response.success) {
+        toast.success('Booking created successfully at negotiated price!');
+        toast.info(`Monthly Rent: ₹${negotiation.finalPrice || negotiation.proposedPrice}`);
+        // Redirect to bookings page after a short delay
+        setTimeout(() => {
+          window.location.href = '/dashboard/bookings';
+        }, 2000);
+      } else {
+        toast.error(response.error || 'Failed to create booking');
       }
-    };
+    } catch (error: any) {
+      console.error('Error creating booking:', error);
+      toast.error(error.message || 'Failed to create booking');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
-    const config = statusConfig[negotiation.status] || statusConfig.pending;
+  const handleAcceptCounter = async (negotiationId: string) => {
+    if (!confirm('Accept this counter offer?')) return;
 
+    setActionLoading(negotiationId);
+    try {
+      const response = await apiClient.request(`/negotiations/${negotiationId}/accept-counter`, {
+        method: 'POST'
+      });
+
+      if (response.success) {
+        toast.success(`Counter offer accepted! You saved ₹${response.data.savings}`);
+        fetchNegotiations();
+      } else {
+        toast.error(response.error || 'Failed to accept counter offer');
+      }
+    } catch (error: any) {
+      console.error('Error accepting counter:', error);
+      toast.error(error.message || 'Failed to accept counter offer');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const getStatusBadge = (negotiation: Negotiation) => {
+    const status = negotiation.status;
+
+    if (status === 'pending') {
+      return (
+        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          Pending Response
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'countered') {
+      return (
+        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1">
+          <RotateCcw className="h-3 w-3" />
+          Counter Offered
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'accepted') {
+      return (
+        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+          <CheckCircle className="h-3 w-3" />
+          Accepted
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'rejected') {
+      return (
+        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200 flex items-center gap-1">
+          <XCircle className="h-3 w-3" />
+          Rejected
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'withdrawn') {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200 flex items-center gap-1">
+          <Trash2 className="h-3 w-3" />
+          Withdrawn
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    // Default fallback
     return (
-      <Badge variant="outline" className={`${config.color} flex items-center gap-1`}>
-        {config.icon}
-        {config.label}
+      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 flex items-center gap-1">
+        <Clock className="h-3 w-3" />
+        Pending Response
         {negotiation.isExpired && ' (Expired)'}
       </Badge>
     );
@@ -408,8 +497,8 @@ export default function StudentNegotiationsPage() {
                                 </span>
                               </div>
                               <div className="flex items-center justify-between text-sm mt-1">
-                                <span className="text-gray-600">Room Type:</span>
-                                <span className="font-medium text-gray-900">{negotiation.room.roomType}</span>
+                                <span className="text-gray-600">Room Name:</span>
+                                <span className="font-medium text-gray-900">{negotiation.room.title}</span>
                               </div>
                             </div>
 
@@ -500,13 +589,34 @@ export default function StudentNegotiationsPage() {
                               </Button>
                             )}
 
+                            {negotiation.status === 'countered' && !negotiation.isExpired && (
+                              <Button
+                                size="sm"
+                                className="bg-blue-600 hover:bg-blue-700"
+                                onClick={() => handleAcceptCounter(negotiation._id)}
+                                disabled={actionLoading === negotiation._id}
+                              >
+                                {actionLoading === negotiation._id ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                )}
+                                Accept Counter (₹{negotiation.counterOffer})
+                              </Button>
+                            )}
+
                             {negotiation.status === 'accepted' && (
                               <Button
                                 size="sm"
                                 className="bg-green-600 hover:bg-green-700"
-                                onClick={() => window.location.href = `/dashboard/rooms/${negotiation.room._id}/book?price=${negotiation.finalPrice || negotiation.proposedPrice}`}
+                                onClick={() => handleBookNow(negotiation)}
+                                disabled={actionLoading === negotiation._id}
                               >
-                                <CheckCircle className="h-4 w-4 mr-1" />
+                                {actionLoading === negotiation._id ? (
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                )}
                                 Book Now
                               </Button>
                             )}

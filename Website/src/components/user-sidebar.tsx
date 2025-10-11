@@ -21,9 +21,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import { LogOut, Home as HomeIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { StudentNestLogoIcon } from "./ui/logo";
+import { useNotificationCounts } from "../hooks/useNotificationCounts";
 
 interface User {
   id?: string;
@@ -66,6 +68,7 @@ interface UserSidebarProps {
 
 export function UserSidebar({ user, children }: UserSidebarProps) {
   const pathname = usePathname();
+  const { counts } = useNotificationCounts(user.role);
 
   const items = React.useMemo(() => {
     const userRole = user.role || 'student';
@@ -74,6 +77,15 @@ export function UserSidebar({ user, children }: UserSidebarProps) {
     console.log("Filtered nav items:", filtered.length, filtered.map(i => i.label));
     return filtered;
   }, [user.role]);
+
+  // Get notification badge count for a menu item
+  const getBadgeCount = (href: string): number => {
+    if (href.includes('/bookings')) return counts.bookings;
+    if (href.includes('/negotiations')) return counts.negotiations;
+    if (href.includes('/messages')) return counts.messages;
+    if (href.includes('/visits')) return counts.visits;
+    return 0;
+  };
 
   // Get current page title based on pathname
   const currentPageTitle = React.useMemo(() => {
@@ -116,16 +128,27 @@ export function UserSidebar({ user, children }: UserSidebarProps) {
                 Navigation
               </SidebarGroupLabel>
               <SidebarMenu className="space-y-1">
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild>
-                      <ActiveLink href={item.href}>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.label}</span>
-                      </ActiveLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {items.map((item) => {
+                  const badgeCount = getBadgeCount(item.href);
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton asChild>
+                        <ActiveLink href={item.href}>
+                          <item.icon className="h-4 w-4" />
+                          <span className="flex-1">{item.label}</span>
+                          {badgeCount > 0 && (
+                            <Badge
+                              variant="destructive"
+                              className="h-5 min-w-[20px] px-1.5 text-xs font-semibold flex items-center justify-center rounded-full"
+                            >
+                              {badgeCount > 99 ? '99+' : badgeCount}
+                            </Badge>
+                          )}
+                        </ActiveLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroup>
           </SidebarContent>

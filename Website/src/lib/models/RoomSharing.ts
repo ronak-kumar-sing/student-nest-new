@@ -228,12 +228,14 @@ const roomSharingSchema = new Schema<IRoomSharing>({
       type: Number,
       required: true,
       min: 1,
-      max: 10
+      max: 10,
+      default: 2
     },
     bedsAvailable: {
       type: Number,
       required: true,
-      min: 1
+      min: 1,
+      default: 1
     },
     hasPrivateBathroom: {
       type: Boolean,

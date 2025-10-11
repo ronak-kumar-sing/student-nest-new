@@ -6,7 +6,7 @@ import { verifyAccessToken } from '../../../../lib/utils/jwt';
 // GET: Get specific negotiation details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('authorization');
@@ -27,9 +27,11 @@ export async function GET(
       );
     }
 
+    const resolvedParams = await params;
+
     await connectDB();
 
-    const negotiation = await Negotiation.findById(params.id)
+    const negotiation = await Negotiation.findById(resolvedParams.id)
       .populate('room', 'title price location images roomType')
       .populate('student', 'fullName email phone collegeId course yearOfStudy')
       .populate('owner', 'fullName email phone');
@@ -83,7 +85,7 @@ export async function GET(
 // PATCH: Update negotiation (accept, reject, counter, or withdraw)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('authorization');
@@ -115,9 +117,11 @@ export async function PATCH(
       );
     }
 
+    const resolvedParams = await params;
+
     await connectDB();
 
-    const negotiation = await Negotiation.findById(params.id)
+    const negotiation = await Negotiation.findById(resolvedParams.id)
       .populate('room', 'title price')
       .populate('student', 'fullName email')
       .populate('owner', 'fullName email');

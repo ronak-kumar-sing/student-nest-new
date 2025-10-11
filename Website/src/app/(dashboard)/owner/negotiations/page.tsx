@@ -173,40 +173,63 @@ export default function OwnerNegotiationsPage() {
   };
 
   const getStatusBadge = (negotiation: Negotiation) => {
-    const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-      pending: {
-        color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-        icon: <Clock className="h-3 w-3" />,
-        label: 'Needs Response'
-      },
-      countered: {
-        color: 'bg-blue-100 text-blue-800 border-blue-200',
-        icon: <RotateCcw className="h-3 w-3" />,
-        label: 'Counter Offered'
-      },
-      accepted: {
-        color: 'bg-green-100 text-green-800 border-green-200',
-        icon: <CheckCircle className="h-3 w-3" />,
-        label: 'Accepted'
-      },
-      rejected: {
-        color: 'bg-red-100 text-red-800 border-red-200',
-        icon: <XCircle className="h-3 w-3" />,
-        label: 'Rejected'
-      },
-      withdrawn: {
-        color: 'bg-gray-100 text-gray-800 border-gray-200',
-        icon: <XCircle className="h-3 w-3" />,
-        label: 'Withdrawn by Student'
-      }
-    };
+    const status = negotiation.status;
 
-    const config = statusConfig[negotiation.status] || statusConfig.pending;
+    if (status === 'pending') {
+      return (
+        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 flex items-center gap-1">
+          <Clock className="h-3 w-3" />
+          Needs Response
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
 
+    if (status === 'countered') {
+      return (
+        <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1">
+          <RotateCcw className="h-3 w-3" />
+          Counter Offered
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'accepted') {
+      return (
+        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+          <CheckCircle className="h-3 w-3" />
+          Accepted
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'rejected') {
+      return (
+        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200 flex items-center gap-1">
+          <XCircle className="h-3 w-3" />
+          Rejected
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    if (status === 'withdrawn') {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200 flex items-center gap-1">
+          <XCircle className="h-3 w-3" />
+          Withdrawn by Student
+          {negotiation.isExpired && ' (Expired)'}
+        </Badge>
+      );
+    }
+
+    // Default fallback
     return (
-      <Badge variant="outline" className={`${config.color} flex items-center gap-1`}>
-        {config.icon}
-        {config.label}
+      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 flex items-center gap-1">
+        <Clock className="h-3 w-3" />
+        Needs Response
         {negotiation.isExpired && ' (Expired)'}
       </Badge>
     );
@@ -388,8 +411,8 @@ export default function OwnerNegotiationsPage() {
                                 </span>
                               </div>
                               <div className="flex items-center justify-between text-sm mt-1">
-                                <span className="text-gray-600">Room Type:</span>
-                                <span className="font-medium text-gray-900">{negotiation.room.roomType}</span>
+                                <span className="text-gray-600">Room Name:</span>
+                                <span className="font-medium text-gray-900">{negotiation.room.title}</span>
                               </div>
                             </div>
 
