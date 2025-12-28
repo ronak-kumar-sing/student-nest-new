@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { ConnectOptions } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -27,7 +27,7 @@ async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    const opts = {
+    const opts: ConnectOptions = {
       bufferCommands: false,
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 10000, // Increased from 5000
@@ -35,7 +35,7 @@ async function connectDB(): Promise<typeof mongoose> {
       connectTimeoutMS: 10000, // Added connection timeout
       family: 4, // Force IPv4
       retryWrites: true,
-      w: 'majority'
+      w: 'majority' as const
     };
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
