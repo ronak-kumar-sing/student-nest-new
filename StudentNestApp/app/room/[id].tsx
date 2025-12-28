@@ -81,6 +81,8 @@ export default function RoomDetailScreen() {
   const [visitDate, setVisitDate] = useState('');
   const [visitTime, setVisitTime] = useState('');
   const [visitMessage, setVisitMessage] = useState('');
+  const [moveInDate, setMoveInDate] = useState('');
+  const [bookingDuration, setBookingDuration] = useState(6); // Default 6 months
   const fadeAnim = useRef(new RNAnimated.Value(0)).current;
 
   useEffect(() => {
@@ -113,17 +115,24 @@ export default function RoomDetailScreen() {
   });
 
   const bookMutation = useMutation({
-    mutationFn: () => bookingsApi.create({
-      roomId: id!,
-      startDate: new Date().toISOString(),
-    }),
+    mutationFn: () => {
+      if (!moveInDate) {
+        throw new Error('Please select a move-in date');
+      }
+      return bookingsApi.create({
+        roomId: id!,
+        moveInDate: moveInDate,
+        duration: bookingDuration,
+      });
+    },
     onSuccess: () => {
       Alert.alert('Success', 'Booking request sent successfully!');
       setShowBookingModal(false);
+      setMoveInDate('');
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
     onError: (error: any) => {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to book room');
+      Alert.alert('Error', error.message || error.response?.data?.error || 'Failed to book room');
     },
   });
 
@@ -146,7 +155,8 @@ export default function RoomDetailScreen() {
 
   const visitMutation = useMutation({
     mutationFn: () => visitRequestsApi.create({
-      roomId: id!,
+      propertyId: id!,
+      recipientId: room?.owner?._id || room?.owner?.id,
       preferredDate: visitDate,
       preferredTime: visitTime,
       message: visitMessage,
@@ -192,14 +202,12 @@ export default function RoomDetailScreen() {
       return;
     }
 
-    Alert.alert(
-      'Confirm Booking',
-      `Request to book "${room?.title}" for ₹${room?.price}/month?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Confirm', onPress: () => bookMutation.mutate() },
-      ]
-    );
+    // Set default move-in date to a week from now
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    setMoveInDate(nextWeek.toISOString().split('T')[0]);
+    setBookingDuration(6);
+    setShowBookingModal(true);
   };
 
   const handleContact = () => {
@@ -761,45 +769,54 @@ export default function RoomDetailScreen() {
             )}
 
             {/* Location Map */}
-            {room.location?.coordinates && room.location.coordinates.length === 2 && (
+            {room.location?.coordinates && (
               <Animated.View entering={FadeInDown.delay(450).duration(500)} className="mb-6">
                 <Text className="text-white text-lg font-bold mb-3">Location</Text>
-                <View className="bg-dark-surface rounded-2xl overflow-hidden">
-                  <MapView
-                    style={{ width: '100%', height: 200 }}
-                    initialRegion={{
-                      latitude: room.location.coordinates[1],
-                      longitude: room.location.coordinates[0],
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    scrollEnabled={false}
-                    zoomEnabled={false}
-                    pitchEnabled={false}
-                    rotateEnabled={false}
-                  >
-                    <Marker
-                      coordinate={{
-                        latitude: room.location.coordinates[1],
-                        longitude: room.location.coordinates[0],
-                      }}
-                      title={room.title}
-                      description={room.location?.address || room.location?.city}
-                    />
-                  </MapView>
-                  <Pressable
-                    onPress={() => {
-                      const lat = room.location.coordinates[1];
-                      const lng = room.location.coordinates[0];
-                      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-                      Linking.openURL(url);
-                    }}
-                    className="p-4 flex-row items-center justify-center bg-dark-card"
-                  >
-                    <MapPin size={18} color="#F97316" />
-                    <Text className="text-primary-500 font-medium ml-2">Get Directions</Text>
-                  </Pressable>
-                </View>
+                {(() => {
+                  // Handle both array format [lng, lat] and object format { lat, lng }
+                  const coords = room.location.coordinates;
+                  const lat = Array.isArray(coords) ? coords[1] : coords.lat;
+                  const lng = Array.isArray(coords) ? coords[0] : coords.lng;
+                  
+                  if (!lat || !lng) return null;
+                  
+                  return (
+                    <View className="bg-dark-surface rounded-2xl overflow-hidden">
+                      <MapView
+                        style={{ width: '100%', height: 200 }}
+                        initialRegion={{
+                          latitude: lat,
+                          longitude: lng,
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.01,
+                        }}
+                        scrollEnabled={false}
+                        zoomEnabled={false}
+                        pitchEnabled={false}
+                        rotateEnabled={false}
+                      >
+                        <Marker
+                          coordinate={{
+                            latitude: lat,
+                            longitude: lng,
+                          }}
+                          title={room.title}
+                          description={room.location?.address || room.location?.city}
+                        />
+                      </MapView>
+                      <Pressable
+                        onPress={() => {
+                          const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                          Linking.openURL(url);
+                        }}
+                        className="p-4 flex-row items-center justify-center bg-dark-card"
+                      >
+                        <MapPin size={18} color="#F97316" />
+                        <Text className="text-primary-500 font-medium ml-2">Get Directions</Text>
+                      </Pressable>
+                    </View>
+                  );
+                })()}
               </Animated.View>
             )}
           </View>
@@ -1085,6 +1102,116 @@ export default function RoomDetailScreen() {
                           <>
                             <Calendar size={20} color="#fff" />
                             <Text className="text-white font-bold text-lg ml-2">Request Visit</Text>
+                          </>
+                        )}
+                      </Pressable>
+                    </View>
+                  </SafeAreaView>
+                </View>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Modal>
+
+        {/* Booking Modal */}
+        <Modal
+          visible={showBookingModal}
+          animationType="slide"
+          transparent
+          onRequestClose={() => setShowBookingModal(false)}
+        >
+          <Pressable
+            className="flex-1 bg-black/60"
+            onPress={() => setShowBookingModal(false)}
+          >
+            <View className="flex-1 justify-end">
+              <Pressable onPress={(e) => e.stopPropagation()}>
+                <View className="bg-dark-surface rounded-t-3xl">
+                  <SafeAreaView edges={['bottom']}>
+                    <View className="p-6">
+                      <View className="flex-row items-center justify-between mb-6">
+                        <Text className="text-white text-xl font-bold">Book Room</Text>
+                        <Pressable
+                          onPress={() => setShowBookingModal(false)}
+                          className="w-10 h-10 bg-dark-bg rounded-full items-center justify-center"
+                        >
+                          <X size={20} color="#71717A" />
+                        </Pressable>
+                      </View>
+
+                      {/* Room Summary */}
+                      <View className="bg-dark-card rounded-xl p-4 mb-4">
+                        <Text className="text-white font-bold">{room?.title}</Text>
+                        <Text className="text-primary-500 font-bold text-lg mt-1">₹{room?.price?.toLocaleString()}/month</Text>
+                      </View>
+
+                      <View className="mb-4">
+                        <Text className="text-white font-medium mb-2">Move-in Date *</Text>
+                        <View className="bg-dark-card rounded-xl flex-row items-center px-4">
+                          <Calendar size={20} color="#71717A" />
+                          <TextInput
+                            value={moveInDate}
+                            onChangeText={setMoveInDate}
+                            placeholder="YYYY-MM-DD"
+                            placeholderTextColor="#6B7280"
+                            className="flex-1 text-white py-4 ml-2"
+                          />
+                        </View>
+                      </View>
+
+                      <View className="mb-4">
+                        <Text className="text-white font-medium mb-2">Duration (months)</Text>
+                        <View className="flex-row flex-wrap">
+                          {[3, 6, 9, 12].map((duration) => (
+                            <Pressable
+                              key={duration}
+                              onPress={() => setBookingDuration(duration)}
+                              className={`px-6 py-3 rounded-xl mr-2 mb-2 ${
+                                bookingDuration === duration ? 'bg-primary-500' : 'bg-dark-card'
+                              }`}
+                            >
+                              <Text className={bookingDuration === duration ? 'text-white font-bold' : 'text-dark-text'}>
+                                {duration} months
+                              </Text>
+                            </Pressable>
+                          ))}
+                        </View>
+                      </View>
+
+                      {/* Cost Summary */}
+                      <View className="bg-dark-card rounded-xl p-4 mb-6">
+                        <View className="flex-row justify-between mb-2">
+                          <Text className="text-dark-text">Monthly Rent</Text>
+                          <Text className="text-white">₹{room?.price?.toLocaleString()}</Text>
+                        </View>
+                        <View className="flex-row justify-between mb-2">
+                          <Text className="text-dark-text">Duration</Text>
+                          <Text className="text-white">{bookingDuration} months</Text>
+                        </View>
+                        <View className="flex-row justify-between mb-2">
+                          <Text className="text-dark-text">Security Deposit</Text>
+                          <Text className="text-white">₹{((room?.price || 0) * 2).toLocaleString()}</Text>
+                        </View>
+                        <View className="h-px bg-dark-border my-2" />
+                        <View className="flex-row justify-between">
+                          <Text className="text-white font-bold">Total Initial</Text>
+                          <Text className="text-primary-500 font-bold">₹{((room?.price || 0) * 3).toLocaleString()}</Text>
+                        </View>
+                      </View>
+
+                      <Pressable
+                        onPress={() => bookMutation.mutate()}
+                        disabled={bookMutation.isPending || !moveInDate}
+                        className={`py-4 rounded-xl flex-row items-center justify-center ${
+                          moveInDate ? 'bg-primary-500' : 'bg-dark-border'
+                        }`}
+                      >
+                        {bookMutation.isPending ? (
+                          <ActivityIndicator color="#fff" />
+                        ) : (
+                          <>
+                            <Home size={20} color="#fff" />
+                            <Text className="text-white font-bold text-lg ml-2">Confirm Booking</Text>
                           </>
                         )}
                       </Pressable>

@@ -65,13 +65,26 @@ export default function RoomSharingDetailScreen() {
   const applyMutation = useMutation({
     mutationFn: () => roomSharingApi.apply(id!, { message: applicationMessage }),
     onSuccess: () => {
-      Alert.alert('Success', 'Your application has been sent!');
+      Alert.alert('Success', 'Your application has been sent! The room host will review and respond.');
       setShowApplyModal(false);
       setApplicationMessage('');
       queryClient.invalidateQueries({ queryKey: ['roomSharing'] });
     },
     onError: (error: any) => {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to submit application');
+      const errorMessage = error.response?.data?.error || 'Failed to submit application';
+      // Check if it's a verification error and provide more helpful message
+      if (errorMessage.includes('verified')) {
+        Alert.alert(
+          'Verification Required',
+          'You need to verify both your email and phone number to apply for room sharing. Go to Profile > Verification to complete this.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Go to Profile', onPress: () => router.push('/(tabs)/profile') },
+          ]
+        );
+      } else {
+        Alert.alert('Error', errorMessage);
+      }
     },
   });
 

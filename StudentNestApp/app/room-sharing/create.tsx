@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
+import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { roomSharingApi, roomsApi } from '../../lib/api';
@@ -56,6 +56,7 @@ export default function CreateRoomSharingScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isAuthenticated, user } = useAuth();
+  const { roomId: preselectedRoomId } = useLocalSearchParams<{ roomId?: string }>();
 
   const [step, setStep] = useState(1);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -77,6 +78,30 @@ export default function CreateRoomSharingScreen() {
     queryFn: () => roomsApi.getAll({}, 1, 50),
     enabled: !!user?._id,
   });
+
+  // Fetch preselected room if coming from room detail page
+  const { data: preselectedRoomData } = useQuery({
+    queryKey: ['room', preselectedRoomId],
+    queryFn: () => roomsApi.getById(preselectedRoomId!),
+    enabled: !!preselectedRoomId && !selectedRoom,
+  });
+
+  // Auto-select preselected room when data is available
+  useEffect(() => {
+    if (preselectedRoomData?.data && !selectedRoom) {
+      const room = preselectedRoomData.data;
+      setSelectedRoom(room);
+      // Auto-set rent per person based on room price
+      if (room.price) {
+        setFormData(prev => ({
+          ...prev,
+          rentPerPerson: Math.round(room.price / 2).toString(),
+          securityDepositPerPerson: Math.round(room.price).toString(),
+        }));
+      }
+    }
+  }, [preselectedRoomData, selectedRoom]);
+
 
   const rooms = roomsData?.data || [];
 

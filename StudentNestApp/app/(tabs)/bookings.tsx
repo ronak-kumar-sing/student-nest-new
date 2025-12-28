@@ -33,7 +33,10 @@ export default function BookingsScreen() {
     enabled: isAuthenticated,
   });
 
-  const bookings = data?.data || [];
+  // Handle nested API response: data.data.bookings or data.data if it's already an array
+  const bookings = Array.isArray(data?.data) 
+    ? data.data 
+    : (data?.data?.bookings || []);
 
   if (!isAuthenticated) {
     return (

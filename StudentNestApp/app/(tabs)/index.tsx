@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Animated,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,10 +29,12 @@ import {
   Filter,
   ChevronRight,
   Users,
+  Map,
 } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { ROOM_TYPES } from '../../constants/config';
 import { FadeIn, SlideIn, ScaleIn, Shimmer } from '../../components/Animations';
+import RoomsMap from '../../components/map/RoomsMap';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 48;
@@ -40,15 +43,38 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMapView, setShowMapView] = useState(false);
 
-  // Fetch rooms
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  // Fetch rooms with error handling
+  const { data, isLoading, refetch, isRefetching, error } = useQuery({
     queryKey: ['rooms'],
-    queryFn: () => roomsApi.getAll({}, 1, 20),
+    queryFn: async () => {
+      try {
+        const response = await roomsApi.getAll({}, 1, 20);
+        if (__DEV__) {
+          console.log('📦 Rooms API Response:', JSON.stringify(response, null, 2).substring(0, 500));
+        }
+        return response;
+      } catch (err) {
+        if (__DEV__) {
+          console.error('❌ Rooms API Error:', err);
+        }
+        throw err;
+      }
+    },
+    retry: 2,
   });
 
-  const rooms = data?.data || [];
+  // Handle both response formats: { data: rooms } or { data: { rooms: [] } }
+  const rooms = Array.isArray(data?.data) 
+    ? data.data 
+    : (data?.data?.rooms || data?.rooms || []);
   const featuredRooms = rooms.slice(0, 5);
+
+  // Debug log
+  if (__DEV__ && data) {
+    console.log('🏠 Rooms count:', rooms.length);
+  }
 
   const handleRoomPress = (roomId: string) => {
     router.push(`/room/${roomId}`);
@@ -124,6 +150,20 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-dark-bg" edges={['top']}>
+      {/* Map View Modal */}
+      <Modal
+        visible={showMapView}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowMapView(false)}
+      >
+        <RoomsMap 
+          rooms={rooms} 
+          onClose={() => setShowMapView(false)}
+          showCloseButton
+        />
+      </Modal>
+
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
@@ -147,12 +187,21 @@ export default function HomeScreen() {
                   {isAuthenticated ? user?.name?.split(' ')[0] : 'StudentNest'} 👋
                 </Text>
               </View>
-              <Pressable
-                onPress={() => isAuthenticated ? router.push('/(tabs)/profile') : router.push('/(auth)/login')}
-                className="w-12 h-12 bg-dark-surface rounded-full items-center justify-center"
-              >
-                <Bell size={22} color="#fff" />
-              </Pressable>
+              <View className="flex-row items-center gap-2">
+                {/* Map Button */}
+                <Pressable
+                  onPress={() => setShowMapView(true)}
+                  className="w-12 h-12 bg-primary-500 rounded-full items-center justify-center"
+                >
+                  <Map size={22} color="#fff" />
+                </Pressable>
+                <Pressable
+                  onPress={() => isAuthenticated ? router.push('/notifications') : router.push('/(auth)/login')}
+                  className="w-12 h-12 bg-dark-surface rounded-full items-center justify-center"
+                >
+                  <Bell size={22} color="#fff" />
+                </Pressable>
+              </View>
             </View>
 
             {/* Search Bar */}
@@ -246,6 +295,24 @@ export default function HomeScreen() {
               <RoomSkeleton />
               <RoomSkeleton />
             </View>
+          ) : error ? (
+            <FadeIn>
+              <View className="py-8 items-center">
+                <HomeIcon size={48} color="#EF4444" />
+                <Text className="text-red-400 mt-4 text-center font-medium">
+                  Failed to load rooms
+                </Text>
+                <Text className="text-dark-muted mt-2 text-center text-sm px-4">
+                  {error instanceof Error ? error.message : 'Please check your connection and try again'}
+                </Text>
+                <Pressable 
+                  onPress={() => refetch()}
+                  className="mt-4 bg-primary-500 px-6 py-3 rounded-xl"
+                >
+                  <Text className="text-white font-semibold">Retry</Text>
+                </Pressable>
+              </View>
+            </FadeIn>
           ) : rooms.length === 0 ? (
             <FadeIn>
               <View className="py-8 items-center">
@@ -253,6 +320,12 @@ export default function HomeScreen() {
                 <Text className="text-dark-text mt-4 text-center">
                   No rooms available at the moment
                 </Text>
+                <Pressable 
+                  onPress={() => refetch()}
+                  className="mt-4 bg-dark-surface border border-dark-border px-6 py-3 rounded-xl"
+                >
+                  <Text className="text-white font-semibold">Refresh</Text>
+                </Pressable>
               </View>
             </FadeIn>
           ) : (

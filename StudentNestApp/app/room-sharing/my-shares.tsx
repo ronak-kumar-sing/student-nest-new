@@ -93,7 +93,19 @@ export default function MySharesScreen() {
     },
   });
 
-  const shares = data?.data || [];
+  // Handle nested API response: data.data has created, joined, applied arrays
+  const sharesData = (data?.data || {}) as {
+    created?: any[];
+    joined?: any[];
+    applied?: any[];
+    statistics?: any;
+  };
+  const shares = [
+    ...(sharesData.created || []),
+    ...(sharesData.joined || []),
+  ];
+  const myApplications = sharesData.applied || [];
+  const statistics = sharesData.statistics || {};
 
   const handleRespondToApplication = (
     shareId: string,

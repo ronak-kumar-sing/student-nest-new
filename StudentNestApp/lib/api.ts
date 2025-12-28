@@ -219,8 +219,23 @@ export const roomsApi = {
       });
     }
 
-    const response = await api.get(`/rooms?${params.toString()}`);
-    return response.data;
+    try {
+      if (__DEV__) {
+        console.log('🔗 Fetching rooms from:', `${API_URL}/rooms?${params.toString()}`);
+      }
+      const response = await api.get(`/rooms?${params.toString()}`);
+      if (__DEV__) {
+        console.log('✅ Rooms response status:', response.status);
+      }
+      // API returns { success: true, data: [...rooms], pagination: {...} }
+      return response.data;
+    } catch (error: any) {
+      if (__DEV__) {
+        console.error('❌ Rooms API error:', error.message);
+        console.error('❌ Error details:', error.response?.data || error);
+      }
+      throw error;
+    }
   },
 
   getById: async (id: string): Promise<ApiResponse<Room>> => {
@@ -243,6 +258,14 @@ export const roomsApi = {
 export const savedRoomsApi = {
   getAll: async (): Promise<ApiResponse<Room[]>> => {
     const response = await api.get('/saved-rooms');
+    // Backend returns { success: true, data: { savedRooms: [...], total: N } }
+    // Transform to match frontend expectation: { success: true, data: [...] }
+    if (response.data?.data?.savedRooms) {
+      return {
+        ...response.data,
+        data: response.data.data.savedRooms,
+      };
+    }
     return response.data;
   },
 
@@ -252,7 +275,8 @@ export const savedRoomsApi = {
   },
 
   remove: async (roomId: string): Promise<ApiResponse<null>> => {
-    const response = await api.delete(`/saved-rooms/${roomId}`);
+    // Backend expects roomId as query param, not path param
+    const response = await api.delete(`/saved-rooms?roomId=${roomId}`);
     return response.data;
   },
 
@@ -276,9 +300,10 @@ export const bookingsApi = {
 
   create: async (data: {
     roomId: string;
-    startDate: string;
-    endDate?: string;
+    moveInDate: string;
+    duration: number;
     message?: string;
+    negotiationId?: string;
   }): Promise<ApiResponse<Booking>> => {
     const response = await api.post('/bookings', data);
     return response.data;
@@ -329,12 +354,34 @@ export const visitRequestsApi = {
   },
 
   create: async (data: {
-    roomId: string;
+    propertyId: string;
+    recipientId?: string;
     preferredDate: string;
     preferredTime?: string;
     message?: string;
+    timeSlots?: Array<{ date: string; startTime: string; endTime: string }>;
   }): Promise<ApiResponse<any>> => {
-    const response = await api.post('/visit-requests', data);
+    // Convert simple date/time to timeSlots format expected by backend
+    const payload: any = {
+      propertyId: data.propertyId,
+      recipientId: data.recipientId,
+      message: data.message,
+    };
+    
+    // Create timeSlots from preferredDate and preferredTime
+    if (data.preferredDate && data.preferredTime) {
+      payload.timeSlots = [{
+        date: data.preferredDate,
+        startTime: data.preferredTime,
+        endTime: data.preferredTime.includes(':') 
+          ? `${parseInt(data.preferredTime.split(':')[0]) + 1}:${data.preferredTime.split(':')[1]}`
+          : data.preferredTime,
+      }];
+    } else if (data.timeSlots) {
+      payload.timeSlots = data.timeSlots;
+    }
+    
+    const response = await api.post('/visit-requests', payload);
     return response.data;
   },
 
@@ -508,6 +555,84 @@ export const roomSharingApi = {
     topCities: { city: string; count: number }[];
   }>> => {
     const response = await api.get('/room-sharing/statistics');
+    return response.data;
+  },
+};
+
+// Owner Properties API
+export const ownerPropertiesApi = {
+  // Get owner's properties
+  getAll: async (): Promise<ApiResponse<{ properties: Room[]; total: number }>> => {
+    const response = await api.get('/properties/my-properties');
+    return response.data;
+  },
+
+  // Create new property
+  create: async (data: Partial<Room>): Promise<ApiResponse<Room>> => {
+    const response = await api.post('/properties/my-properties', data);
+    return response.data;
+  },
+
+  // Update property
+  update: async (id: string, data: Partial<Room>): Promise<ApiResponse<Room>> => {
+    const response = await api.put(`/properties/my-properties/${id}`, data);
+    return response.data;
+  },
+
+  // Delete property
+  delete: async (id: string): Promise<ApiResponse<null>> => {
+    const response = await api.delete(`/properties/my-properties/${id}`);
+    return response.data;
+  },
+
+  // Get property statistics
+  getStats: async (): Promise<ApiResponse<{
+    totalProperties: number;
+    occupiedRooms: number;
+    availableRooms: number;
+    totalRent: number;
+    pendingBookings: number;
+    pendingVisits: number;
+  }>> => {
+    const response = await api.get('/properties/my-properties/stats');
+    return response.data;
+  },
+};
+
+// Payments API
+export const paymentsApi = {
+  // Get payment history
+  getAll: async (filters?: {
+    status?: string;
+    type?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<ApiResponse<{ payments: any[]; pagination: any }>> => {
+    const params = new URLSearchParams();
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, value.toString());
+        }
+      });
+    }
+    const response = await api.get(`/payments?${params.toString()}`);
+    return response.data;
+  },
+
+  // Get payment by ID
+  getById: async (id: string): Promise<ApiResponse<any>> => {
+    const response = await api.get(`/payments/${id}`);
+    return response.data;
+  },
+
+  // Get payment summary/stats
+  getSummary: async (): Promise<ApiResponse<{
+    totalPaid: number;
+    totalPending: number;
+    nextDue: { amount: number; dueDate: string } | null;
+  }>> => {
+    const response = await api.get('/payments/summary');
     return response.data;
   },
 };

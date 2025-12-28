@@ -2,10 +2,12 @@
 export interface User {
   _id: string;
   name: string;
+  fullName?: string; // Backend may use fullName instead of name
   email: string;
   phone?: string;
   role: 'student' | 'owner' | 'admin';
   avatar?: string;
+  profilePhoto?: string; // Backend uses profilePhoto
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   isIdentityVerified: boolean;
@@ -43,7 +45,7 @@ export interface Room {
     coordinates: {
       lat: number;
       lng: number;
-    };
+    } | [number, number]; // Support both object and array format
     nearbyUniversities?: string[];
     nearbyFacilities?: string[];
   };

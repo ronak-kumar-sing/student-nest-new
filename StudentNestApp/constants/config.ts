@@ -14,16 +14,16 @@ const getApiUrl = () => {
   if (__DEV__) {
     // Development mode
     if (Platform.OS === 'android') {
-      // Android emulator uses 10.0.2.2 to access host machine
-      // For physical device, use your computer's local IP
-      return 'http://192.168.1.18:3001/api';
+      // Android emulator uses 10.0.2.2 to access host machine's localhost
+      // Change this to your computer's IP for physical device testing
+      return 'http://10.0.2.2:3000/api';
     }
     // iOS simulator can use localhost
-    return 'http://localhost:3001/api';
+    return 'http://localhost:3000/api';
   }
   
   // Production URL (update this when you deploy)
-  return 'https://studentnest.vercel.app/api';
+  return 'https://student-nest-infotsav.vercel.app/api';
 };
 
 export const API_URL = getApiUrl();

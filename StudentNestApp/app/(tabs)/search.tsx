@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Dimensions,
+  Modal,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { roomsApi } from '../../lib/api';
 import { Room, RoomFilters } from '../../types';
 import { ROOM_TYPES, AMENITIES } from '../../constants/config';
+import RoomsMap from '../../components/map/RoomsMap';
 import {
   Search,
   MapPin,
@@ -24,6 +26,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   Home as HomeIcon,
+  Map,
+  List,
 } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -34,6 +38,7 @@ export default function SearchScreen() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showMapView, setShowMapView] = useState(false);
   const [filters, setFilters] = useState<RoomFilters>({
     type: params.type ? [params.type] : undefined,
     minPrice: undefined,
@@ -43,12 +48,19 @@ export default function SearchScreen() {
     sortOrder: 'desc',
   });
 
-  const { data, isLoading, refetch, isRefetching } = useQuery({
+  const { data, isLoading, refetch, isRefetching, error } = useQuery({
     queryKey: ['rooms', 'search', filters],
-    queryFn: () => roomsApi.getAll(filters, 1, 50),
+    queryFn: async () => {
+      const response = await roomsApi.getAll(filters, 1, 50);
+      return response;
+    },
+    retry: 2,
   });
 
-  const rooms = data?.data || [];
+  // Handle both response formats
+  const rooms = Array.isArray(data?.data)
+    ? data.data
+    : (data?.data?.rooms || data?.rooms || []);
 
   // Filter by search query locally
   const filteredRooms = rooms.filter((room) => {
@@ -119,6 +131,20 @@ export default function SearchScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-dark-bg" edges={['top']}>
+      {/* Map View Modal */}
+      <Modal
+        visible={showMapView}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowMapView(false)}
+      >
+        <RoomsMap 
+          rooms={filteredRooms} 
+          onClose={() => setShowMapView(false)}
+          showCloseButton
+        />
+      </Modal>
+
       {/* Search Header */}
       <View className="px-6 pt-4 pb-4">
         <View className="flex-row items-center bg-dark-surface rounded-xl px-4">
@@ -138,16 +164,27 @@ export default function SearchScreen() {
           )}
         </View>
 
-        {/* Filter Toggle */}
+        {/* Filter & Map Toggle */}
         <View className="flex-row items-center justify-between mt-4">
-          <Pressable
-            onPress={() => setShowFilters(!showFilters)}
-            className="flex-row items-center bg-dark-surface px-4 py-2 rounded-xl"
-          >
-            <SlidersHorizontal size={16} color="#F97316" />
-            <Text className="text-white font-medium ml-2">Filters</Text>
-            <ChevronDown size={16} color="#71717A" className="ml-2" />
-          </Pressable>
+          <View className="flex-row items-center gap-2">
+            <Pressable
+              onPress={() => setShowFilters(!showFilters)}
+              className="flex-row items-center bg-dark-surface px-4 py-2 rounded-xl"
+            >
+              <SlidersHorizontal size={16} color="#F97316" />
+              <Text className="text-white font-medium ml-2">Filters</Text>
+              <ChevronDown size={16} color="#71717A" className="ml-2" />
+            </Pressable>
+
+            {/* Map View Toggle */}
+            <Pressable
+              onPress={() => setShowMapView(true)}
+              className="flex-row items-center bg-primary-500 px-4 py-2 rounded-xl"
+            >
+              <Map size={16} color="#fff" />
+              <Text className="text-white font-medium ml-2">Map</Text>
+            </Pressable>
+          </View>
 
           {(filters.type || filters.minPrice || filters.amenities) && (
             <Pressable onPress={clearFilters}>

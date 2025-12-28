@@ -27,6 +27,12 @@ import {
   Lock,
   Eye,
   EyeOff,
+  DollarSign,
+  Calendar,
+  Bookmark,
+  Home,
+  Building2,
+  Wallet,
 } from 'lucide-react-native';
 
 export default function ProfileScreen() {
@@ -176,7 +182,7 @@ export default function ProfileScreen() {
           }
 
           const response = await userApi.uploadAvatarBase64(
-  \`data:\${mimeType};base64,\${base64}\`,
+            `data:${mimeType};base64,${base64}`,
             mimeType
           );
 
@@ -230,16 +236,16 @@ export default function ProfileScreen() {
       onPress={onPress}
       className="flex-row items-center py-4 border-b border-dark-border"
     >
-      <View className={\`w-10 h-10 rounded-full items-center justify-center \${danger ? 'bg-red-500/20' : 'bg-dark-surface'}\`}>
+      <View className={`w-10 h-10 rounded-full items-center justify-center ${danger ? 'bg-red-500/20' : 'bg-dark-surface'}  `}>
         <Icon size={20} color={danger ? '#EF4444' : '#F97316'} />
       </View>
       <View className="flex-1 ml-3">
-        <Text className={\`font-medium \${danger ? 'text-red-500' : 'text-white'}\`}>{title}</Text>
-        {subtitle && <Text className="text-dark-muted text-sm">{subtitle}</Text>}
-      </View>
-      {rightElement}
-      {showChevron && !rightElement && <ChevronRight size={20} color="#71717A" />}
-    </Pressable>
+        <Text className={`font-medium ${danger ? 'text-red-500' : 'text-white'}`}>{title}</Text>
+        { subtitle && <Text className="text-dark-muted text-sm">{subtitle}</Text> }
+      </View >
+    { rightElement }
+  { showChevron && !rightElement && <ChevronRight size={20} color="#71717A" /> }
+    </Pressable >
   );
 
   if (!isAuthenticated) {
@@ -278,7 +284,9 @@ export default function ProfileScreen() {
     );
   }
 
-  const displayAvatar = avatarUri || user?.avatar;
+  // Handle both avatar and profilePhoto field names from backend
+  const displayAvatar = avatarUri || user?.avatar || user?.profilePhoto;
+  const displayName = user?.name || user?.fullName || 'User';
 
   return (
     <SafeAreaView className="flex-1 bg-dark-bg" edges={['top']}>
@@ -301,7 +309,7 @@ export default function ProfileScreen() {
               ) : (
                 <View className="bg-primary-500/20 rounded-full items-center justify-center" style={{ width: 80, height: 80 }}>
                   <Text className="text-primary-500 text-3xl font-bold">
-                    {user?.name?.charAt(0).toUpperCase()}
+                    {displayName.charAt(0).toUpperCase()}
                   </Text>
                 </View>
               )}
@@ -314,7 +322,7 @@ export default function ProfileScreen() {
               </View>
             </Pressable>
             <View className="flex-1 ml-4">
-              <Text className="text-white text-xl font-bold">{user?.name}</Text>
+              <Text className="text-white text-xl font-bold">{displayName}</Text>
               <Text className="text-dark-text text-sm">{user?.email}</Text>
               <View className="flex-row items-center mt-2 flex-wrap">
                 <View className="bg-primary-500/20 px-2 py-1 rounded-full mr-2 mb-1">
@@ -398,6 +406,50 @@ export default function ProfileScreen() {
               subtitle="Manage your payment options"
               onPress={() => Alert.alert('Payments', 'Payment methods coming soon!')}
               showChevron={false}
+            />
+          </View>
+
+          {/* Activity */}
+          <Text className="text-dark-muted text-sm font-semibold mb-2 uppercase">Activity</Text>
+          <View className="bg-dark-surface rounded-2xl px-4 mb-6">
+            {/* Owner Dashboard - only shown for owners */}
+            {user?.role?.toLowerCase() === 'owner' && (
+              <MenuItem
+                icon={Building2}
+                title="Owner Dashboard"
+                subtitle="Manage your properties & bookings"
+                onPress={() => router.push('/owner')}
+              />
+            )}
+            <MenuItem
+              icon={Wallet}
+              title="Payment History"
+              subtitle="View your payment transactions"
+              onPress={() => router.push('/payments')}
+            />
+            <MenuItem
+              icon={DollarSign}
+              title="Negotiations"
+              subtitle="View your price negotiations"
+              onPress={() => router.push('/negotiations')}
+            />
+            <MenuItem
+              icon={Calendar}
+              title="Scheduled Visits"
+              subtitle="Upcoming property visits"
+              onPress={() => router.push('/visits')}
+            />
+            <MenuItem
+              icon={Bookmark}
+              title="Saved Rooms"
+              subtitle="Your bookmarked properties"
+              onPress={() => router.push('/(tabs)/saved')}
+            />
+            <MenuItem
+              icon={Home}
+              title="My Room Sharing"
+              subtitle="Manage your room sharing listings"
+              onPress={() => router.push('/room-sharing/my-shares')}
             />
           </View>
 
