@@ -589,29 +589,29 @@ function RoomBrowser() {
                       .filter(room => {
                         // Filter out rooms with invalid coordinates
                         const coords = room.location?.coordinates;
-                        return coords && 
-                          typeof coords.lat === 'number' && 
-                          typeof coords.lng === 'number' && 
-                          !isNaN(coords.lat) && 
+                        return coords &&
+                          typeof coords.lat === 'number' &&
+                          typeof coords.lng === 'number' &&
+                          !isNaN(coords.lat) &&
                           !isNaN(coords.lng) &&
-                          coords.lat !== 0 && 
+                          coords.lat !== 0 &&
                           coords.lng !== 0;
                       })
                       .map(room => ({
-                      _id: room.id,
-                      title: room.title,
-                      price: room.price,
-                      location: {
-                        coordinates: room.location.coordinates!,
-                        address: room.location?.address || '',
-                        city: room.location?.city || '',
-                      },
-                      images: room.images || [],
-                      roomType: room.roomType || '',
-                      accommodationType: room.roomType || '',
-                      rating: room.rating,
-                      availability: room.availability,
-                    }))}
+                        _id: room.id,
+                        title: room.title,
+                        price: room.price,
+                        location: {
+                          coordinates: room.location.coordinates!,
+                          address: room.location?.address || '',
+                          city: room.location?.city || '',
+                        },
+                        images: room.images || [],
+                        roomType: room.roomType || '',
+                        accommodationType: room.roomType || '',
+                        rating: room.rating,
+                        availability: room.availability,
+                      }))}
                     userLocation={selectedLocation?.coordinates}
                     height="600px"
                     showRadius={!!selectedLocation}

@@ -38,12 +38,12 @@ export default function OwnerVerificationPage() {
       ...prev,
       [type]: file
     }));
-    
+
     // Update step based on what's uploaded
     if (type === 'aadhaar' && file) setStep(Math.max(step, 2));
     if (type === 'pan' && file) setStep(Math.max(step, 3));
     if (type === 'propertyDocs' && file) setStep(Math.max(step, 4));
-    
+
     const names: Record<string, string> = {
       aadhaar: 'Aadhaar Card',
       pan: 'PAN Card',

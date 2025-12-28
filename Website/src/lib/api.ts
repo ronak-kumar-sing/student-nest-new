@@ -1044,21 +1044,21 @@ class ApiClient {
 
   // Forgot password methods
   async forgotPassword(email: string) {
-    return this.request('/forgot-password/initiate', {
+    return this.request('/auth/forgot-password', {
       method: 'POST',
       body: { email } as any,
     });
   }
 
-  async resetPassword(token: string, newPassword: string) {
-    return this.request('/forgot-password/reset', {
+  async resetPassword(token: string, email: string, password: string) {
+    return this.request('/auth/reset-password', {
       method: 'POST',
-      body: { token, newPassword } as any,
+      body: { token, email, password } as any,
     });
   }
 
   async verifyResetToken(token: string) {
-    return this.request('/forgot-password/verify-token', {
+    return this.request('/auth/verify-reset-token', {
       method: 'POST',
       body: { token } as any,
     });

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Verify authentication
     const decoded = await verifyToken(request);
-    
+
     const body = await request.json();
     const { documents } = body;
 
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             folder: `verification/${decoded.userId}`,
             tags: [docType, 'verification']
           });
-          
+
           if (result.success && result.url) {
             uploadedDocs.push({
               type: docType,
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Update Owner document
     const owner = await Owner.findOne({ user: decoded.userId });
-    
+
     if (owner) {
       owner.verification = {
         ...owner.verification,

@@ -111,12 +111,12 @@ export function LeafletRoomsMapView({
 }: LeafletRoomsMapViewProps) {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  
+
   // Validate user location
-  const validUserLocation = userLocation && isValidCoordinate(userLocation.lat, userLocation.lng) 
-    ? userLocation 
+  const validUserLocation = userLocation && isValidCoordinate(userLocation.lat, userLocation.lng)
+    ? userLocation
     : null;
-  
+
   const [center, setCenter] = useState<[number, number]>(
     validUserLocation ? [validUserLocation.lat, validUserLocation.lng] : defaultCenter
   );
@@ -134,7 +134,7 @@ export function LeafletRoomsMapView({
       const coords = room.location?.coordinates;
       return coords && isValidCoordinate(coords.lat, coords.lng);
     });
-    
+
     if (showRadius && validUserLocation) {
       return filterRoomsByDistance(validRooms, validUserLocation, radiusKm);
     }
