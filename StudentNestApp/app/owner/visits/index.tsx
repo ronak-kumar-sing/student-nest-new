@@ -120,9 +120,10 @@ export default function OwnerVisitsScreen() {
   });
 
   // Handle nested API response
-  const visits: VisitRequest[] = Array.isArray(data?.data)
-    ? data.data
-    : (data?.data?.visits || []);
+  const responseData = data?.data as any;
+  const visits: VisitRequest[] = Array.isArray(responseData)
+    ? responseData
+    : (responseData?.visits || []);
 
   const filteredVisits = visits.filter((v) => {
     if (activeTab === 'all') return true;
@@ -180,11 +181,11 @@ export default function OwnerVisitsScreen() {
                 <View className={`${config.bg} px-2 py-1 rounded-full flex-row items-center`}>
                   <StatusIcon size={12} color={
                     config.text.includes('yellow') ? '#EAB308' :
-                    config.text.includes('green') ? '#22C55E' :
-                    config.text.includes('red') ? '#EF4444' :
-                    config.text.includes('blue') ? '#3B82F6' :
-                    config.text.includes('purple') ? '#A855F7' :
-                    '#71717A'
+                      config.text.includes('green') ? '#22C55E' :
+                        config.text.includes('red') ? '#EF4444' :
+                          config.text.includes('blue') ? '#3B82F6' :
+                            config.text.includes('purple') ? '#A855F7' :
+                              '#71717A'
                   } />
                   <Text className={`text-xs font-medium ml-1 ${config.text}`}>{config.label}</Text>
                 </View>
@@ -312,9 +313,8 @@ export default function OwnerVisitsScreen() {
           <Pressable
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
-            className={`flex-1 py-2.5 rounded-xl items-center ${
-              activeTab === tab.key ? 'bg-primary-500' : 'bg-dark-surface'
-            }`}
+            className={`flex-1 py-2.5 rounded-xl items-center ${activeTab === tab.key ? 'bg-primary-500' : 'bg-dark-surface'
+              }`}
           >
             <Text className={`font-medium ${activeTab === tab.key ? 'text-white' : 'text-dark-text'}`}>
               {tab.label} ({tab.count})
@@ -349,8 +349,8 @@ export default function OwnerVisitsScreen() {
                 {activeTab === 'pending'
                   ? 'No pending visit requests'
                   : activeTab === 'upcoming'
-                  ? 'No upcoming visits scheduled'
-                  : 'You have no visit requests yet'}
+                    ? 'No upcoming visits scheduled'
+                    : 'You have no visit requests yet'}
               </Text>
             </View>
           }

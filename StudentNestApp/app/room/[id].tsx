@@ -174,9 +174,14 @@ export default function RoomDetailScreen() {
   });
 
   const room = data?.data;
-  const reviews = Array.isArray(reviewsData?.data) 
-    ? reviewsData.data 
+  const reviews = Array.isArray(reviewsData?.data)
+    ? reviewsData.data
     : (reviewsData?.data as any)?.reviews || [];
+
+  // Check if current user is the owner of this room
+  const isOwner = user?.role?.toLowerCase() === 'owner';
+  const isRoomOwner = room?.owner && user?._id &&
+    (room.owner._id === user._id || room.owner.id === user._id || room.owner === user._id);
 
   const handleShare = async () => {
     try {
@@ -242,10 +247,10 @@ export default function RoomDetailScreen() {
       const message = encodeURIComponent(
         `Hi! I'm interested in your room "${room.title}" listed on StudentNest for ₹${room.price}/month. Is it still available?`
       );
-      
+
       // Try WhatsApp API URL first (works on both iOS and Android)
       const whatsappUrl = `https://wa.me/${formattedPhone}?text=${message}`;
-      
+
       try {
         const canOpen = await Linking.canOpenURL(whatsappUrl);
         if (canOpen) {
@@ -516,8 +521,8 @@ export default function RoomDetailScreen() {
               <Animated.View entering={FadeInDown.delay(250).duration(500)} className="mb-6">
                 <Text className="text-white text-lg font-bold mb-3">House Rules</Text>
                 {room.rules.map((rule, index) => (
-                  <Animated.View 
-                    key={index} 
+                  <Animated.View
+                    key={index}
                     entering={SlideInRight.delay(250 + index * 50).duration(300)}
                     className="flex-row items-center mb-2"
                   >
@@ -613,62 +618,78 @@ export default function RoomDetailScreen() {
 
                 {/* Action Buttons */}
                 <View className="space-y-3">
-                  <Pressable
-                    onPress={handleBook}
-                    disabled={bookMutation.isPending}
-                    className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center mb-3"
-                  >
-                    {bookMutation.isPending ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <>
-                        <Calendar size={18} color="#fff" />
-                        <Text className="text-white font-semibold ml-2">Book Now - Pay Later</Text>
-                      </>
-                    )}
-                  </Pressable>
+                  {/* Show owner message if current user is the owner of this room */}
+                  {isRoomOwner ? (
+                    <View className="bg-primary-500/10 border border-primary-500/30 p-4 rounded-xl mb-3">
+                      <Text className="text-primary-500 font-bold text-center">This is your property</Text>
+                      <Text className="text-dark-text text-center text-sm mt-1">Manage it from your Owner Dashboard</Text>
+                    </View>
+                  ) : isOwner ? (
+                    <View className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl mb-3">
+                      <Text className="text-yellow-500 font-bold text-center">Owner Account</Text>
+                      <Text className="text-dark-text text-center text-sm mt-1">Switch to a student account to book rooms</Text>
+                    </View>
+                  ) : (
+                    <>
+                      <Pressable
+                        onPress={handleBook}
+                        disabled={bookMutation.isPending}
+                        className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center mb-3"
+                      >
+                        {bookMutation.isPending ? (
+                          <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                          <>
+                            <Calendar size={18} color="#fff" />
+                            <Text className="text-white font-semibold ml-2">Book Now - Pay Later</Text>
+                          </>
+                        )}
+                      </Pressable>
 
-                  <Pressable
-                    onPress={handleNegotiate}
-                    className="bg-green-600 py-4 rounded-xl flex-row items-center justify-center mb-3"
-                  >
-                    <DollarSign size={18} color="#fff" />
-                    <Text className="text-white font-semibold ml-2">Negotiate Price</Text>
-                  </Pressable>
+                      <Pressable
+                        onPress={handleNegotiate}
+                        className="bg-green-600 py-4 rounded-xl flex-row items-center justify-center mb-3"
+                      >
+                        <DollarSign size={18} color="#fff" />
+                        <Text className="text-white font-semibold ml-2">Negotiate Price</Text>
+                      </Pressable>
 
-                  <Pressable
-                    onPress={handleScheduleVisit}
-                    className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border mb-3"
-                  >
-                    <Calendar size={18} color="#9CA3AF" />
-                    <Text className="text-dark-text font-semibold ml-2">Schedule Visit</Text>
-                  </Pressable>
+                      <Pressable
+                        onPress={handleScheduleVisit}
+                        className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border mb-3"
+                      >
+                        <Calendar size={18} color="#9CA3AF" />
+                        <Text className="text-dark-text font-semibold ml-2">Schedule Visit</Text>
+                      </Pressable>
 
-                  <Pressable
-                    onPress={handleSaveForLater}
-                    disabled={saveMutation.isPending}
-                    className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border mb-3"
-                  >
-                    <Bookmark size={18} color={isSaved ? "#F97316" : "#9CA3AF"} fill={isSaved ? "#F97316" : "transparent"} />
-                    <Text className={`font-semibold ml-2 ${isSaved ? 'text-primary-500' : 'text-dark-text'}`}>
-                      {isSaved ? 'Saved' : 'Save for Later'}
-                    </Text>
-                  </Pressable>
+                      <Pressable
+                        onPress={handleSaveForLater}
+                        disabled={saveMutation.isPending}
+                        className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border mb-3"
+                      >
+                        <Bookmark size={18} color={isSaved ? "#F97316" : "#9CA3AF"} fill={isSaved ? "#F97316" : "transparent"} />
+                        <Text className={`font-semibold ml-2 ${isSaved ? 'text-primary-500' : 'text-dark-text'}`}>
+                          {isSaved ? 'Saved' : 'Save for Later'}
+                        </Text>
+                      </Pressable>
 
+                      <Pressable
+                        onPress={handlePostForSharing}
+                        className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border"
+                      >
+                        <UserPlus size={18} color="#F97316" />
+                        <Text className="text-primary-500 font-semibold ml-2">Post for Room Sharing</Text>
+                      </Pressable>
+                    </>
+                  )}
+
+                  {/* Share button is always visible */}
                   <Pressable
                     onPress={handleShare}
                     className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border mb-3"
                   >
                     <Share2 size={18} color="#9CA3AF" />
                     <Text className="text-dark-text font-semibold ml-2">Share Room</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={handlePostForSharing}
-                    className="bg-dark-card py-4 rounded-xl flex-row items-center justify-center border border-dark-border"
-                  >
-                    <UserPlus size={18} color="#F97316" />
-                    <Text className="text-primary-500 font-semibold ml-2">Post for Room Sharing</Text>
                   </Pressable>
                 </View>
               </View>
@@ -684,7 +705,7 @@ export default function RoomDetailScreen() {
                   </Pressable>
                 )}
               </View>
-              
+
               {reviews.length === 0 ? (
                 <View className="bg-dark-surface rounded-2xl p-6 items-center">
                   <Star size={32} color="#71717A" />
@@ -777,9 +798,9 @@ export default function RoomDetailScreen() {
                   const coords = room.location.coordinates;
                   const lat = Array.isArray(coords) ? coords[1] : coords.lat;
                   const lng = Array.isArray(coords) ? coords[0] : coords.lng;
-                  
+
                   if (!lat || !lng) return null;
-                  
+
                   return (
                     <View className="bg-dark-surface rounded-2xl overflow-hidden">
                       <MapView
@@ -995,9 +1016,8 @@ export default function RoomDetailScreen() {
                       <Pressable
                         onPress={() => negotiateMutation.mutate()}
                         disabled={negotiateMutation.isPending || !proposedPrice}
-                        className={`py-4 rounded-xl flex-row items-center justify-center ${
-                          proposedPrice ? 'bg-green-600' : 'bg-dark-border'
-                        }`}
+                        className={`py-4 rounded-xl flex-row items-center justify-center ${proposedPrice ? 'bg-green-600' : 'bg-dark-border'
+                          }`}
                       >
                         {negotiateMutation.isPending ? (
                           <ActivityIndicator color="#fff" />
@@ -1063,9 +1083,8 @@ export default function RoomDetailScreen() {
                             <Pressable
                               key={time}
                               onPress={() => setVisitTime(time)}
-                              className={`px-4 py-2 rounded-xl mr-2 mb-2 ${
-                                visitTime === time ? 'bg-primary-500' : 'bg-dark-card'
-                              }`}
+                              className={`px-4 py-2 rounded-xl mr-2 mb-2 ${visitTime === time ? 'bg-primary-500' : 'bg-dark-card'
+                                }`}
                             >
                               <Text className={visitTime === time ? 'text-white font-medium' : 'text-dark-text'}>
                                 {time}
@@ -1092,9 +1111,8 @@ export default function RoomDetailScreen() {
                       <Pressable
                         onPress={() => visitMutation.mutate()}
                         disabled={visitMutation.isPending || !visitDate || !visitTime}
-                        className={`py-4 rounded-xl flex-row items-center justify-center ${
-                          visitDate && visitTime ? 'bg-primary-500' : 'bg-dark-border'
-                        }`}
+                        className={`py-4 rounded-xl flex-row items-center justify-center ${visitDate && visitTime ? 'bg-primary-500' : 'bg-dark-border'
+                          }`}
                       >
                         {visitMutation.isPending ? (
                           <ActivityIndicator color="#fff" />
@@ -1166,9 +1184,8 @@ export default function RoomDetailScreen() {
                             <Pressable
                               key={duration}
                               onPress={() => setBookingDuration(duration)}
-                              className={`px-6 py-3 rounded-xl mr-2 mb-2 ${
-                                bookingDuration === duration ? 'bg-primary-500' : 'bg-dark-card'
-                              }`}
+                              className={`px-6 py-3 rounded-xl mr-2 mb-2 ${bookingDuration === duration ? 'bg-primary-500' : 'bg-dark-card'
+                                }`}
                             >
                               <Text className={bookingDuration === duration ? 'text-white font-bold' : 'text-dark-text'}>
                                 {duration} months
@@ -1202,9 +1219,8 @@ export default function RoomDetailScreen() {
                       <Pressable
                         onPress={() => bookMutation.mutate()}
                         disabled={bookMutation.isPending || !moveInDate}
-                        className={`py-4 rounded-xl flex-row items-center justify-center ${
-                          moveInDate ? 'bg-primary-500' : 'bg-dark-border'
-                        }`}
+                        className={`py-4 rounded-xl flex-row items-center justify-center ${moveInDate ? 'bg-primary-500' : 'bg-dark-border'
+                          }`}
                       >
                         {bookMutation.isPending ? (
                           <ActivityIndicator color="#fff" />

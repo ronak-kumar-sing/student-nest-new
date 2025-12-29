@@ -3,12 +3,13 @@ import sgMail from '@sendgrid/mail';
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
 const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@studentnest.com';
 const FROM_NAME = 'StudentNest';
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 // Initialize SendGrid
 if (SENDGRID_API_KEY) {
   sgMail.setApiKey(SENDGRID_API_KEY);
 } else {
-  console.warn('SendGrid API key not configured');
+  console.warn('SendGrid API key not configured - running in mock mode');
 }
 
 interface EmailOptions {
@@ -22,7 +23,12 @@ interface EmailOptions {
  * Send email using SendGrid
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
+  // In development without API key, simulate success
   if (!SENDGRID_API_KEY) {
+    if (IS_DEV) {
+      console.log(`[MOCK EMAIL] To: ${options.to}, Subject: ${options.subject}`);
+      return true;
+    }
     console.error('SendGrid API key not configured');
     return false;
   }
@@ -43,6 +49,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error sending email:', error);
+    // In development, return true even on error to allow testing
+    if (IS_DEV) {
+      console.log('[DEV MODE] Simulating successful email send');
+      return true;
+    }
     return false;
   }
 }
@@ -51,6 +62,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
  * Send OTP email
  */
 export async function sendOTPEmail(email: string, otp: string): Promise<boolean> {
+  // Log OTP in development mode for testing
+  if (IS_DEV) {
+    console.log(`\n========================================`);
+    console.log(`📧 [DEV OTP] Email: ${email}`);
+    console.log(`🔐 [DEV OTP] Code: ${otp}`);
+    console.log(`========================================\n`);
+  }
+
   const html = `
     <!DOCTYPE html>
     <html>

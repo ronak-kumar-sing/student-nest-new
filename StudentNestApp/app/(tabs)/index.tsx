@@ -11,6 +11,7 @@ import {
   Dimensions,
   Animated,
   Modal,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -30,8 +31,12 @@ import {
   ChevronRight,
   Users,
   Map,
+  Navigation,
+  Building2,
+  Settings,
 } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
+import { useLocation } from '../../hooks/useLocation';
 import { ROOM_TYPES } from '../../constants/config';
 import { FadeIn, SlideIn, ScaleIn, Shimmer } from '../../components/Animations';
 import RoomsMap from '../../components/map/RoomsMap';
@@ -42,15 +47,38 @@ const CARD_WIDTH = width - 48;
 export default function HomeScreen() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showMapView, setShowMapView] = useState(false);
+  const [showNearbyOnly, setShowNearbyOnly] = useState(true);
 
-  // Fetch rooms with error handling
+  // Check if user is an owner
+  const isOwner = user?.role?.toLowerCase() === 'owner';
+
+  // Build filters with location if available
+  const buildFilters = () => {
+    const filters: Record<string, any> = {};
+
+    if (showNearbyOnly && location.latitude && location.longitude) {
+      filters.lat = location.latitude;
+      filters.lng = location.longitude;
+      filters.maxDistance = 50; // 50 km radius
+    }
+
+    if (location.city && !filters.lat) {
+      filters.city = location.city;
+    }
+
+    return filters;
+  };
+
+  // Fetch rooms with location-based filtering
   const { data, isLoading, refetch, isRefetching, error } = useQuery({
-    queryKey: ['rooms'],
+    queryKey: ['rooms', location.latitude, location.longitude, location.city, showNearbyOnly],
     queryFn: async () => {
       try {
-        const response = await roomsApi.getAll({}, 1, 20);
+        const filters = buildFilters();
+        const response = await roomsApi.getAll(filters, 1, 20);
         if (__DEV__) {
           console.log('📦 Rooms API Response:', JSON.stringify(response, null, 2).substring(0, 500));
         }
@@ -63,12 +91,21 @@ export default function HomeScreen() {
       }
     },
     retry: 2,
+    enabled: true,
   });
 
+  // Refetch when location becomes available
+  useEffect(() => {
+    if (location.latitude && location.longitude && !location.loading) {
+      refetch();
+    }
+  }, [location.latitude, location.longitude, location.loading]);
+
   // Handle both response formats: { data: rooms } or { data: { rooms: [] } }
-  const rooms = Array.isArray(data?.data) 
-    ? data.data 
-    : (data?.data?.rooms || data?.rooms || []);
+  const responseData = data?.data as any;
+  const rooms = Array.isArray(responseData)
+    ? responseData
+    : (responseData?.rooms || []);
   const featuredRooms = rooms.slice(0, 5);
 
   // Debug log
@@ -148,6 +185,97 @@ export default function HomeScreen() {
     </View>
   );
 
+  // Owner Dashboard Quick Access
+  const OwnerQuickAccess = () => (
+    <SlideIn from="bottom" delay={100}>
+      <View className="mx-6 mb-6">
+        <Text className="text-white text-lg font-bold mb-4">Owner Dashboard</Text>
+        <View className="flex-row gap-3 flex-wrap">
+          <Pressable
+            onPress={() => router.push('/owner')}
+            className="flex-1 min-w-[45%] bg-primary-500 rounded-2xl p-4"
+          >
+            <Building2 size={24} color="#fff" />
+            <Text className="text-white font-bold mt-2">My Properties</Text>
+            <Text className="text-white/70 text-xs">Manage listings</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/owner/bookings')}
+            className="flex-1 min-w-[45%] bg-dark-surface border border-dark-border rounded-2xl p-4"
+          >
+            <HomeIcon size={24} color="#F97316" />
+            <Text className="text-white font-bold mt-2">Bookings</Text>
+            <Text className="text-dark-text text-xs">View requests</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/owner/visits')}
+            className="flex-1 min-w-[45%] bg-dark-surface border border-dark-border rounded-2xl p-4"
+          >
+            <Users size={24} color="#A855F7" />
+            <Text className="text-white font-bold mt-2">Visit Requests</Text>
+            <Text className="text-dark-text text-xs">Schedule visits</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push('/payments')}
+            className="flex-1 min-w-[45%] bg-dark-surface border border-dark-border rounded-2xl p-4"
+          >
+            <Settings size={24} color="#22C55E" />
+            <Text className="text-white font-bold mt-2">Payments</Text>
+            <Text className="text-dark-text text-xs">Track earnings</Text>
+          </Pressable>
+        </View>
+      </View>
+    </SlideIn>
+  );
+
+  // Location Banner
+  const LocationBanner = () => {
+    if (location.loading) {
+      return (
+        <View className="mx-6 mb-4 bg-dark-surface rounded-xl p-3 flex-row items-center">
+          <ActivityIndicator size="small" color="#F97316" />
+          <Text className="text-dark-text ml-3">Getting your location...</Text>
+        </View>
+      );
+    }
+
+    if (location.error || !location.latitude) {
+      return (
+        <Pressable
+          onPress={() => location.requestPermission()}
+          className="mx-6 mb-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 flex-row items-center"
+        >
+          <Navigation size={18} color="#EAB308" />
+          <View className="flex-1 ml-3">
+            <Text className="text-yellow-500 font-medium">Enable location</Text>
+            <Text className="text-dark-muted text-xs">See rooms near you</Text>
+          </View>
+          <ChevronRight size={18} color="#EAB308" />
+        </Pressable>
+      );
+    }
+
+    return (
+      <View className="mx-6 mb-4 bg-green-500/10 border border-green-500/30 rounded-xl p-3 flex-row items-center">
+        <MapPin size={18} color="#22C55E" />
+        <View className="flex-1 ml-3">
+          <Text className="text-green-500 font-medium">
+            {location.city || 'Your Location'}
+          </Text>
+          <Text className="text-dark-muted text-xs">Showing rooms near you</Text>
+        </View>
+        <Pressable
+          onPress={() => setShowNearbyOnly(!showNearbyOnly)}
+          className={`px-3 py-1.5 rounded-lg ${showNearbyOnly ? 'bg-green-500' : 'bg-dark-surface'}`}
+        >
+          <Text className={`text-xs font-medium ${showNearbyOnly ? 'text-white' : 'text-dark-text'}`}>
+            {showNearbyOnly ? 'Nearby' : 'All'}
+          </Text>
+        </Pressable>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-dark-bg" edges={['top']}>
       {/* Map View Modal */}
@@ -157,8 +285,8 @@ export default function HomeScreen() {
         presentationStyle="fullScreen"
         onRequestClose={() => setShowMapView(false)}
       >
-        <RoomsMap 
-          rooms={rooms} 
+        <RoomsMap
+          rooms={rooms}
           onClose={() => setShowMapView(false)}
           showCloseButton
         />
@@ -170,7 +298,10 @@ export default function HomeScreen() {
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={refetch}
+            onRefresh={() => {
+              location.refresh();
+              refetch();
+            }}
             tintColor="#F97316"
           />
         }
@@ -184,8 +315,15 @@ export default function HomeScreen() {
                   {isAuthenticated ? `Welcome back,` : 'Welcome to'}
                 </Text>
                 <Text className="text-white text-2xl font-bold">
-                  {isAuthenticated ? user?.name?.split(' ')[0] : 'StudentNest'} 👋
+                  {isAuthenticated ? (user?.name?.split(' ')[0] || user?.fullName?.split(' ')[0]) : 'StudentNest'} 👋
                 </Text>
+                {isOwner && (
+                  <View className="flex-row items-center mt-1">
+                    <View className="bg-primary-500/20 px-2 py-0.5 rounded-full">
+                      <Text className="text-primary-500 text-xs font-medium">Property Owner</Text>
+                    </View>
+                  </View>
+                )}
               </View>
               <View className="flex-row items-center gap-2">
                 {/* Map Button */}
@@ -216,6 +354,12 @@ export default function HomeScreen() {
           </View>
         </FadeIn>
 
+        {/* Location Banner */}
+        <LocationBanner />
+
+        {/* Owner Quick Access - Show only for owners */}
+        {isOwner && <OwnerQuickAccess />}
+
         {/* Categories */}
         <View className="mb-6">
           <View className="flex-row items-center justify-between px-6 mb-4">
@@ -237,31 +381,35 @@ export default function HomeScreen() {
               </Pressable>
             ))}
           </ScrollView>
-        </View>
+        </View >
 
         {/* Featured Rooms */}
-        {featuredRooms.length > 0 && (
-          <View className="mb-6">
-            <View className="flex-row items-center justify-between px-6 mb-4">
-              <Text className="text-white text-lg font-bold">Featured Rooms</Text>
-              <Pressable
-                onPress={() => router.push('/(tabs)/search')}
-                className="flex-row items-center"
-              >
-                <Text className="text-primary-500 font-medium">See All</Text>
-                <ChevronRight size={16} color="#F97316" />
-              </Pressable>
+        {
+          featuredRooms.length > 0 && (
+            <View className="mb-6">
+              <View className="flex-row items-center justify-between px-6 mb-4">
+                <Text className="text-white text-lg font-bold">
+                  {location.city ? `Rooms in ${location.city}` : 'Featured Rooms'}
+                </Text>
+                <Pressable
+                  onPress={() => router.push('/(tabs)/search')}
+                  className="flex-row items-center"
+                >
+                  <Text className="text-primary-500 font-medium">See All</Text>
+                  <ChevronRight size={16} color="#F97316" />
+                </Pressable>
+              </View>
+              <FlatList
+                data={featuredRooms}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 24 }}
+                keyExtractor={(item) => item.id || item._id || String(Math.random())}
+                renderItem={({ item }) => <RoomCard room={item} featured />}
+              />
             </View>
-            <FlatList
-              data={featuredRooms}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 24 }}
-              keyExtractor={(item) => item.id || item._id || String(Math.random())}
-              renderItem={({ item }) => <RoomCard room={item} featured />}
-            />
-          </View>
-        )}
+          )
+        }
 
         {/* Room Sharing Banner */}
         <SlideIn from="right" delay={200}>
@@ -289,7 +437,7 @@ export default function HomeScreen() {
             <Text className="text-dark-muted text-sm">{rooms.length} available</Text>
           </View>
 
-          {isLoading ? (
+          {isLoading || location.loading ? (
             <View>
               <RoomSkeleton />
               <RoomSkeleton />
@@ -305,7 +453,7 @@ export default function HomeScreen() {
                 <Text className="text-dark-muted mt-2 text-center text-sm px-4">
                   {error instanceof Error ? error.message : 'Please check your connection and try again'}
                 </Text>
-                <Pressable 
+                <Pressable
                   onPress={() => refetch()}
                   className="mt-4 bg-primary-500 px-6 py-3 rounded-xl"
                 >
@@ -318,9 +466,19 @@ export default function HomeScreen() {
               <View className="py-8 items-center">
                 <HomeIcon size={48} color="#71717A" />
                 <Text className="text-dark-text mt-4 text-center">
-                  No rooms available at the moment
+                  {location.city
+                    ? `No rooms available in ${location.city}`
+                    : 'No rooms available at the moment'}
                 </Text>
-                <Pressable 
+                {showNearbyOnly && location.latitude && (
+                  <Pressable
+                    onPress={() => setShowNearbyOnly(false)}
+                    className="mt-4 bg-primary-500 px-6 py-3 rounded-xl"
+                  >
+                    <Text className="text-white font-semibold">Show All Rooms</Text>
+                  </Pressable>
+                )}
+                <Pressable
                   onPress={() => refetch()}
                   className="mt-4 bg-dark-surface border border-dark-border px-6 py-3 rounded-xl"
                 >
@@ -329,7 +487,7 @@ export default function HomeScreen() {
               </View>
             </FadeIn>
           ) : (
-            rooms.slice(5).map((room, index) => (
+            rooms.slice(5).map((room: Room, index: number) => (
               <RoomCard key={room.id || room._id} room={room} index={index} />
             ))
           )}

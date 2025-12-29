@@ -13,7 +13,9 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  ChevronRight
+  ChevronRight,
+  CreditCard,
+  IndianRupee,
 } from 'lucide-react-native';
 
 const STATUS_COLORS = {
@@ -21,6 +23,12 @@ const STATUS_COLORS = {
   confirmed: { bg: 'bg-green-500/20', text: 'text-green-500', icon: CheckCircle },
   cancelled: { bg: 'bg-red-500/20', text: 'text-red-500', icon: XCircle },
   completed: { bg: 'bg-blue-500/20', text: 'text-blue-500', icon: CheckCircle },
+};
+
+const PAYMENT_STATUS_COLORS = {
+  pending: { bg: 'bg-orange-500/20', text: 'text-orange-500' },
+  partial: { bg: 'bg-yellow-500/20', text: 'text-yellow-500' },
+  paid: { bg: 'bg-green-500/20', text: 'text-green-500' },
 };
 
 export default function BookingsScreen() {
@@ -34,9 +42,10 @@ export default function BookingsScreen() {
   });
 
   // Handle nested API response: data.data.bookings or data.data if it's already an array
-  const bookings = Array.isArray(data?.data) 
-    ? data.data 
-    : (data?.data?.bookings || []);
+  const responseData = data?.data as any;
+  const bookings = Array.isArray(responseData)
+    ? responseData
+    : (responseData?.bookings || []);
 
   if (!isAuthenticated) {
     return (
@@ -58,9 +67,22 @@ export default function BookingsScreen() {
     );
   }
 
+  const handlePayNow = (booking: Booking) => {
+    router.push({
+      pathname: '/payments/checkout',
+      params: {
+        bookingId: booking._id,
+        amount: booking.totalAmount.toString(),
+        roomTitle: booking.room?.title || 'Room',
+      },
+    });
+  };
+
   const BookingCard = ({ booking }: { booking: Booking }) => {
     const status = STATUS_COLORS[booking.status] || STATUS_COLORS.pending;
+    const paymentStatus = PAYMENT_STATUS_COLORS[booking.paymentStatus] || PAYMENT_STATUS_COLORS.pending;
     const StatusIcon = status.icon;
+    const needsPayment = booking.status === 'pending' && booking.paymentStatus !== 'paid';
 
     return (
       <Pressable
@@ -70,12 +92,12 @@ export default function BookingsScreen() {
         <View className="flex-row">
           <Image
             source={{ uri: booking.room.images?.[0] || 'https://via.placeholder.com/100x100' }}
-            style={{ width: 100, height: 100 }}
+            style={{ width: 100, height: 120 }}
             contentFit="cover"
           />
           <View className="flex-1 p-3">
             <View className="flex-row items-center justify-between mb-1">
-              <Text className="text-white font-bold text-base" numberOfLines={1}>
+              <Text className="text-white font-bold text-base flex-1" numberOfLines={1}>
                 {booking.room.title}
               </Text>
               <ChevronRight size={16} color="#71717A" />
@@ -86,7 +108,7 @@ export default function BookingsScreen() {
                 {booking.room.location?.city}
               </Text>
             </View>
-            <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center justify-between mb-2">
               <View className={`flex-row items-center px-2 py-1 rounded-lg ${status.bg}`}>
                 <StatusIcon size={12} color={status.text.replace('text-', '#').replace('-500', '')} />
                 <Text className={`text-xs font-medium ml-1 capitalize ${status.text}`}>
@@ -95,8 +117,40 @@ export default function BookingsScreen() {
               </View>
               <Text className="text-primary-500 font-bold">₹{booking.monthlyRent}/mo</Text>
             </View>
+            {/* Payment Status */}
+            <View className="flex-row items-center justify-between">
+              <View className={`flex-row items-center px-2 py-1 rounded-lg ${paymentStatus.bg}`}>
+                <CreditCard size={10} color={paymentStatus.text.includes('green') ? '#22C55E' : paymentStatus.text.includes('orange') ? '#F97316' : '#EAB308'} />
+                <Text className={`text-xs font-medium ml-1 capitalize ${paymentStatus.text}`}>
+                  {booking.paymentStatus === 'paid' ? 'Paid' : 'Payment Pending'}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
+
+        {/* Payment Section */}
+        {needsPayment && (
+          <View className="px-4 py-3 border-t border-dark-border bg-primary-500/5">
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className="text-dark-text text-xs">Total Due</Text>
+                <View className="flex-row items-center">
+                  <IndianRupee size={14} color="#F97316" />
+                  <Text className="text-primary-500 font-bold text-lg">{booking.totalAmount?.toLocaleString('en-IN')}</Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={() => handlePayNow(booking)}
+                className="bg-primary-500 px-6 py-2.5 rounded-xl flex-row items-center"
+              >
+                <CreditCard size={16} color="#fff" />
+                <Text className="text-white font-bold ml-2">Pay Now</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
         <View className="px-4 py-3 border-t border-dark-border flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Calendar size={14} color="#71717A" />

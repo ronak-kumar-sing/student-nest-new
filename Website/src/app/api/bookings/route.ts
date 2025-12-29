@@ -4,6 +4,7 @@ import Booking from '../../../lib/models/Booking';
 import Room from '../../../lib/models/Room';
 import User from '../../../lib/models/User';
 import Negotiation from '../../../lib/models/Negotiation';
+import Notification from '../../../lib/models/Notification';
 import { verifyAccessToken } from '../../../lib/utils/jwt';
 
 // Helper function to verify JWT token
@@ -190,6 +191,24 @@ export async function POST(request: NextRequest) {
       { path: 'student', select: 'fullName phone email profilePhoto' },
       { path: 'owner', select: 'fullName phone email profilePhoto' }
     ]);
+
+    // Send notification to owner about new booking request
+    try {
+      await Notification.create({
+        userId: (room.owner as any)._id,
+        type: 'booking',
+        title: 'New Booking Request',
+        message: `${student.fullName} has requested to book "${room.title}"`,
+        data: {
+          bookingId: booking._id,
+          roomId: room._id,
+          actionUrl: '/owner/bookings'
+        },
+        priority: 'high',
+      });
+    } catch (notifyError) {
+      console.error('Error creating notification:', notifyError);
+    }
 
     return NextResponse.json({
       success: true,

@@ -103,9 +103,10 @@ export default function OwnerBookingsScreen() {
   });
 
   // Handle nested API response
-  const bookings: Booking[] = Array.isArray(data?.data)
-    ? data.data
-    : (data?.data?.bookings || []);
+  const responseData = data?.data as any;
+  const bookings: Booking[] = Array.isArray(responseData)
+    ? responseData
+    : (responseData?.bookings || []);
 
   const filteredBookings = bookings.filter((b) => {
     if (activeTab === 'all') return true;
@@ -269,9 +270,8 @@ export default function OwnerBookingsScreen() {
           <Pressable
             key={tab.key}
             onPress={() => setActiveTab(tab.key as any)}
-            className={`flex-1 py-2.5 rounded-xl items-center ${
-              activeTab === tab.key ? 'bg-primary-500' : 'bg-dark-surface'
-            }`}
+            className={`flex-1 py-2.5 rounded-xl items-center ${activeTab === tab.key ? 'bg-primary-500' : 'bg-dark-surface'
+              }`}
           >
             <Text className={`font-medium ${activeTab === tab.key ? 'text-white' : 'text-dark-text'}`}>
               {tab.label} ({tab.count})
@@ -306,8 +306,8 @@ export default function OwnerBookingsScreen() {
                 {activeTab === 'pending'
                   ? 'No pending booking requests'
                   : activeTab === 'confirmed'
-                  ? 'No confirmed bookings yet'
-                  : 'You have no bookings yet'}
+                    ? 'No confirmed bookings yet'
+                    : 'You have no bookings yet'}
               </Text>
             </View>
           }

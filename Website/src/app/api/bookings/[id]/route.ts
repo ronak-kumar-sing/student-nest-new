@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '../../../../lib/db/connection';
 import Booking from '../../../../lib/models/Booking';
+import Notification from '../../../../lib/models/Notification';
 import { verifyAccessToken } from '../../../../lib/utils/jwt';
 
 // Helper function to verify JWT token
@@ -117,13 +118,42 @@ export async function PUT(
     // Update allowed fields
     if (body.status && bookingOwner === decoded.userId) {
       // Only owner can update status
+      const previousStatus = booking.status;
       booking.status = body.status;
 
       if (body.status === 'confirmed') {
         booking.confirmedAt = new Date();
-      } else if (body.status === 'cancelled') {
+      } else if (body.status === 'cancelled' || body.status === 'rejected') {
         booking.cancelledAt = new Date();
         booking.cancellationReason = body.cancellationReason || 'Cancelled by owner';
+      }
+
+      // Send notification to student about status change
+      try {
+        await booking.populate('room', 'title');
+        const roomTitle = (booking.room as any)?.title || 'your room';
+
+        if (body.status === 'confirmed' && previousStatus === 'pending') {
+          await Notification.create({
+            userId: bookingStudent,
+            type: 'booking',
+            title: 'Booking Confirmed!',
+            message: `Great news! Your booking for "${roomTitle}" has been confirmed by the owner.`,
+            data: { bookingId: booking._id, actionUrl: '/student/bookings' },
+            priority: 'high',
+          });
+        } else if (body.status === 'rejected' || (body.status === 'cancelled' && previousStatus === 'pending')) {
+          await Notification.create({
+            userId: bookingStudent,
+            type: 'booking',
+            title: 'Booking Declined',
+            message: `Your booking request for "${roomTitle}" was declined.${body.cancellationReason ? ` Reason: ${body.cancellationReason}` : ''}`,
+            data: { bookingId: booking._id, actionUrl: '/student/bookings' },
+            priority: 'normal',
+          });
+        }
+      } catch (notifyError) {
+        console.error('Error creating notification:', notifyError);
       }
     }
 

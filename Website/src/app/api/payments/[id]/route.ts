@@ -28,9 +28,10 @@ async function getAuthenticatedUser(request: NextRequest) {
 // GET /api/payments/[id] - Get payment details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId, role, error } = await getAuthenticatedUser(request);
 
     if (error) {
@@ -42,7 +43,7 @@ export async function GET(
 
     await connectDB();
 
-    const payment = await Payment.findById(params.id)
+    const payment = await Payment.findById(id)
       .populate('bookingId', 'startDate endDate status monthlyRent')
       .populate('studentId', 'fullName email phone')
       .populate('ownerId', 'fullName email phone')
@@ -107,9 +108,10 @@ export async function GET(
 // PATCH /api/payments/[id] - Update payment status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId, role, error } = await getAuthenticatedUser(request);
 
     if (error) {
@@ -124,7 +126,7 @@ export async function PATCH(
     const body = await request.json();
     const { status, transactionId, gatewayResponse, receiptUrl, notes } = body;
 
-    const payment = await Payment.findById(params.id);
+    const payment = await Payment.findById(id);
 
     if (!payment) {
       return NextResponse.json({

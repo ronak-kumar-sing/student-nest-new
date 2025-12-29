@@ -1,15 +1,15 @@
 import { z } from 'zod';
 import { emailSchema, phoneSchema } from './authSchemas';
 
-// Send OTP schemas
+// Send OTP schemas - includes 'verification' for mobile app compatibility
 export const sendEmailOTPSchema = z.object({
   value: emailSchema,
-  purpose: z.enum(['signup', 'login', 'reset-password']).optional().default('signup')
+  purpose: z.enum(['signup', 'login', 'reset-password', 'verification']).optional().default('signup')
 });
 
 export const sendPhoneOTPSchema = z.object({
   value: phoneSchema,
-  purpose: z.enum(['signup', 'login', 'reset-password']).optional().default('signup')
+  purpose: z.enum(['signup', 'login', 'reset-password', 'verification']).optional().default('signup')
 });
 
 // Verify OTP schemas

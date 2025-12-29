@@ -1,13 +1,41 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
+// Check if mock mode should be used
+function shouldUseMockMode(): boolean {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  const mockEnabled = process.env.MOCK_PAYMENTS === 'true' || process.env.NODE_ENV === 'development';
+
+  // Use mock mode if credentials are missing, placeholders, or explicitly enabled
+  if (!keyId || !keySecret) return true;
+  if (keyId.includes('xxxx') || keySecret === 'your_razorpay_key_secret') return true;
+
+  return false;
+}
+
 // Validate Razorpay credentials
 function validateRazorpayCredentials() {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
     console.error('❌ RAZORPAY CREDENTIALS MISSING!');
     console.error('Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your .env.local file');
+    console.error('Get your credentials from: https://dashboard.razorpay.com/app/keys');
     throw new Error('Razorpay credentials not configured. Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your .env.local file');
   }
+
+  // Check if using placeholder values
+  if (keyId.includes('xxxx') || keySecret === 'your_razorpay_key_secret') {
+    console.error('❌ RAZORPAY CREDENTIALS ARE PLACEHOLDERS!');
+    console.error('Please replace with your actual Razorpay API credentials');
+    console.error('Get your credentials from: https://dashboard.razorpay.com/app/keys');
+    throw new Error('Razorpay credentials are placeholder values. Please use your actual API keys.');
+  }
+
+  // Log key format for debugging (don't log actual key)
+  console.log('[Razorpay] Using key ID:', keyId.substring(0, 10) + '...');
 }
 
 // Initialize Razorpay instance
@@ -38,13 +66,44 @@ export interface VerifyPaymentOptions {
 }
 
 /**
+ * Create a mock order for development
+ */
+function createMockOrder(options: CreateOrderOptions) {
+  const mockOrderId = `order_mock_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  console.log('[Razorpay] ⚠️ MOCK MODE: Creating mock order');
+
+  return {
+    success: true,
+    data: {
+      id: mockOrderId,
+      entity: 'order',
+      amount: options.amount,
+      amount_paid: 0,
+      amount_due: options.amount,
+      currency: options.currency || 'INR',
+      receipt: options.receipt || `receipt_${Date.now()}`,
+      status: 'created',
+      notes: options.notes || {},
+      created_at: Math.floor(Date.now() / 1000),
+    },
+    isMock: true,
+  };
+}
+
+/**
  * Create a Razorpay order
  */
 export async function createRazorpayOrder(options: CreateOrderOptions) {
+  // Check if we should use mock mode
+  if (shouldUseMockMode()) {
+    console.log('[Razorpay] Using MOCK mode - Razorpay credentials not configured');
+    return createMockOrder(options);
+  }
+
   try {
     console.log('[Razorpay] Getting instance...');
     const instance = getRazorpayInstance();
-    
+
     console.log('[Razorpay] Creating order with options:', {
       amount: options.amount,
       currency: options.currency || 'INR',
@@ -74,12 +133,12 @@ export async function createRazorpayOrder(options: CreateOrderOptions) {
     console.error('[Razorpay] Error message:', error.message);
     console.error('[Razorpay] Error details:', error);
     console.error('[Razorpay] Error stack:', error.stack);
-    
+
     // Check if it's a Razorpay API error
     if (error.error) {
       console.error('[Razorpay] API Error:', error.error);
     }
-    
+
     return {
       success: false,
       error: error.message || 'Failed to create order',

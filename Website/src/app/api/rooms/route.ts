@@ -157,19 +157,31 @@ export async function GET(request: NextRequest) {
     const lng = searchParams.get('lng');
     const maxDistance = searchParams.get('maxDistance'); // in kilometers
 
+    // Flag to indicate if we need geospatial sorting
+    let useGeoQuery = false;
+    let geoFilter: any = null;
+
     if (lat && lng && maxDistance) {
-      // Geospatial query
       const latitude = parseFloat(lat);
       const longitude = parseFloat(lng);
       const distance = parseFloat(maxDistance);
 
+      // Use $geoWithin for filtering (compatible with countDocuments)
+      // We'll use aggregation pipeline for sorting by distance
+      useGeoQuery = true;
+      geoFilter = {
+        lat: latitude,
+        lng: longitude,
+        distance: distance
+      };
+
+      // Use $geoWithin with $centerSphere for count query compatibility
       filter['location.coordinates'] = {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [longitude, latitude]
-          },
-          $maxDistance: distance * 1000 // Convert km to meters
+        $geoWithin: {
+          $centerSphere: [
+            [longitude, latitude],
+            distance / 6378.1 // Convert km to radians (Earth's radius in km)
+          ]
         }
       };
     }
@@ -215,12 +227,53 @@ export async function GET(request: NextRequest) {
     const total = await Room.countDocuments(filter);
 
     // Fetch rooms with owner information
-    const rooms = await Room.find(filter)
-      .populate('owner', 'fullName email phone profilePhoto isVerified emailVerified phoneVerified averageRating responseRate businessName')
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    let rooms;
+
+    if (useGeoQuery && geoFilter) {
+      // Use aggregation pipeline for geospatial query with distance sorting
+      const aggregationPipeline: any[] = [
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: [geoFilter.lng, geoFilter.lat]
+            },
+            distanceField: 'distance',
+            maxDistance: geoFilter.distance * 1000, // Convert km to meters
+            spherical: true
+          }
+        },
+        // Apply other filters
+        { $match: { ...filter, 'location.coordinates': { $exists: true } } },
+        // Populate owner
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'owner',
+            foreignField: '_id',
+            as: 'owner',
+            pipeline: [
+              { $project: { fullName: 1, email: 1, phone: 1, profilePhoto: 1, isVerified: 1, emailVerified: 1, phoneVerified: 1, averageRating: 1, responseRate: 1, businessName: 1 } }
+            ]
+          }
+        },
+        { $unwind: { path: '$owner', preserveNullAndEmptyArrays: true } },
+        { $skip: skip },
+        { $limit: limit }
+      ];
+
+      // Remove the $geoWithin filter for aggregation (we use $geoNear instead)
+      delete filter['location.coordinates'];
+
+      rooms = await Room.aggregate(aggregationPipeline);
+    } else {
+      rooms = await Room.find(filter)
+        .populate('owner', 'fullName email phone profilePhoto isVerified emailVerified phoneVerified averageRating responseRate businessName')
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .lean();
+    }
 
     // Filter by verified owner if requested (post-population)
     let filteredRooms = rooms;

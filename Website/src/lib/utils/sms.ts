@@ -3,6 +3,7 @@ import twilio from 'twilio';
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || '';
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 let twilioClient: ReturnType<typeof twilio> | null = null;
 
@@ -10,7 +11,7 @@ let twilioClient: ReturnType<typeof twilio> | null = null;
 if (TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN) {
   twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 } else {
-  console.warn('Twilio credentials not configured');
+  console.warn('Twilio credentials not configured - running in mock mode');
 }
 
 interface SMSOptions {
@@ -22,13 +23,13 @@ interface SMSOptions {
  * Send SMS using Twilio
  */
 export async function sendSMS(options: SMSOptions): Promise<boolean> {
-  if (!twilioClient) {
+  // In development without credentials, simulate success
+  if (!twilioClient || !TWILIO_PHONE_NUMBER) {
+    if (IS_DEV) {
+      console.log(`[MOCK SMS] To: ${options.to}, Body: ${options.body}`);
+      return true;
+    }
     console.error('Twilio client not initialized');
-    return false;
-  }
-
-  if (!TWILIO_PHONE_NUMBER) {
-    console.error('Twilio phone number not configured');
     return false;
   }
 
@@ -43,6 +44,11 @@ export async function sendSMS(options: SMSOptions): Promise<boolean> {
     return true;
   } catch (error) {
     console.error('Error sending SMS:', error);
+    // In development, return true even on error to allow testing
+    if (IS_DEV) {
+      console.log('[DEV MODE] Simulating successful SMS send');
+      return true;
+    }
     return false;
   }
 }
@@ -51,6 +57,14 @@ export async function sendSMS(options: SMSOptions): Promise<boolean> {
  * Send OTP SMS
  */
 export async function sendOTPSMS(phone: string, otp: string): Promise<boolean> {
+  // Log OTP in development mode for testing
+  if (IS_DEV) {
+    console.log(`\n========================================`);
+    console.log(`📱 [DEV OTP] Phone: ${phone}`);
+    console.log(`🔐 [DEV OTP] Code: ${otp}`);
+    console.log(`========================================\n`);
+  }
+
   const body = `Your StudentNest verification code is: ${otp}. Valid for 10 minutes. Do not share this code with anyone.`;
 
   return sendSMS({
