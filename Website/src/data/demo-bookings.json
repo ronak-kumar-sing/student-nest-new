@@ -1,0 +1,140 @@
+{
+    "bookings": [
+        {
+            "_id": "booking_001",
+            "room": "room_001",
+            "student": "student_001",
+            "owner": "owner_001",
+            "moveInDate": "2026-02-01T00:00:00Z",
+            "duration": 11,
+            "monthlyRent": 12000,
+            "securityDeposit": 12000,
+            "maintenanceCharges": 1000,
+            "totalAmount": 145000,
+            "status": "confirmed",
+            "paymentStatus": "partial",
+            "paymentDetails": {
+                "securityDepositPaid": 12000,
+                "firstMonthRentPaid": 12000,
+                "maintenancePaid": 1000,
+                "totalPaid": 25000,
+                "paymentMethod": "online",
+                "transactionId": "TXN20260125001",
+                "paymentDate": "2026-01-25T14:30:00Z"
+            },
+            "agreementType": "yearly",
+            "studentNotes": "Looking forward to moving in. Please ensure WiFi is set up before my arrival.",
+            "ownerNotes": "Confirmed booking. Room will be ready by Jan 31st.",
+            "confirmedAt": "2026-01-25T15:00:00Z",
+            "extensionRequests": [],
+            "studentReviewSubmitted": false,
+            "ownerReviewSubmitted": false,
+            "createdAt": "2026-01-24T10:00:00Z",
+            "updatedAt": "2026-01-25T15:00:00Z"
+        },
+        {
+            "_id": "booking_002",
+            "room": "room_004",
+            "student": "student_003",
+            "owner": "owner_002",
+            "moveInDate": "2026-01-05T00:00:00Z",
+            "moveOutDate": "2026-07-05T00:00:00Z",
+            "duration": 6,
+            "monthlyRent": 11000,
+            "securityDeposit": 11000,
+            "maintenanceCharges": 0,
+            "totalAmount": 77000,
+            "status": "active",
+            "paymentStatus": "paid",
+            "paymentDetails": {
+                "securityDepositPaid": 11000,
+                "firstMonthRentPaid": 11000,
+                "maintenancePaid": 0,
+                "totalPaid": 77000,
+                "paymentMethod": "bank_transfer",
+                "transactionId": "TXN20260103001",
+                "paymentDate": "2026-01-03T16:00:00Z"
+            },
+            "agreementType": "half_yearly",
+            "agreementDocument": {
+                "url": "https://example.com/agreements/booking_002_agreement.pdf",
+                "uploadedAt": "2026-01-05T09:00:00Z"
+            },
+            "studentNotes": "Very satisfied with the accommodation. Food quality is excellent.",
+            "ownerNotes": "Excellent tenant. Very respectful and timely with payments.",
+            "confirmedAt": "2026-01-04T10:00:00Z",
+            "checkInDetails": {
+                "checkedInAt": "2026-01-05T11:00:00Z",
+                "checkedInBy": "owner_002",
+                "notes": "Smooth check-in. All amenities explained.",
+                "meterReadings": {
+                    "electricity": 1234,
+                    "water": 567
+                },
+                "roomCondition": "Excellent",
+                "photos": [
+                    "/checkin/booking_002_room.jpg",
+                    "/checkin/booking_002_bathroom.jpg"
+                ]
+            },
+            "extensionRequests": [],
+            "studentReviewSubmitted": true,
+            "ownerReviewSubmitted": false,
+            "createdAt": "2026-01-03T14:00:00Z",
+            "updatedAt": "2026-01-28T12:00:00Z"
+        },
+        {
+            "_id": "booking_003",
+            "room": "room_002",
+            "student": "student_002",
+            "owner": "owner_001",
+            "moveInDate": "2025-12-15T00:00:00Z",
+            "moveOutDate": "2026-01-20T00:00:00Z",
+            "duration": 1,
+            "monthlyRent": 7500,
+            "securityDeposit": 7500,
+            "maintenanceCharges": 500,
+            "totalAmount": 15500,
+            "status": "completed",
+            "paymentStatus": "paid",
+            "paymentDetails": {
+                "securityDepositPaid": 7500,
+                "firstMonthRentPaid": 7500,
+                "maintenancePaid": 500,
+                "totalPaid": 15500,
+                "paymentMethod": "upi",
+                "transactionId": "UPI202512140001",
+                "paymentDate": "2025-12-14T10:00:00Z"
+            },
+            "agreementType": "monthly",
+            "studentNotes": "Was a short stay but good experience overall.",
+            "ownerNotes": "Completed stay. Security deposit refunded.",
+            "confirmedAt": "2025-12-14T12:00:00Z",
+            "completedAt": "2026-01-20T12:00:00Z",
+            "checkInDetails": {
+                "checkedInAt": "2025-12-15T10:00:00Z",
+                "checkedInBy": "owner_001",
+                "meterReadings": {
+                    "electricity": 890
+                },
+                "roomCondition": "Good"
+            },
+            "checkOutDetails": {
+                "checkedOutAt": "2026-01-20T11:00:00Z",
+                "checkedOutBy": "student_002",
+                "meterReadings": {
+                    "electricity": 950
+                },
+                "roomCondition": "Good",
+                "utilityCharges": 300,
+                "finalSettlement": 7200
+            },
+            "refundAmount": 7200,
+            "refundStatus": "completed",
+            "studentReviewSubmitted": true,
+            "ownerReviewSubmitted": true,
+            "createdAt": "2025-12-13T09:00:00Z",
+            "updatedAt": "2026-01-21T10:00:00Z"
+        }
+    ]
+}

@@ -8,28 +8,31 @@ export default function SocialProofSection() {
   // Reduced from 6 to 3 testimonials as requested
   const testimonials = [
     {
-      quote: "Found my perfect PG within 2 days! The verification process made me feel safe, and the owner was so responsive.",
-      author: "Priya S.",
-      role: "Engineering Student",
+      quote: "Found my perfect PG within 2 days! The verification process made me feel safe, and the owner was so responsive. Highly recommend to all students!",
+      author: "Priya Sharma",
+      role: "B.Tech Student",
       college: "IIT Delhi",
       rating: 5,
-      avatar: "P"
+      avatar: "P",
+      verified: true
     },
     {
-      quote: "As a property owner, StudentNest helped me connect with genuine students. The platform is so easy to use!",
-      author: "Rajesh M.",
+      quote: "As a property owner, StudentNest helped me connect with genuine, verified students. Filled my 3 rooms in just one week!",
+      author: "Rajesh Mehta",
       role: "Property Owner",
-      location: "Near DU Campus",
+      location: "Near DU North Campus",
       rating: 5,
-      avatar: "R"
+      avatar: "R",
+      verified: true
     },
     {
-      quote: "Transparent pricing, verified owners, and great support. This is how student housing should work!",
-      author: "Sneha T.",
-      role: "Medical Student",
+      quote: "Transparent pricing, verified owners, and excellent support team. This is exactly how student housing should work. Love the platform!",
+      author: "Sneha Thakur",
+      role: "MBBS Student",
       college: "AIIMS Delhi",
       rating: 5,
-      avatar: "S"
+      avatar: "S",
+      verified: true
     }
   ];
 
@@ -63,10 +66,14 @@ export default function SocialProofSection() {
             </span>
           </h2>
 
-          <p className="text-xl text-[#a1a1aa] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-[#a1a1aa] max-w-3xl mx-auto leading-relaxed mb-4">
             Real feedback from students and property owners who have successfully
             connected through our platform.
           </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#10b981]/10 border border-[#10b981]/30">
+            <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></div>
+            <span className="text-sm text-[#10b981] font-medium">15 students joined this week</span>
+          </div>
         </div>
 
         {/* Stats grid */}
@@ -116,7 +123,14 @@ export default function SocialProofSection() {
                 </div>
                 <div>
                   <div className="text-white font-semibold">{testimonial.author}</div>
-                  <div className="text-[#a1a1aa] text-sm">{testimonial.role}</div>
+                  <div className="text-[#a1a1aa] text-sm flex items-center gap-2">
+                    {testimonial.role}
+                    {testimonial.verified && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#10b981]/10 text-[#10b981] text-xs">
+                        ✓ Verified
+                      </span>
+                    )}
+                  </div>
                   {testimonial.college && (
                     <div className="text-[#7c3aed] text-sm">{testimonial.college}</div>
                   )}

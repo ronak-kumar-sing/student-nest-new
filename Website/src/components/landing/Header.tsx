@@ -28,6 +28,7 @@ export default function Header() {
 
   return (
     <motion.header
+      role="banner"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
         ? "bg-[#0a0a0b]/90 backdrop-blur-lg border-b border-[#2a2a2b]"
         : "bg-transparent"
@@ -44,13 +45,17 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <Link href="/" className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="flex items-center gap-3"
+              aria-label="Student Nest home page"
+            >
               <StudentNestLogo showText={true} />
             </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8" aria-label="Main navigation">
             {navigation.map((item) => (
               <motion.div
                 key={item.name}
@@ -60,6 +65,7 @@ export default function Header() {
                 <Link
                   href={item.href}
                   className="text-[#a1a1aa] hover:text-white transition-colors duration-300 font-medium"
+                  aria-label={item.name === 'Home' ? 'Go to home page' : `Jump to ${item.name} section`}
                 >
                   {item.name}
                 </Link>
@@ -97,6 +103,9 @@ export default function Header() {
             className="lg:hidden p-2 text-[#a1a1aa] hover:text-white transition-colors duration-300"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             whileTap={{ scale: 0.95 }}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </motion.button>
@@ -105,11 +114,14 @@ export default function Header() {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <motion.div
+            id="mobile-menu"
             className="lg:hidden absolute top-full left-0 right-0 bg-[#0a0a0b]/95 backdrop-blur-lg border-b border-[#2a2a2b]"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
+            role="navigation"
+            aria-label="Mobile navigation"
           >
             <div className="px-4 py-6 space-y-4">
               {navigation.map((item) => (

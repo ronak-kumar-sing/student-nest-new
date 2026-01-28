@@ -1,0 +1,695 @@
+{
+    "rooms": [
+        {
+            "_id": "room_001",
+            "title": "Cozy Single Room Near DU North Campus",
+            "description": "Fully furnished single room with attached bathroom, WiFi, and AC. Perfect for students seeking independence.",
+            "fullDescription": "This spacious single room is located in Model Town, just 10 minutes from DU North Campus. The room comes fully furnished with a comfortable bed, study table, chair, wardrobe, and attached bathroom. High-speed WiFi and AC are included. The building has 24/7 security, power backup, and CCTV surveillance. Common areas include a shared kitchen and laundry facilities. The neighborhood is safe and well-connected with metro and bus services.",
+            "price": 12000,
+            "images": [
+                "/demo-rooms/room-1-main.jpg",
+                "/demo-rooms/room-1-bathroom.jpg",
+                "/demo-rooms/room-1-study.jpg",
+                "/demo-rooms/room-1-building.jpg"
+            ],
+            "roomType": "single",
+            "accommodationType": "pg",
+            "maxSharingCapacity": 1,
+            "features": {
+                "area": 120,
+                "floor": 2,
+                "totalFloors": 3,
+                "furnished": true,
+                "balcony": true,
+                "attached_bathroom": true
+            },
+            "location": {
+                "address": "123, Model Town",
+                "fullAddress": "123, Block B, Model Town, Delhi - 110009",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110009",
+                "coordinates": {
+                    "lat": 28.7196,
+                    "lng": 77.1910
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "Delhi University - North Campus",
+                        "distance": "2 km",
+                        "commute": "10 mins by metro"
+                    },
+                    {
+                        "name": "IP University",
+                        "distance": "5 km",
+                        "commute": "20 mins by bus"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "Model Town Metro Station",
+                        "distance": "500m",
+                        "type": "metro"
+                    },
+                    {
+                        "name": "Max Hospital",
+                        "distance": "1 km",
+                        "type": "hospital"
+                    },
+                    {
+                        "name": "Big Bazaar",
+                        "distance": "800m",
+                        "type": "mall"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "ac",
+                "powerBackup",
+                "security",
+                "housekeeping",
+                "laundry",
+                "parking",
+                "cctv",
+                "bed",
+                "wardrobe",
+                "study_table",
+                "chair"
+            ],
+            "detailedAmenities": [
+                "High-speed WiFi (100 Mbps)",
+                "Air Conditioning",
+                "24/7 Power Backup",
+                "24/7 Security Guard",
+                "Weekly Housekeeping",
+                "Laundry Service",
+                "Bike Parking",
+                "CCTV Coverage"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-02-01T00:00:00Z",
+                "totalRooms": 1,
+                "availableRooms": 1
+            },
+            "owner": "owner_001",
+            "rating": 4.7,
+            "totalReviews": 8,
+            "status": "active",
+            "securityDeposit": 12000,
+            "maintenanceCharges": 1000,
+            "electricityCharges": "extra",
+            "rules": {
+                "guestsAllowed": true,
+                "smokingAllowed": false,
+                "alcoholAllowed": false,
+                "petsAllowed": false,
+                "genderPreference": "any",
+                "curfewTime": "11:00 PM"
+            },
+            "totalRooms": 1,
+            "occupiedRooms": 0,
+            "tags": [
+                "near_metro",
+                "fully_furnished",
+                "safe",
+                "female_friendly"
+            ],
+            "isVerified": true,
+            "totalBookings": 4,
+            "monthlyRevenue": 12000,
+            "createdAt": "2026-01-06T10:00:00Z",
+            "updatedAt": "2026-01-28T10:00:00Z"
+        },
+        {
+            "_id": "room_002",
+            "title": "Affordable Shared Room for 2 - GTB Nagar",
+            "description": "Budget-friendly shared room near DU North Campus. Includes WiFi, mess facility, and good connectivity.",
+            "fullDescription": "This well-maintained shared room in GTB Nagar can accommodate 2 students comfortably. Each student gets a separate bed, study space, and storage. The PG includes homestyle meals (breakfast and dinner), unlimited WiFi, and common areas for recreation. Located just 5 minutes walk from GTB Nagar metro station and very close to DU North Campus.",
+            "price": 7500,
+            "images": [
+                "/demo-rooms/room-2-main.jpg",
+                "/demo-rooms/room-2-beds.jpg",
+                "/demo-rooms/room-2-mess.jpg",
+                "/demo-rooms/room-2-common.jpg"
+            ],
+            "roomType": "shared",
+            "accommodationType": "pg",
+            "maxSharingCapacity": 2,
+            "features": {
+                "area": 150,
+                "floor": 1,
+                "totalFloors": 3,
+                "furnished": true,
+                "balcony": false,
+                "attached_bathroom": false
+            },
+            "location": {
+                "address": "45, GTB Nagar",
+                "fullAddress": "45, Near GTB Nagar Metro, Delhi - 110009",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110009",
+                "coordinates": {
+                    "lat": 28.6963,
+                    "lng": 77.2090
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "Delhi University - North Campus",
+                        "distance": "1.5 km",
+                        "commute": "5 mins walk + metro"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "GTB Nagar Metro Station",
+                        "distance": "300m",
+                        "type": "metro"
+                    },
+                    {
+                        "name": "Local Market",
+                        "distance": "200m",
+                        "type": "market"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "security",
+                "housekeeping",
+                "laundry",
+                "cafeteria",
+                "cctv",
+                "bed",
+                "wardrobe",
+                "study_table"
+            ],
+            "detailedAmenities": [
+                "WiFi (50 Mbps)",
+                "24/7 Security",
+                "Daily Housekeeping",
+                "Mess Facility (2 meals)",
+                "Laundry Service",
+                "CCTV"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-02-05T00:00:00Z",
+                "totalRooms": 2,
+                "availableRooms": 1
+            },
+            "owner": "owner_001",
+            "rating": 4.5,
+            "totalReviews": 12,
+            "status": "active",
+            "securityDeposit": 7500,
+            "maintenanceCharges": 500,
+            "electricityCharges": "shared",
+            "rules": {
+                "guestsAllowed": false,
+                "smokingAllowed": false,
+                "alcoholAllowed": false,
+                "petsAllowed": false,
+                "genderPreference": "male",
+                "curfewTime": "10:30 PM"
+            },
+            "totalRooms": 2,
+            "occupiedRooms": 1,
+            "tags": [
+                "budget_friendly",
+                "near_metro",
+                "mess_included",
+                "male_only"
+            ],
+            "isVerified": true,
+            "totalBookings": 6,
+            "monthlyRevenue": 15000,
+            "createdAt": "2026-01-06T11:00:00Z",
+            "updatedAt": "2026-01-28T10:00:00Z"
+        },
+        {
+            "_id": "room_003",
+            "title": "Premium Single Room - Model Town (Girls Only)",
+            "description": "Luxurious single room for female students with AC, WiFi, and attached bathroom. Very safe locality.",
+            "price": 14000,
+            "images": [
+                "/demo-rooms/room-3-main.jpg",
+                "/demo-rooms/room-3-interior.jpg",
+                "/demo-rooms/room-3-bathroom.jpg",
+                "/demo-rooms/room-3-building.jpg"
+            ],
+            "roomType": "single",
+            "accommodationType": "pg",
+            "maxSharingCapacity": 1,
+            "features": {
+                "area": 140,
+                "floor": 3,
+                "totalFloors": 4,
+                "furnished": true,
+                "balcony": true,
+                "attached_bathroom": true
+            },
+            "location": {
+                "address": "123, Model Town",
+                "fullAddress": "123, Sector 3, Model Town, Delhi - 110009",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110009",
+                "coordinates": {
+                    "lat": 28.7206,
+                    "lng": 77.1890
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "Delhi University - North Campus",
+                        "distance": "2.5 km",
+                        "commute": "12 mins by auto"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "Model Town Metro Station",
+                        "distance": "600m",
+                        "type": "metro"
+                    },
+                    {
+                        "name": "Safal Market",
+                        "distance": "400m",
+                        "type": "market"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "ac",
+                "powerBackup",
+                "security",
+                "housekeeping",
+                "laundry",
+                "cctv",
+                "geyser",
+                "fridge",
+                "bed",
+                "wardrobe",
+                "study_table"
+            ],
+            "detailedAmenities": [
+                "High-speed WiFi",
+                "AC in room",
+                "Inverter Backup",
+                "Female Security Guard",
+                "Daily Cleaning",
+                "Washing Machine",
+                "CCTV",
+                "Geyser",
+                "Common Fridge"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-02-10T00:00:00Z",
+                "totalRooms": 1,
+                "availableRooms": 1
+            },
+            "owner": "owner_001",
+            "rating": 4.8,
+            "totalReviews": 5,
+            "status": "active",
+            "securityDeposit": 14000,
+            "maintenanceCharges": 1200,
+            "electricityCharges": "extra",
+            "rules": {
+                "guestsAllowed": true,
+                "smokingAllowed": false,
+                "alcoholAllowed": false,
+                "petsAllowed": false,
+                "genderPreference": "female",
+                "curfewTime": "11:00 PM"
+            },
+            "totalRooms": 1,
+            "occupiedRooms": 0,
+            "tags": [
+                "premium",
+                "girls_only",
+                "safe",
+                "fully_furnished"
+            ],
+            "isVerified": true,
+            "totalBookings": 2,
+            "monthlyRevenue": 14000,
+            "createdAt": "2026-01-06T12:00:00Z",
+            "updatedAt": "2026-01-28T10:00:00Z"
+        },
+        {
+            "_id": "room_004",
+            "title": "Comfortable Girls PG - Satya Niketan (Meals Included)",
+            "description": "Well-maintained girls PG with homely environment, 3 meals daily. Close to DU South Campus.",
+            "price": 11000,
+            "images": [
+                "/demo-rooms/room-4-main.jpg",
+                "/demo-rooms/room-4-mess.jpg",
+                "/demo-rooms/room-4-common.jpg",
+                "/demo-rooms/room-4-exterior.jpg"
+            ],
+            "roomType": "shared",
+            "accommodationType": "pg",
+            "maxSharingCapacity": 3,
+            "features": {
+                "area": 180,
+                "floor": 2,
+                "totalFloors": 3,
+                "furnished": true,
+                "balcony": false,
+                "attached_bathroom": false
+            },
+            "location": {
+                "address": "45, Satya Niketan",
+                "fullAddress": "45, Main Road, Satya Niketan, Delhi - 110021",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110021",
+                "coordinates": {
+                    "lat": 28.5321,
+                    "lng": 77.1903
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "Delhi University - South Campus",
+                        "distance": "1 km",
+                        "commute": "10 mins walk"
+                    },
+                    {
+                        "name": "JNU",
+                        "distance": "6 km",
+                        "commute": "25 mins by auto"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "Durgabai Deshmukh South Campus Metro",
+                        "distance": "1.2 km",
+                        "type": "metro"
+                    },
+                    {
+                        "name": "Satya Niketan Market",
+                        "distance": "100m",
+                        "type": "market"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "security",
+                "housekeeping",
+                "cafeteria",
+                "laundry",
+                "cctv",
+                "cooler",
+                "bed",
+                "wardrobe",
+                "study_table"
+            ],
+            "detailedAmenities": [
+                "WiFi",
+                "24/7 Female Warden",
+                "3 Meals Daily",
+                "Weekly Laundry",
+                "CCTV",
+                "Common Room",
+                "Water Cooler"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-02-01T00:00:00Z",
+                "totalRooms": 3,
+                "availableRooms": 2
+            },
+            "owner": "owner_002",
+            "rating": 4.9,
+            "totalReviews": 15,
+            "status": "active",
+            "securityDeposit": 11000,
+            "maintenanceCharges": 0,
+            "electricityCharges": "included",
+            "rules": {
+                "guestsAllowed": false,
+                "smokingAllowed": false,
+                "alcoholAllowed": false,
+                "petsAllowed": false,
+                "genderPreference": "female",
+                "curfewTime": "10:00 PM"
+            },
+            "totalRooms": 3,
+            "occupiedRooms": 1,
+            "tags": [
+                "girls_only",
+                "meals_included",
+                "homely",
+                "safe"
+            ],
+            "isVerified": true,
+            "totalBookings": 8,
+            "monthlyRevenue": 22000,
+            "createdAt": "2026-01-04T09:00:00Z",
+            "updatedAt": "2026-01-28T11:30:00Z"
+        },
+        {
+            "_id": "room_005",
+            "title": "Single Room with Kitchen - Satya Niketan",
+            "description": "Independent single room with small kitchenette. Perfect for students who like to cook.",
+            "price": 13500,
+            "images": [
+                "/demo-rooms/room-5-main.jpg",
+                "/demo-rooms/room-5-kitchen.jpg",
+                "/demo-rooms/room-5-bathroom.jpg",
+                "/demo-rooms/room-5-view.jpg"
+            ],
+            "roomType": "single",
+            "accommodationType": "apartment",
+            "maxSharingCapacity": 1,
+            "features": {
+                "area": 160,
+                "floor": 1,
+                "totalFloors": 2,
+                "furnished": true,
+                "balcony": true,
+                "attached_bathroom": true
+            },
+            "location": {
+                "address": "45, Satya Niketan",
+                "fullAddress": "45, Lane 3, Satya Niketan, Delhi - 110021",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110021",
+                "coordinates": {
+                    "lat": 28.5325,
+                    "lng": 77.1915
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "Delhi University - South Campus",
+                        "distance": "800m",
+                        "commute": "8 mins walk"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "Satya Niketan Market",
+                        "distance": "50m",
+                        "type": "market"
+                    },
+                    {
+                        "name": "Restaurants",
+                        "distance": "100m",
+                        "type": "restaurant"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "ac",
+                "powerBackup",
+                "security",
+                "parking",
+                "cctv",
+                "geyser",
+                "fridge",
+                "bed",
+                "wardrobe",
+                "study_table"
+            ],
+            "detailedAmenities": [
+                "WiFi (100 Mbps)",
+                "AC",
+                "Inverter",
+                "Gate Security",
+                "Bike Parking",
+                "CCTV",
+                "Kitchenette",
+                "Geyser",
+                "Small Fridge"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-02-15T00:00:00Z",
+                "totalRooms": 1,
+                "availableRooms": 1
+            },
+            "owner": "owner_002",
+            "rating": 4.7,
+            "totalReviews": 6,
+            "status": "active",
+            "securityDeposit": 13500,
+            "maintenanceCharges": 1000,
+            "electricityCharges": "extra",
+            "rules": {
+                "guestsAllowed": true,
+                "smokingAllowed": false,
+                "alcoholAllowed": false,
+                "petsAllowed": false,
+                "genderPreference": "female",
+                "curfewTime": "No curfew"
+            },
+            "totalRooms": 1,
+            "occupiedRooms": 0,
+            "tags": [
+                "independent",
+                "kitchen",
+                "female_only",
+                "flexible"
+            ],
+            "isVerified": true,
+            "totalBookings": 3,
+            "monthlyRevenue": 13500,
+            "createdAt": "2026-01-04T10:00:00Z",
+            "updatedAt": "2026-01-28T11:30:00Z"
+        },
+        {
+            "_id": "room_006",
+            "title": "Modern Studio Apartment - Hauz Khas",
+            "description": "Contemporary studio with all modern amenities. Perfect for IIT Delhi students.",
+            "price": 18000,
+            "images": [
+                "/demo-rooms/room-6-main.jpg",
+                "/demo-rooms/room-6-living.jpg",
+                "/demo-rooms/room-6-kitchen.jpg",
+                "/demo-rooms/room-6-view.jpg"
+            ],
+            "roomType": "studio",
+            "accommodationType": "apartment",
+            "maxSharingCapacity": 1,
+            "features": {
+                "area": 250,
+                "floor": 3,
+                "totalFloors": 5,
+                "furnished": true,
+                "balcony": true,
+                "attached_bathroom": true
+            },
+            "location": {
+                "address": "78, Hauz Khas Village",
+                "fullAddress": "78, Block A, Hauz Khas Village, Delhi - 110016",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110016",
+                "coordinates": {
+                    "lat": 28.5494,
+                    "lng": 77.2001
+                },
+                "nearbyUniversities": [
+                    {
+                        "name": "IIT Delhi",
+                        "distance": "2 km",
+                        "commute": "8 mins by auto"
+                    },
+                    {
+                        "name": "JNU",
+                        "distance": "4 km",
+                        "commute": "15 mins by metro"
+                    }
+                ],
+                "nearbyFacilities": [
+                    {
+                        "name": "Hauz Khas Metro Station",
+                        "distance": "500m",
+                        "type": "metro"
+                    },
+                    {
+                        "name": "Hauz Khas Village Cafes",
+                        "distance": "200m",
+                        "type": "restaurant"
+                    },
+                    {
+                        "name": "Deer Park",
+                        "distance": "300m",
+                        "type": "park"
+                    }
+                ]
+            },
+            "amenities": [
+                "wifi",
+                "ac",
+                "powerBackup",
+                "security",
+                "housekeeping",
+                "parking",
+                "gym",
+                "cctv",
+                "geyser",
+                "fridge",
+                "tv",
+                "bed",
+                "wardrobe",
+                "study_table"
+            ],
+            "detailedAmenities": [
+                "High-speed WiFi (200 Mbps)",
+                "Central AC",
+                "Full Power Backup",
+                "24/7 Security",
+                "Weekly Housekeeping",
+                "Car Parking",
+                "Building Gym",
+                "Smart TV",
+                "Kitchen",
+                "Washing Machine",
+                "Water Purifier"
+            ],
+            "availability": {
+                "isAvailable": true,
+                "availableFrom": "2026-03-01T00:00:00Z",
+                "totalRooms": 1,
+                "availableRooms": 1
+            },
+            "owner": "owner_003",
+            "rating": 4.9,
+            "totalReviews": 10,
+            "status": "active",
+            "securityDeposit": 36000,
+            "maintenanceCharges": 2000,
+            "electricityCharges": "extra",
+            "rules": {
+                "guestsAllowed": true,
+                "smokingAllowed": false,
+                "alcoholAllowed": true,
+                "petsAllowed": false,
+                "genderPreference": "any",
+                "curfewTime": "No curfew"
+            },
+            "totalRooms": 1,
+            "occupiedRooms": 0,
+            "tags": [
+                "premium",
+                "studio",
+                "modern",
+                "independent"
+            ],
+            "isVerified": true,
+            "totalBookings": 5,
+            "monthlyRevenue": 18000,
+            "createdAt": "2026-01-08T10:00:00Z",
+            "updatedAt": "2026-01-28T09:15:00Z"
+        }
+    ]
+}

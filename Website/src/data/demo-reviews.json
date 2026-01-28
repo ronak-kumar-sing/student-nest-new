@@ -1,0 +1,114 @@
+{
+    "reviews": [
+        {
+            "_id": "review_001",
+            "property": "room_004",
+            "student": "student_003",
+            "booking": "booking_002",
+            "overallRating": 4.8,
+            "categories": {
+                "cleanliness": 5,
+                "location": 5,
+                "facilities": 4.5,
+                "owner": 5,
+                "value": 4.5
+            },
+            "comment": "Excellent PG! Aunty is very caring and the food is homely. The location is perfect for DU South Campus students. All rooms are clean and well-maintained. Highly recommend for girls looking for a safe and comfortable stay.",
+            "stayDuration": "2 months",
+            "isVerified": true,
+            "helpfulCount": 12,
+            "helpfulUsers": [
+                "student_001",
+                "student_005"
+            ],
+            "images": [
+                "/reviews/review_001_room.jpg",
+                "/reviews/review_001_food.jpg"
+            ],
+            "isApproved": true,
+            "ownerResponse": {
+                "message": "Thank you so much, Sneha! It's been a pleasure having you. We're glad you feel at home here. Wishing you all the best for your studies!",
+                "respondedAt": "2026-01-22T10:00:00Z"
+            },
+            "createdAt": "2026-01-21T16:30:00Z",
+            "updatedAt": "2026-01-22T10:00:00Z"
+        },
+        {
+            "_id": "review_002",
+            "property": "room_002",
+            "student": "student_002",
+            "booking": "booking_003",
+            "overallRating": 4.2,
+            "categories": {
+                "cleanliness": 4,
+                "location": 5,
+                "facilities": 4,
+                "owner": 4.5,
+                "value": 4
+            },
+            "comment": "Good PG for the price. Location is unbeatable - just 5 mins from GTB Nagar metro and very close to DU North Campus. Rooms are decent, WiFi works well. Mess food could be better but it's acceptable for the price. Owner is responsive and helpful.",
+            "stayDuration": "1 month",
+            "isVerified": true,
+            "helpfulCount": 8,
+            "helpfulUsers": [
+                "student_004"
+            ],
+            "images": [],
+            "isApproved": true,
+            "ownerResponse": {
+                "message": "Thanks for the feedback, Rahul! We're working on improving the mess menu. Hope to host you again in the future!",
+                "respondedAt": "2026-01-21T14:00:00Z"
+            },
+            "createdAt": "2026-01-21T12:00:00Z",
+            "updatedAt": "2026-01-21T14:00:00Z"
+        },
+        {
+            "_id": "review_003",
+            "property": "room_001",
+            "student": "student_001",
+            "overallRating": 4.7,
+            "categories": {
+                "cleanliness": 5,
+                "location": 4.5,
+                "facilities": 5,
+                "owner": 4.5,
+                "value": 4.5
+            },
+            "comment": "Visited the property for inspection. Very impressed with the cleanliness and amenities. The room is spacious with good natural light. WiFi speed is excellent (tested at 95 Mbps). Owner was courteous and answered all my questions. Planning to book soon!",
+            "stayDuration": "Inspection visit",
+            "isVerified": false,
+            "helpfulCount": 5,
+            "helpfulUsers": [],
+            "images": [],
+            "isApproved": true,
+            "createdAt": "2026-01-23T14:30:00Z",
+            "updatedAt": "2026-01-23T14:30:00Z"
+        },
+        {
+            "_id": "review_004",
+            "property": "room_006",
+            "student": "student_005",
+            "overallRating": 5.0,
+            "categories": {
+                "cleanliness": 5,
+                "location": 5,
+                "facilities": 5,
+                "owner": 5,
+                "value": 5
+            },
+            "comment": "Absolutely love this studio! Modern amenities, beautiful interior, and Hauz Khas Village is such a vibrant location. The gym in the building is a huge plus. Owner is professional and very responsive. Worth every penny for the independence and quality you get.",
+            "stayDuration": "Inspection visit",
+            "isVerified": false,
+            "helpfulCount": 3,
+            "helpfulUsers": [],
+            "images": [],
+            "isApproved": true,
+            "ownerResponse": {
+                "message": "Thank you for the wonderful review! We're glad you loved the studio. Feel free to reach out if you have any questions!",
+                "respondedAt": "2026-01-24T09:00:00Z"
+            },
+            "createdAt": "2026-01-23T18:00:00Z",
+            "updatedAt": "2026-01-24T09:00:00Z"
+        }
+    ]
+}

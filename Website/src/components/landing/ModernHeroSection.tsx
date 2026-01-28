@@ -2,10 +2,11 @@
 
 import CardSwap, { Card } from './components/CardSwap';
 import { Button } from '../ui/button';
-import { ArrowRight, Star, Users, Shield } from 'lucide-react';
+import { ArrowRight, Star, Users, Shield, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import TrustBadges from './TrustBadges';
 
 // MacOS Navigation Bar Component
 function MacOSNavBar() {
@@ -52,9 +53,9 @@ function MacOSNavBar() {
 
 export default function ModernHeroSection() {
   return (
-    <section className="relative min-h-screen bg-[#0a0a0b] overflow-hidden">
+    <section className="relative min-h-screen bg-[#0a0a0b] overflow-hidden" aria-label="Hero section">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed]/20 via-transparent to-[#3b82f6]/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed]/20 via-transparent to-[#3b82f6]/20" aria-hidden="true"></div>
 
       {/* Content container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 overflow-visible">
@@ -94,6 +95,7 @@ export default function ModernHeroSection() {
                 asChild
                 size="lg"
                 className="bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] hover:from-[#6d28d9] hover:to-[#2563eb] text-white border-0 h-14 px-8 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                aria-label="Sign up and find student accommodation"
               >
                 <Link href="/student/signup">
                   Find Accommodation
@@ -111,6 +113,11 @@ export default function ModernHeroSection() {
                   View Pricing
                 </Link>
               </Button>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mt-8">
+              <TrustBadges />
             </div>
 
             {/* Social proof */}
@@ -150,7 +157,7 @@ export default function ModernHeroSection() {
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/dashboard-view.svg"
-                        alt="Student Dashboard"
+                        alt="Student dashboard interface showing available rooms, filters, and booking options"
                         width={700}
                         height={568}
                         className="w-full h-full object-cover"
@@ -173,7 +180,7 @@ export default function ModernHeroSection() {
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/room-search.svg"
-                        alt="Room Search"
+                        alt="Room search interface with map view, filters by price, location, and amenities"
                         width={700}
                         height={568}
                         className="w-full h-full object-cover"
@@ -196,7 +203,7 @@ export default function ModernHeroSection() {
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/property-details.svg"
-                        alt="Property Details"
+                        alt="Property details page showing photos gallery, amenities, pricing, and verified owner contact information"
                         width={700}
                         height={568}
                         className="w-full h-full object-cover"

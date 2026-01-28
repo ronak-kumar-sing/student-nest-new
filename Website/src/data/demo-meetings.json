@@ -1,0 +1,71 @@
+{
+    "meetings": [
+        {
+            "_id": "meeting_001",
+            "studentId": "student_001",
+            "ownerId": "owner_001",
+            "propertyId": "room_001",
+            "scheduledAt": "2026-01-24T15:00:00Z",
+            "duration": 30,
+            "type": "virtual",
+            "status": "completed",
+            "meetLink": "https://meet.google.com/abc-defg-hij",
+            "notes": "Discussed property details, security arrangements, and move-in timeline. Student satisfied with all answers. Booking confirmed post-meeting.",
+            "createdAt": "2026-01-23T14:00:00Z",
+            "updatedAt": "2026-01-24T15:35:00Z"
+        },
+        {
+            "_id": "meeting_002",
+            "studentId": "student_005",
+            "ownerId": "owner_003",
+            "propertyId": "room_006",
+            "scheduledAt": "2026-01-23T16:00:00Z",
+            "duration": 45,
+            "type": "in-person",
+            "status": "completed",
+            "notes": "Property visit conducted. Showed all amenities including gym and co-working space. Student very impressed with the modern setup and location.",
+            "createdAt": "2026-01-22T11:00:00Z",
+            "updatedAt": "2026-01-23T16:50:00Z"
+        },
+        {
+            "_id": "meeting_003",
+            "studentId": "student_004",
+            "ownerId": "owner_001",
+            "propertyId": "room_002",
+            "scheduledAt": "2026-01-29T14:00:00Z",
+            "duration": 30,
+            "type": "virtual",
+            "status": "scheduled",
+            "meetLink": "https://meet.google.com/klm-nopq-rst",
+            "notes": "Student wants to discuss sharing arrangements and mess timings.",
+            "createdAt": "2026-01-28T12:00:00Z",
+            "updatedAt": "2026-01-28T12:00:00Z"
+        },
+        {
+            "_id": "meeting_004",
+            "studentId": "student_002",
+            "ownerId": "owner_002",
+            "propertyId": "room_005",
+            "scheduledAt": "2026-01-30T10:00:00Z",
+            "duration": 30,
+            "type": "in-person",
+            "status": "scheduled",
+            "notes": "Property inspection scheduled. Student wants to see the kitchenette setup.",
+            "createdAt": "2026-01-28T15:00:00Z",
+            "updatedAt": "2026-01-28T15:00:00Z"
+        },
+        {
+            "_id": "meeting_005",
+            "studentId": "student_003",
+            "ownerId": "owner_002",
+            "propertyId": "room_004",
+            "scheduledAt": "2026-01-05T10:00:00Z",
+            "duration": 45,
+            "type": "in-person",
+            "status": "completed",
+            "notes": "Pre-move-in property visit. Showed room, common areas, and discussed house rules. Check-in completed successfully.",
+            "createdAt": "2026-01-03T16:00:00Z",
+            "updatedAt": "2026-01-05T11:00:00Z"
+        }
+    ]
+}

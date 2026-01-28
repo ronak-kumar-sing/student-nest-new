@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- House shape -->
+  <path d="M50 15 L20 40 L20 80 L80 80 L80 40 Z" fill="url(#grad1)"/>
+  <!-- Door -->
+  <rect x="40" y="55" width="20" height="25" fill="#0a0a0b" rx="2"/>
+  <!-- Window -->
+  <rect x="30" y="45" width="12" height="12" fill="#0a0a0b" rx="1"/>
+  <rect x="58" y="45" width="12" height="12" fill="#0a0a0b" rx="1"/>
+  <!-- Roof accent -->
+  <path d="M50 15 L85 40 L15 40 Z" fill="none" stroke="#10b981" stroke-width="2"/>
+</svg>

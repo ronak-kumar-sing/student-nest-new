@@ -1,0 +1,239 @@
+{
+    "owners": [
+        {
+            "_id": "owner_001",
+            "email": "rajesh.mehta@gmail.com",
+            "phone": "+919876543220",
+            "fullName": "Rajesh Mehta",
+            "profilePhoto": "https://i.pravatar.cc/150?img=33",
+            "role": "owner",
+            "isEmailVerified": true,
+            "isPhoneVerified": true,
+            "isIdentityVerified": true,
+            "identityVerificationRequired": false,
+            "identityVerificationSkipped": false,
+            "savedRooms": [],
+            "isActive": true,
+            "lastLogin": "2026-01-28T10:00:00Z",
+            "loginAttempts": 0,
+            "settings": {
+                "notifications": {
+                    "email": true,
+                    "sms": true,
+                    "push": true
+                }
+            },
+            "city": "Delhi",
+            "state": "Delhi",
+            "bio": "Experienced property owner specializing in student accommodations near DU North Campus. Committed to providing safe and comfortable living spaces.",
+            "businessName": "Mehta Properties",
+            "businessType": "individual",
+            "businessDescription": "Providing quality student housing for over 10 years in the North Delhi area.",
+            "experience": 10,
+            "address": {
+                "street": "123, Model Town",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110009",
+                "country": "India"
+            },
+            "verification": {
+                "status": "verified",
+                "aadhaarNumber": "****-****-1234",
+                "aadhaarDocument": "https://example.com/documents/rajesh_aadhaar.pdf",
+                "digilockerLinked": true,
+                "digilockerData": {
+                    "name": "Rajesh Kumar Mehta",
+                    "dob": "1978-05-15T00:00:00Z",
+                    "gender": "Male",
+                    "address": "123, Model Town, Delhi - 110009"
+                },
+                "verificationDocuments": [
+                    {
+                        "type": "aadhaar",
+                        "url": "https://example.com/documents/rajesh_aadhaar.pdf",
+                        "uploadedAt": "2026-01-05T10:00:00Z"
+                    },
+                    {
+                        "type": "property_deed",
+                        "url": "https://example.com/documents/rajesh_property.pdf",
+                        "uploadedAt": "2026-01-05T10:05:00Z"
+                    }
+                ],
+                "verifiedAt": "2026-01-06T14:00:00Z"
+            },
+            "properties": [
+                "room_001",
+                "room_002",
+                "room_003"
+            ],
+            "stats": {
+                "totalProperties": 3,
+                "activeListings": 3,
+                "totalBookings": 12,
+                "monthlyRevenue": 45000,
+                "averageRating": 4.7,
+                "responseRate": 95,
+                "responseTime": "< 2 hours"
+            },
+            "profileCompleteness": 100,
+            "createdAt": "2026-01-05T09:00:00Z",
+            "updatedAt": "2026-01-28T10:00:00Z"
+        },
+        {
+            "_id": "owner_002",
+            "email": "sunita.kapoor@gmail.com",
+            "phone": "+919876543221",
+            "fullName": "Sunita Kapoor",
+            "profilePhoto": "https://i.pravatar.cc/150?img=44",
+            "role": "owner",
+            "isEmailVerified": true,
+            "isPhoneVerified": true,
+            "isIdentityVerified": true,
+            "identityVerificationRequired": false,
+            "identityVerificationSkipped": false,
+            "savedRooms": [],
+            "isActive": true,
+            "lastLogin": "2026-01-28T11:30:00Z",
+            "loginAttempts": 0,
+            "settings": {
+                "notifications": {
+                    "email": true,
+                    "sms": true,
+                    "push": true
+                }
+            },
+            "city": "Delhi",
+            "state": "Delhi",
+            "bio": "Professional property manager catering to female students near South Campus. Focus on safety and comfort.",
+            "businessName": "Kapoor Girls PG",
+            "businessType": "individual",
+            "businessDescription": "Women-only accommodations with home-cooked meals and 24/7 security.",
+            "experience": 8,
+            "address": {
+                "street": "45, Satya Niketan",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110021",
+                "country": "India"
+            },
+            "verification": {
+                "status": "verified",
+                "aadhaarNumber": "****-****-5678",
+                "aadhaarDocument": "https://example.com/documents/sunita_aadhaar.pdf",
+                "digilockerLinked": true,
+                "digilockerData": {
+                    "name": "Sunita Kapoor",
+                    "dob": "1982-03-20T00:00:00Z",
+                    "gender": "Female",
+                    "address": "45, Satya Niketan, Delhi - 110021"
+                },
+                "verificationDocuments": [
+                    {
+                        "type": "aadhaar",
+                        "url": "https://example.com/documents/sunita_aadhaar.pdf",
+                        "uploadedAt": "2026-01-03T11:00:00Z"
+                    }
+                ],
+                "verifiedAt": "2026-01-04T16:00:00Z"
+            },
+            "properties": [
+                "room_004",
+                "room_005"
+            ],
+            "stats": {
+                "totalProperties": 2,
+                "activeListings": 2,
+                "totalBookings": 8,
+                "monthlyRevenue": 30000,
+                "averageRating": 4.9,
+                "responseRate": 98,
+                "responseTime": "< 1 hour"
+            },
+            "profileCompleteness": 100,
+            "createdAt": "2026-01-03T10:00:00Z",
+            "updatedAt": "2026-01-28T11:30:00Z"
+        },
+        {
+            "_id": "owner_003",
+            "email": "vikas.sharma@gmail.com",
+            "phone": "+919876543222",
+            "fullName": "Vikas Sharma",
+            "profilePhoto": "https://i.pravatar.cc/150?img=60",
+            "role": "owner",
+            "isEmailVerified": true,
+            "isPhoneVerified": true,
+            "isIdentityVerified": true,
+            "identityVerificationRequired": false,
+            "identityVerificationSkipped": false,
+            "savedRooms": [],
+            "isActive": true,
+            "lastLogin": "2026-01-28T09:15:00Z",
+            "loginAttempts": 0,
+            "settings": {
+                "notifications": {
+                    "email": true,
+                    "sms": false,
+                    "push": true
+                }
+            },
+            "city": "Delhi",
+            "state": "Delhi",
+            "bio": "Modern apartment provider near IIT Delhi. Tech-friendly amenities and co-working spaces available.",
+            "businessName": "SmartStay Properties",
+            "businessType": "company",
+            "businessDescription": "Premium student accommodations with modern amenities and co-working spaces.",
+            "gstNumber": "07AABCU9603R1ZX",
+            "experience": 5,
+            "address": {
+                "street": "78, Hauz Khas Village",
+                "city": "Delhi",
+                "state": "Delhi",
+                "pincode": "110016",
+                "country": "India"
+            },
+            "verification": {
+                "status": "verified",
+                "aadhaarNumber": "****-****-9101",
+                "aadhaarDocument": "https://example.com/documents/vikas_aadhaar.pdf",
+                "digilockerLinked": true,
+                "digilockerData": {
+                    "name": "Vikas Sharma",
+                    "dob": "1985-11-10T00:00:00Z",
+                    "gender": "Male",
+                    "address": "78, Hauz Khas Village, Delhi - 110016"
+                },
+                "verificationDocuments": [
+                    {
+                        "type": "aadhaar",
+                        "url": "https://example.com/documents/vikas_aadhaar.pdf",
+                        "uploadedAt": "2026-01-07T09:00:00Z"
+                    },
+                    {
+                        "type": "gst_certificate",
+                        "url": "https://example.com/documents/vikas_gst.pdf",
+                        "uploadedAt": "2026-01-07T09:05:00Z"
+                    }
+                ],
+                "verifiedAt": "2026-01-08T10:00:00Z"
+            },
+            "properties": [
+                "room_006",
+                "room_007",
+                "room_008"
+            ],
+            "stats": {
+                "totalProperties": 3,
+                "activeListings": 3,
+                "totalBookings": 15,
+                "monthlyRevenue": 55000,
+                "averageRating": 4.8,
+                "responseRate": 92,
+                "responseTime": "< 3 hours"
+            },
+            "profileCompleteness": 100,
+            "createdAt": "2026-01-07T08:00:00Z",
+            "updatedAt": "2026-01-28T09:15:00Z"
+        }
+    ]
+}
