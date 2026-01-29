@@ -5,6 +5,7 @@ import { ThemeProvider } from '../lib/providers/theme-provider';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '../hooks/useAuth';
 import AuthInitializer from '../components/auth/AuthInitializer';
+import OrganizationSchema from '../components/seo/OrganizationSchema';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -101,6 +102,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <OrganizationSchema />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

@@ -93,7 +93,7 @@ export default function VerificationPrompt({
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
       const response = await fetch('/api/verify/requirements', {
         method: 'POST',
         headers: {
@@ -107,7 +107,25 @@ export default function VerificationPrompt({
 
       if (result.success) {
         toast.success('Identity verification skipped. You can enable it later from your profile.');
-        onSkip?.();
+
+        // Update local state
+        if (requirements) {
+          setRequirements({
+            ...requirements,
+            user: {
+              ...requirements.user,
+              identityVerificationSkipped: true
+            }
+          });
+        }
+
+        // Handle callback or reload
+        if (onSkip) {
+          onSkip();
+        } else if (showInDashboard) {
+          // Reload to refresh the dashboard
+          setTimeout(() => window.location.reload(), 500);
+        }
       } else {
         toast.error(result.error || 'Failed to skip verification');
       }

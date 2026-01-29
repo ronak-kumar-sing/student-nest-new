@@ -88,10 +88,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }));
 
     // Calculate owner response metrics
-    const ownerJoinDate = new Date((room.owner as any).createdAt).toLocaleDateString('en-US', {
-      month: 'short',
-      year: 'numeric',
-    });
+    const ownerCreatedAt = (room.owner as any)?.createdAt;
+    const ownerJoinDate = ownerCreatedAt
+      ? new Date(ownerCreatedAt).toLocaleDateString('en-US', {
+        month: 'short',
+        year: 'numeric',
+      })
+      : 'Recently joined';
 
     // Format response to match frontend expectations exactly
     const roomData = {
