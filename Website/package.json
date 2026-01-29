@@ -14,7 +14,7 @@
     "seed-demo": "NODE_ENV=development tsx --env-file=.env.local scripts/seed-demo-data.ts",
     "seed-accounts": "node scripts/seed-demo-accounts.js",
     "seed-rooms": "node scripts/seed-rooms-reviews.js",
-    "cleanup-demo": "node scripts/cleanup-demo-accounts.js",
+    "cleanup-demo": "NODE_ENV=development tsx --env-file=.env.local scripts/cleanup-demo-data.ts",
     "clean-db": "node scripts/clean-database.js",
     "setup-db": "bash scripts/setup-database.sh",
     "ensure-indexes": "node scripts/ensure-indexes.js"
