@@ -54,23 +54,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Redirect www to non-www
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.student-nest.live',
-          },
-        ],
-        destination: 'https://student-nest.live/:path*',
-        permanent: true,
-      },
-    ];
-  },
-
   webpack: (config) => {
     // Exclude TypeScript definition files from webpack processing
     config.module.rules.push({
