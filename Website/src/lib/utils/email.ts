@@ -1,7 +1,7 @@
 import sgMail from '@sendgrid/mail';
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@studentnest.com';
+const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@student-nest.live';
 const FROM_NAME = 'StudentNest';
 const IS_DEV = process.env.NODE_ENV === 'development';
 

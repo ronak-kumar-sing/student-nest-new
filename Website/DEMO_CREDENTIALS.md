@@ -8,8 +8,8 @@
 
 | Role | Email | Password |
 |------|-------|----------|
-| **Student** | `demo.student@studentnest.com` | `Demo@123` |
-| **Owner** | `demo.owner@studentnest.com` | `Demo@123` |
+| **Student** | `demo.student@student-nest.live` | `Demo@123` |
+| **Owner** | `demo.owner@student-nest.live` | `Demo@123` |
 
 > **Note:** All demo accounts use the same password: `Demo@123`
 
@@ -20,7 +20,7 @@
 ### 👨‍🎓 Student Accounts (6 Total)
 
 #### 1. Demo Student (Primary)
-- **Email:** demo.student@studentnest.com
+- **Email:** demo.student@student-nest.live
 - **Password:** Demo@123
 - **Status:** ✅ Fully Verified
 - **Profile:** 95% Complete
@@ -71,7 +71,7 @@
 ### 🏠 Property Owner Accounts (3 Total)
 
 #### 1. Demo Owner (Primary)
-- **Email:** demo.owner@studentnest.com
+- **Email:** demo.owner@student-nest.live
 - **Password:** Demo@123
 - **Status:** ✅ Fully Verified
 - **Properties:** 3 Active Listings

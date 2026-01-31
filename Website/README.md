@@ -528,10 +528,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 📞 Support
 
-- 📧 Email: support@studentnest.com
+- 📧 Email: support@student-nest.live
 - 💬 Discord: [Join our community](https://discord.gg/studentnest)
 - 🐛 Issues: [GitHub Issues](https://github.com/yourusername/student-nest/issues)
-- 📖 Docs: [Documentation](https://docs.studentnest.com)
+- 📖 Docs: [Documentation](https://docs.student-nest.live)
 
 ---
 

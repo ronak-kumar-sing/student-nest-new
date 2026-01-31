@@ -9,12 +9,12 @@ Your environment is configured and the app is running at **http://localhost:3000
 ## 🔐 Demo Login Credentials
 
 ### Student Account
-- **Email:** `demo.student@studentnest.com`
+- **Email:** `demo.student@student-nest.live`
 - **Password:** `Demo@123`
 - **Phone:** `+1234567890`
 
 ### Owner Account
-- **Email:** `demo.owner@studentnest.com`
+- **Email:** `demo.owner@student-nest.live`
 - **Password:** `Demo@123`
 - **Phone:** `+1234567891`
 

@@ -93,7 +93,7 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url: strin
 
 // Default schemas for Student Nest
 export const defaultOrganizationSchema = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://studentnest.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student-nest.live';
     return generateOrganizationSchema({
         name: 'Student Nest',
         url: baseUrl,
@@ -101,13 +101,13 @@ export const defaultOrganizationSchema = () => {
         description: 'Student housing platform connecting students with verified property owners near colleges',
         contactPoint: {
             contactType: 'Customer Service',
-            email: 'support@studentnest.com',
+            email: 'support@student-nest.live',
         },
     });
 };
 
 export const defaultWebSiteSchema = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://studentnest.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student-nest.live';
     return generateWebSiteSchema({
         name: 'Student Nest',
         url: baseUrl,

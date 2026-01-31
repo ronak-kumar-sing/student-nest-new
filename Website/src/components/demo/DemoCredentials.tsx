@@ -11,14 +11,14 @@ interface DemoCredential {
 
 const demoCredentials: DemoCredential[] = [
     {
-        email: 'demo.student@studentnest.com',
+        email: 'demo.student@student-nest.live',
         password: 'Demo@123',
         role: 'student',
         name: 'Demo Student',
         description: 'Primary student account with full features'
     },
     {
-        email: 'demo.owner@studentnest.com',
+        email: 'demo.owner@student-nest.live',
         password: 'Demo@123',
         role: 'owner',
         name: 'Demo Owner',
@@ -77,15 +77,17 @@ export default function DemoCredentials() {
 
                             {/* Email Field */}
                             <div className="mb-3">
-                                <label className="flex items-center gap-2 text-xs text-[#a1a1aa] mb-2">
+                                <label htmlFor={`email-input-${index}`} className="flex items-center gap-2 text-xs text-[#a1a1aa] mb-2">
                                     <Mail className="w-3 h-3" />
                                     Email
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <input
+                                        id={`email-input-${index}`}
                                         type="text"
                                         value={cred.email}
                                         readOnly
+                                        aria-label="Demo email address"
                                         className="flex-1 bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg px-3 py-2 text-sm text-white font-mono"
                                     />
                                     <button
@@ -104,15 +106,17 @@ export default function DemoCredentials() {
 
                             {/* Password Field */}
                             <div>
-                                <label className="flex items-center gap-2 text-xs text-[#a1a1aa] mb-2">
+                                <label htmlFor={`password-input-${index}`} className="flex items-center gap-2 text-xs text-[#a1a1aa] mb-2">
                                     <Lock className="w-3 h-3" />
                                     Password
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <input
+                                        id={`password-input-${index}`}
                                         type="text"
                                         value={cred.password}
                                         readOnly
+                                        aria-label="Demo password"
                                         className="flex-1 bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg px-3 py-2 text-sm text-white font-mono"
                                     />
                                     <button

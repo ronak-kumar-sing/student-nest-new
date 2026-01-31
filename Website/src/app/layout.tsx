@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://studentnest.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://student-nest.live'),
   title: {
     default: 'Student Nest - Find Your Perfect Student Accommodation',
     template: '%s | Student Nest',

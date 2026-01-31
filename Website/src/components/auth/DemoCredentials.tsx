@@ -11,12 +11,12 @@ interface DemoCredentialsProps {
 
 const DEMO_CREDENTIALS = {
   student: {
-    email: "demo.student@studentnest.com",
+    email: "demo.student@student-nest.live",
     password: "Demo@123",
     phone: "+1234567890",
   },
   owner: {
-    email: "demo.owner@studentnest.com",
+    email: "demo.owner@student-nest.live",
     password: "Demo@123",
     phone: "+1234567891",
   },
