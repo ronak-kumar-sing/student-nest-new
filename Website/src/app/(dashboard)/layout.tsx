@@ -4,6 +4,7 @@ import { UserSidebar } from "../../components/user-sidebar";
 import { useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import VerificationGuard from "../../components/verification/VerificationGuard";
+import { useAuth } from "../../hooks/useAuth";
 
 interface User {
   id: string;
@@ -21,44 +22,34 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user: authUser, loading, isAuthenticated } = useAuth();
+  const [sidebarUser, setSidebarUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Get user from localStorage
-    const accessToken = localStorage.getItem("accessToken");
-    const token = localStorage.getItem("token");
-    const userStr = localStorage.getItem("user");
+    // Wait for auth to finish loading
+    if (loading) return;
 
-    const finalToken = accessToken || token;
-
-    if (!finalToken || !userStr) {
-      // Not authenticated, redirect to login
+    // If not authenticated, redirect to home
+    if (!isAuthenticated || !authUser) {
       router.push("/");
       return;
     }
 
-    try {
-      const userData = JSON.parse(userStr);
-      console.log("User data loaded:", userData);
+    // Normalize role to lowercase and create sidebar user
+    const normalizedRole = (authUser.role?.toLowerCase() || 'student') as "student" | "owner";
 
-      // Normalize role to lowercase
-      const normalizedRole = userData.role?.toLowerCase() || userData.userType?.toLowerCase() || 'student';
-
-      // Ensure signedIn is set to true and role is properly set
-      setUser({
-        ...userData,
-        signedIn: true,
-        role: normalizedRole as "student" | "owner"
-      });
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      router.push("/");
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+    setSidebarUser({
+      id: authUser.id || authUser._id || '',
+      name: authUser.fullName || authUser.email || 'User',
+      email: authUser.email || '',
+      role: normalizedRole,
+      image: authUser.avatar,
+      signedIn: true,
+      isIdentityVerified: authUser.isIdentityVerified,
+      identityVerificationSkipped: authUser.identityVerificationSkipped
+    });
+  }, [loading, isAuthenticated, authUser, router]);
 
   if (loading) {
     return (
@@ -71,13 +62,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     );
   }
 
-  if (!user) {
+  if (!sidebarUser || !isAuthenticated) {
     return null; // Will redirect in useEffect
   }
 
   return (
-    <VerificationGuard userRole={user.role}>
-      <UserSidebar user={user}>
+    <VerificationGuard userRole={sidebarUser.role}>
+      <UserSidebar user={sidebarUser}>
         {children}
       </UserSidebar>
     </VerificationGuard>
