@@ -3,7 +3,7 @@ import type { ApiResponse, User } from '../types';
 
 // Use environment variable if available, otherwise fall back to defaults
 const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL 
-  || (process.env.NODE_ENV === 'production' ? 'https://student-nest.live' : 'http://localhost:3000');
+  || (process.env.NODE_ENV === 'production' ? 'https://www.student-nest.live' : 'http://localhost:3000');
 
 class ApiClient {
   private baseURL: string;
