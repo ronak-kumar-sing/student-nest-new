@@ -11,14 +11,14 @@ interface DemoCredential {
 
 const demoCredentials: DemoCredential[] = [
     {
-        email: 'demo.student@student-nest.live',
+        email: 'demo.student@studentnest.com',
         password: 'Demo@123',
         role: 'student',
         name: 'Demo Student',
         description: 'Primary student account with full features'
     },
     {
-        email: 'demo.owner@student-nest.live',
+        email: 'demo.owner@studentnest.com',
         password: 'Demo@123',
         role: 'owner',
         name: 'Demo Owner',
