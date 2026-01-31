@@ -6,9 +6,11 @@ import { ApiResponse, PaginatedResponse, Room, User, Booking, Notification, Room
 // Create axios instance
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
-  timeout: 30000,
+  timeout: __DEV__ ? 30000 : 10000, // Shorter timeout for production
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Cache-Control': 'no-cache',
   },
 });
 
@@ -16,6 +18,19 @@ const api: AxiosInstance = axios.create({
 if (__DEV__) {
   console.log('📡 API URL:', API_URL);
 }
+
+// Track failed requests for analytics (production only)
+const logFailedRequest = (error: AxiosError) => {
+  if (!__DEV__ && process.env.EXPO_PUBLIC_ANALYTICS_ENABLED === 'true') {
+    // TODO: Add analytics tracking for failed requests
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.message,
+    });
+  }
+};
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
@@ -35,6 +50,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
+    logFailedRequest(error);
+    
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -56,7 +73,15 @@ api.interceptors.response.use(
       } catch (refreshError) {
         await tokenStorage.clearTokens();
         // TODO: Redirect to login
+        if (__DEV__) {
+          console.error('Token refresh failed:', refreshError);
+        }
       }
+    }
+
+    // Network error handling
+    if (!error.response) {
+      error.message = 'Network error. Please check your internet connection.';
     }
 
     return Promise.reject(error);

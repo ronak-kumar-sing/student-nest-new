@@ -71,7 +71,7 @@ class ApiClient {
       const response = await fetch(url, config);
 
       // Handle 401 - Token expired, try to refresh
-      if (response.status === 401 && endpoint !== '/auth/refresh' && endpoint !== '/auth/login') {
+      if (response.status === 401 && endpoint !== '/auth/refresh' && endpoint !== '/auth/login' && endpoint !== '/auth/me') {
         console.log('Token expired, attempting to refresh...');
 
         try {
@@ -95,8 +95,8 @@ class ApiClient {
       const data: ApiResponse<T> = await response.json();
 
       if (!response.ok) {
-        // Handle other auth failures
-        if (response.status === 401) {
+        // Don't redirect on 401 for auth endpoints - let the caller handle it
+        if (response.status === 401 && endpoint !== '/auth/me' && endpoint !== '/auth/refresh' && endpoint !== '/auth/login') {
           this.handleAuthFailure();
         }
         throw new Error(data.error || `HTTP error! status: ${response.status}`);
@@ -142,17 +142,26 @@ class ApiClient {
   }
 
   handleAuthFailure() {
-    console.log('Authentication failed, redirecting to login...');
+    console.log('Authentication failed, clearing auth data...');
     this.clearToken();
 
     if (typeof window !== 'undefined') {
-      // Store current page for redirect after login
-      const currentPath = window.location.pathname + window.location.search;
-      if (currentPath !== '/student/login' && currentPath !== '/owner/login' && currentPath !== '/student/signup' && currentPath !== '/owner/signup') {
-        localStorage.setItem('redirectAfterLogin', currentPath);
+      const currentPath = window.location.pathname;
+      
+      // Don't redirect if already on login/signup pages or home page
+      const authPages = ['/student/login', '/owner/login', '/student/signup', '/owner/signup', '/'];
+      const isOnAuthPage = authPages.some(page => currentPath === page || currentPath.startsWith('/forgot-password') || currentPath.startsWith('/reset-password'));
+      
+      if (isOnAuthPage) {
+        console.log('Already on auth page, skipping redirect');
+        return;
       }
 
+      // Store current page for redirect after login
+      localStorage.setItem('redirectAfterLogin', currentPath + window.location.search);
+
       // Redirect to login
+      console.log('Redirecting to login from:', currentPath);
       window.location.href = '/student/login';
     }
   }

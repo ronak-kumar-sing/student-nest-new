@@ -16,7 +16,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push('/student/login')
+      // Redirect to home page instead of login to avoid redirect loops
+      router.push('/')
     }
   }, [loading, isAuthenticated, router])
 

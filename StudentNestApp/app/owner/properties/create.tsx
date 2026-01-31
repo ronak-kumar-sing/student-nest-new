@@ -213,12 +213,14 @@ export default function CreatePropertyScreen() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
         className="flex-1"
       >
         <ScrollView
           className="flex-1"
           contentContainerClassName="p-6 pb-20"
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           {/* Images */}
           <View className="mb-6">

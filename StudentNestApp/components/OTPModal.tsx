@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   Animated,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { X, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react-native';
 import { authApi } from '../lib/api';
@@ -180,16 +182,20 @@ export default function OTPModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/70 items-center justify-center px-6">
-        <Animated.View
-          style={{
-            transform: [
-              { translateX: shakeAnimation },
-              { scale: scaleAnimation },
-            ],
-          }}
-          className="w-full bg-dark-surface rounded-3xl p-6"
-        >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
+        <View className="flex-1 bg-black/70 items-center justify-center px-6">
+          <Animated.View
+            style={{
+              transform: [
+                { translateX: shakeAnimation },
+                { scale: scaleAnimation },
+              ],
+            }}
+            className="w-full bg-dark-surface rounded-3xl p-6"
+          >
           {/* Close Button */}
           <Pressable
             onPress={onClose}
@@ -299,6 +305,7 @@ export default function OTPModal({
           )}
         </Animated.View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

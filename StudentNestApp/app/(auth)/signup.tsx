@@ -139,11 +139,13 @@ export default function SignupScreen() {
     <LinearGradient colors={['#0A0A0B', '#1A1A1B', '#0A0A0B']} className="flex-1">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         className="flex-1"
       >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <View className="flex-1 px-6 pt-16">
             {/* Header */}

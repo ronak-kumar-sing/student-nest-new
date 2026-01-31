@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, Alert, Modal, TextInput, Linking, ActivityIndicator, Switch } from 'react-native';
+import { View, Text, ScrollView, Pressable, Alert, Modal, TextInput, Linking, ActivityIndicator, Switch, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -516,8 +516,12 @@ export default function ProfileScreen() {
         transparent={true}
         onRequestClose={() => setShowEditModal(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-dark-surface rounded-t-3xl p-6">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
+        >
+          <View className="flex-1 bg-black/50 justify-end">
+            <View className="bg-dark-surface rounded-t-3xl p-6">
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-white text-xl font-bold">Edit Profile</Text>
               <Pressable onPress={() => setShowEditModal(false)}>
@@ -582,6 +586,7 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Change Password Modal */}
@@ -591,8 +596,12 @@ export default function ProfileScreen() {
         transparent={true}
         onRequestClose={() => setShowPasswordModal(false)}
       >
-        <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-dark-surface rounded-t-3xl p-6">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
+        >
+          <View className="flex-1 bg-black/50 justify-end">
+            <View className="bg-dark-surface rounded-t-3xl p-6">
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-white text-xl font-bold">Change Password</Text>
               <Pressable onPress={() => setShowPasswordModal(false)}>
@@ -667,6 +676,7 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Notifications Settings Modal */}

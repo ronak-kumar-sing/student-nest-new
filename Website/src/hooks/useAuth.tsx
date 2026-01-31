@@ -99,9 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log('Logout successful');
 
-      // Redirect to login page
+      // Redirect to home page
       if (typeof window !== 'undefined') {
-        window.location.href = '/student/login';
+        window.location.href = '/';
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiClient.clearAuthData();
 
       if (typeof window !== 'undefined') {
-        window.location.href = '/student/login';
+        window.location.href = '/';
       }
     } finally {
       setLoading(false);
