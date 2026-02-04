@@ -22,8 +22,8 @@ const getApiUrl = () => {
     return 'http://localhost:3000/api';
   }
   
-  // Production URL (update this when you deploy)
-  return 'https://student-nest-infotsav.vercel.app/api';
+  // Production URL
+  return 'https://www.student-nest.live/api';
 };
 
 export const API_URL = getApiUrl();

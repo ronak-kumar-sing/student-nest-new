@@ -9,13 +9,13 @@ import { MapPin, Navigation, Star, X } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.0922;
+const LATITUDE_DELTA = 0.05;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-// Default center (Delhi, India)
+// Default center - LPU, Phagwara, Punjab (main target location)
 const DEFAULT_CENTER = {
-  latitude: 28.6139,
-  longitude: 77.2090,
+  latitude: 31.2550,
+  longitude: 75.7066,
   latitudeDelta: LATITUDE_DELTA,
   longitudeDelta: LONGITUDE_DELTA,
 };
@@ -24,32 +24,63 @@ interface RoomsMapProps {
   rooms: Room[];
   onClose?: () => void;
   showCloseButton?: boolean;
+  userLocation?: { lat: number; lng: number } | null;
 }
 
-// Helper function to extract coordinates from either array or object format
-const getCoordinates = (coords: { lat: number; lng: number } | [number, number] | undefined) => {
+// Helper function to extract coordinates from various formats
+// API can return: { lat, lng }, { latitude, longitude }, [lng, lat] (GeoJSON format), or undefined
+const getCoordinates = (coords: any): { lat: number; lng: number } | null => {
   if (!coords) return null;
+  
+  // Array format (GeoJSON: [longitude, latitude])
   if (Array.isArray(coords)) {
-    return { lat: coords[1], lng: coords[0] };
+    if (coords.length >= 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+      return { lng: coords[0], lat: coords[1] };
+    }
+    return null;
   }
-  return coords;
+  
+  // Object with lat/lng
+  if (typeof coords.lat === 'number' && typeof coords.lng === 'number') {
+    return { lat: coords.lat, lng: coords.lng };
+  }
+  
+  // Object with latitude/longitude
+  if (typeof coords.latitude === 'number' && typeof coords.longitude === 'number') {
+    return { lat: coords.latitude, lng: coords.longitude };
+  }
+  
+  return null;
 };
 
-export default function RoomsMap({ rooms, onClose, showCloseButton = true }: RoomsMapProps) {
+export default function RoomsMap({ rooms, onClose, showCloseButton = true, userLocation: propUserLocation }: RoomsMapProps) {
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
   const [region, setRegion] = useState<Region>(DEFAULT_CENTER);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
     requestLocation();
   }, []);
 
+  // Center map on prop user location if provided
   useEffect(() => {
-    // Fit map to show all rooms
-    if (rooms.length > 0 && mapRef.current) {
+    if (propUserLocation && mapRef.current && mapReady) {
+      setRegion({
+        latitude: propUserLocation.lat,
+        longitude: propUserLocation.lng,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      });
+    }
+  }, [propUserLocation, mapReady]);
+
+  useEffect(() => {
+    // Fit map to show all rooms when map is ready
+    if (rooms.length > 0 && mapRef.current && mapReady) {
       const validRooms = rooms.filter(room => {
         const coords = getCoordinates(room.location?.coordinates);
         return coords?.lat && coords?.lng;
@@ -57,29 +88,42 @@ export default function RoomsMap({ rooms, onClose, showCloseButton = true }: Roo
       
       if (validRooms.length > 0) {
         const coordinates = validRooms.map(room => {
-          const coords = getCoordinates(room.location.coordinates)!;
+          const coords = getCoordinates(room.location?.coordinates)!;
           return {
             latitude: coords.lat,
             longitude: coords.lng,
           };
         });
 
+        // Add user location to bounds if available
         if (userLocation) {
           coordinates.push({
             latitude: userLocation.coords.latitude,
             longitude: userLocation.coords.longitude,
           });
+        } else if (propUserLocation) {
+          coordinates.push({
+            latitude: propUserLocation.lat,
+            longitude: propUserLocation.lng,
+          });
         }
 
-        setTimeout(() => {
-          mapRef.current?.fitToCoordinates(coordinates, {
-            edgePadding: { top: 100, right: 50, bottom: 150, left: 50 },
-            animated: true,
-          });
-        }, 500);
+        // Only fit to coordinates if we have valid ones
+        if (coordinates.length > 0) {
+          setTimeout(() => {
+            mapRef.current?.fitToCoordinates(coordinates, {
+              edgePadding: { top: 100, right: 50, bottom: 150, left: 50 },
+              animated: true,
+            });
+          }, 300);
+        }
+      } else {
+        // No valid room coordinates, center on first room if it has location city
+        // Or default to LPU area
+        console.log('No valid room coordinates found, using default center');
       }
     }
-  }, [rooms, userLocation]);
+  }, [rooms, userLocation, propUserLocation, mapReady]);
 
   const requestLocation = async () => {
     try {
@@ -124,10 +168,28 @@ export default function RoomsMap({ rooms, onClose, showCloseButton = true }: Roo
   };
 
   const getMarkerColor = (room: Room) => {
-    if (room.availability === 'available') return '#22C55E';
-    if (room.availability === 'occupied') return '#EF4444';
+    // Check availability in different formats
+    const isAvailable = room.availability === 'available' || 
+                       room.availability?.isAvailable === true ||
+                       room.status === 'active';
+    const isOccupied = room.availability === 'occupied' || 
+                       room.availability?.isAvailable === false ||
+                       room.status === 'rented';
+    
+    if (isAvailable) return '#22C55E';
+    if (isOccupied) return '#EF4444';
     return '#F97316';
   };
+
+  const onMapReady = () => {
+    setMapReady(true);
+  };
+
+  // Filter rooms with valid coordinates
+  const validRooms = rooms.filter(room => {
+    const coords = getCoordinates(room.location?.coordinates);
+    return coords?.lat && coords?.lng;
+  });
 
   return (
     <View style={styles.container}>
@@ -136,24 +198,28 @@ export default function RoomsMap({ rooms, onClose, showCloseButton = true }: Roo
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         initialRegion={region}
+        onMapReady={onMapReady}
         showsUserLocation
         showsMyLocationButton={false}
         showsCompass
         rotateEnabled
         zoomEnabled
         pitchEnabled
+        mapType="standard"
       >
-        {rooms.map((room) => {
+        {validRooms.map((room) => {
           const coords = getCoordinates(room.location?.coordinates);
           
           if (!coords?.lat || !coords?.lng) return null;
 
+          const roomId = room.id || room._id;
+          if (!roomId) return null;
+
           return (
             <Marker
-              key={room.id || room._id}
+              key={roomId}
               coordinate={{ latitude: coords.lat, longitude: coords.lng }}
               onPress={() => handleMarkerPress(room)}
-              pinColor={getMarkerColor(room)}
             >
               <View style={styles.customMarker}>
                 <View style={[styles.markerDot, { backgroundColor: getMarkerColor(room) }]}>
@@ -231,8 +297,19 @@ export default function RoomsMap({ rooms, onClose, showCloseButton = true }: Roo
       {/* Room Count Badge */}
       <View style={styles.countBadge}>
         <MapPin size={14} color="#fff" />
-        <Text style={styles.countText}>{rooms.length} rooms</Text>
+        <Text style={styles.countText}>
+          {validRooms.length} room{validRooms.length !== 1 ? 's' : ''} on map
+        </Text>
       </View>
+
+      {/* No Rooms Message */}
+      {validRooms.length === 0 && rooms.length > 0 && (
+        <View style={styles.noRoomsMessage}>
+          <Text style={styles.noRoomsText}>
+            Rooms found but no map coordinates available
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -309,6 +386,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  noRoomsMessage: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  noRoomsText: {
+    color: '#fff',
+    fontSize: 14,
+    textAlign: 'center',
   },
   customMarker: {
     alignItems: 'center',

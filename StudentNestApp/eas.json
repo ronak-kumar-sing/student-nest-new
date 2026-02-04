@@ -28,14 +28,12 @@
         "resourceClass": "m-medium"
       },
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       }
     }
   },
   "submit": {
     "production": {}
   },
-  "updates": {
-    "url": "https://u.expo.dev/your-project-id"
-  }
+  
 }

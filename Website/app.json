@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "c6b22b07-ba6b-46e7-a581-a00cdc4220d9"
+      }
+    },
+    "android": {
+      "package": "com.ronakkumar123.studentnestnew"
+    }
+  }
+}

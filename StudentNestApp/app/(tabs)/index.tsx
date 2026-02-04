@@ -50,7 +50,7 @@ export default function HomeScreen() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showMapView, setShowMapView] = useState(false);
-  const [showNearbyOnly, setShowNearbyOnly] = useState(true);
+  const [showNearbyOnly, setShowNearbyOnly] = useState(false); // Default to false to show all rooms
 
   // Check if user is an owner
   const isOwner = user?.role?.toLowerCase() === 'owner';
@@ -59,15 +59,17 @@ export default function HomeScreen() {
   const buildFilters = () => {
     const filters: Record<string, any> = {};
 
+    // Only apply location filter if showNearbyOnly is true AND we have location
     if (showNearbyOnly && location.latitude && location.longitude) {
       filters.lat = location.latitude;
       filters.lng = location.longitude;
       filters.maxDistance = 50; // 50 km radius
     }
 
-    if (location.city && !filters.lat) {
-      filters.city = location.city;
-    }
+    // Don't filter by city when showing all rooms
+    // if (location.city && !filters.lat) {
+    //   filters.city = location.city;
+    // }
 
     return filters;
   };
@@ -289,6 +291,7 @@ export default function HomeScreen() {
           rooms={rooms}
           onClose={() => setShowMapView(false)}
           showCloseButton
+          userLocation={location.latitude && location.longitude ? { lat: location.latitude, lng: location.longitude } : undefined}
         />
       </Modal>
 
@@ -466,13 +469,17 @@ export default function HomeScreen() {
               <View className="py-8 items-center">
                 <HomeIcon size={48} color="#71717A" />
                 <Text className="text-dark-text mt-4 text-center">
-                  {location.city
-                    ? `No rooms available in ${location.city}`
+                  {showNearbyOnly && location.city
+                    ? `No rooms available near ${location.city}`
                     : 'No rooms available at the moment'}
                 </Text>
-                {showNearbyOnly && location.latitude && (
+                {showNearbyOnly && (
                   <Pressable
-                    onPress={() => setShowNearbyOnly(false)}
+                    onPress={() => {
+                      setShowNearbyOnly(false);
+                      // Trigger refetch after state change
+                      setTimeout(() => refetch(), 100);
+                    }}
                     className="mt-4 bg-primary-500 px-6 py-3 rounded-xl"
                   >
                     <Text className="text-white font-semibold">Show All Rooms</Text>

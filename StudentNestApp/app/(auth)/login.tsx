@@ -187,7 +187,7 @@ export default function LoginScreen() {
                 <Pressable
                   onPress={() => {
                     setMethod('email');
-                    setEmail('demo.student@studentnest.com');
+                    setEmail('demo.student@student-nest.live');
                     setPassword('Demo@123');
                   }}
                   className="bg-secondary-700 px-4 py-2 rounded-lg"
@@ -197,7 +197,7 @@ export default function LoginScreen() {
                 <Pressable
                   onPress={() => {
                     setMethod('email');
-                    setEmail('demo.owner@studentnest.com');
+                    setEmail('demo.owner@student-nest.live');
                     setPassword('Demo@123');
                   }}
                   className="bg-primary-700 px-4 py-2 rounded-lg"

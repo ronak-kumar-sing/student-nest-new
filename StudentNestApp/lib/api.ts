@@ -626,6 +626,46 @@ export const ownerPropertiesApi = {
 
 // Payments API
 export const paymentsApi = {
+  // Create payment order
+  createOrder: async (data: {
+    amount: number;
+    bookingId?: string;
+    propertyId?: string;
+    description?: string;
+    currency?: string;
+  }): Promise<ApiResponse<{
+    orderId: string;
+    amount: number;
+    currency: string;
+    receipt: string;
+    transactionId: string;
+    keyId: string;
+  }>> => {
+    const response = await api.post('/payments/create-order', data);
+    return response.data;
+  },
+
+  // Verify payment
+  verifyPayment: async (data: {
+    orderId: string;
+    paymentId: string;
+    signature: string;
+  }): Promise<ApiResponse<any>> => {
+    const response = await api.post('/payments/verify', data);
+    return response.data;
+  },
+
+  // Confirm offline payment
+  confirmOfflinePayment: async (data: {
+    bookingId: string;
+    amount: number;
+    paymentMethod: string;
+    notes?: string;
+  }): Promise<ApiResponse<any>> => {
+    const response = await api.post('/payments/confirm-offline', data);
+    return response.data;
+  },
+
   // Get payment history
   getAll: async (filters?: {
     status?: string;

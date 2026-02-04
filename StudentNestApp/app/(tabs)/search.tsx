@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { roomsApi } from '../../lib/api';
 import { Room, RoomFilters } from '../../types';
 import { ROOM_TYPES, AMENITIES } from '../../constants/config';
+import { useLocation } from '../../hooks/useLocation';
 import RoomsMap from '../../components/map/RoomsMap';
 import {
   Search,
@@ -35,6 +36,7 @@ const { width } = Dimensions.get('window');
 export default function SearchScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ type?: string }>();
+  const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -142,6 +144,7 @@ export default function SearchScreen() {
           rooms={filteredRooms} 
           onClose={() => setShowMapView(false)}
           showCloseButton
+          userLocation={location.latitude && location.longitude ? { lat: location.latitude, lng: location.longitude } : undefined}
         />
       </Modal>
 

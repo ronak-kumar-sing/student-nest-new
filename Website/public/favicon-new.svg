@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="32" cy="32" r="32" fill="#F97316"/>
+  
+  <!-- House Shape -->
+  <path d="M32 18L18 28V46H28V38H36V46H46V28L32 18Z" fill="white"/>
+  
+  <!-- Graduation Cap on Top -->
+  <path d="M32 14L24 18L32 22L40 18L32 14Z" fill="white"/>
+  <rect x="31" y="18" width="2" height="4" fill="white"/>
+  <circle cx="40" cy="18" r="1.5" fill="white"/>
+  
+  <!-- Door -->
+  <rect x="29" y="40" width="6" height="6" fill="#F97316"/>
+</svg>

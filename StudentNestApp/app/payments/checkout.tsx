@@ -29,8 +29,6 @@ import {
   ExternalLink,
   IndianRupee,
 } from 'lucide-react-native';
-import { API_URL } from '../../constants/config';
-import { tokenStorage } from '../../lib/storage';
 
 export default function PaymentScreen() {
   const router = useRouter();
@@ -61,32 +59,16 @@ export default function PaymentScreen() {
     setPaymentStatus('processing');
 
     try {
-      const token = await tokenStorage.getAccessToken();
-
-      if (!token) {
+      if (!isAuthenticated) {
         throw new Error('Please login to continue');
       }
 
-      // Create order on backend
-      const response = await fetch(`${API_URL}/payments/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          amount: totalAmount,
-          bookingId: bookingId,
-          description: `Booking Payment for ${roomTitle || 'Room'}`,
-        }),
+      // Create order using paymentsApi
+      const result = await paymentsApi.createOrder({
+        amount: totalAmount,
+        bookingId: bookingId,
+        description: `Booking Payment for ${roomTitle || 'Room'}`,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create payment order');
-      }
-
-      const result = await response.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to create order');
@@ -95,7 +77,9 @@ export default function PaymentScreen() {
       return result.data;
     } catch (error: any) {
       console.error('Create order error:', error);
-      throw error;
+      // Extract error message properly
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to create payment order';
+      throw new Error(errorMessage);
     }
   };
 
@@ -164,23 +148,12 @@ export default function PaymentScreen() {
 
   const handlePaymentSuccess = async (response: { orderId: string; paymentId: string; signature: string }) => {
     try {
-      const token = await tokenStorage.getAccessToken();
-
-      // Verify payment with backend
-      const verifyResponse = await fetch(`${API_URL}/payments/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          orderId: response.orderId,
-          paymentId: response.paymentId,
-          signature: response.signature,
-        }),
+      // Verify payment using paymentsApi
+      const verifyResult = await paymentsApi.verifyPayment({
+        orderId: response.orderId,
+        paymentId: response.paymentId,
+        signature: response.signature,
       });
-
-      const verifyResult = await verifyResponse.json();
 
       if (verifyResult.success) {
         setPaymentStatus('success');
@@ -203,7 +176,8 @@ export default function PaymentScreen() {
     } catch (error: any) {
       console.error('Verification error:', error);
       setPaymentStatus('failed');
-      Alert.alert('Error', error.message || 'Payment verification failed');
+      const errorMessage = error.response?.data?.error || error.message || 'Payment verification failed';
+      Alert.alert('Error', errorMessage);
     }
   };
 
