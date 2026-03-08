@@ -279,17 +279,17 @@ const roomAPI = {
 
 // Loading skeleton component
 const RoomDetailsSkeleton = () => (
-  <div className="min-h-screen bg-white animate-pulse">
+  <div className="min-h-screen bg-background animate-pulse">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="h-96 bg-gray-100 rounded-xl"></div>
-          <div className="h-32 bg-gray-100 rounded-xl"></div>
-          <div className="h-48 bg-gray-100 rounded-xl"></div>
+          <div className="h-96 bg-muted rounded-xl"></div>
+          <div className="h-32 bg-muted rounded-xl"></div>
+          <div className="h-48 bg-muted rounded-xl"></div>
         </div>
         <div className="space-y-6">
-          <div className="h-64 bg-gray-100 rounded-xl"></div>
-          <div className="h-48 bg-gray-100 rounded-xl"></div>
+          <div className="h-64 bg-muted rounded-xl"></div>
+          <div className="h-48 bg-muted rounded-xl"></div>
         </div>
       </div>
     </div>
@@ -322,13 +322,13 @@ const ImageGallery = ({ images, title }: { images: string[]; title: string }) =>
           <>
             <button
               onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-gray-900 p-3 rounded-full transition-all"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-gray-900 p-3 rounded-full transition-all"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -337,12 +337,12 @@ const ImageGallery = ({ images, title }: { images: string[]; title: string }) =>
 
         <button
           onClick={() => setIsFullscreen(true)}
-          className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-gray-900 p-2 rounded-lg transition-all"
+          className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg transition-all"
         >
           <Maximize className="w-5 h-5" />
         </button>
 
-        <div className="absolute bottom-4 right-4 bg-black/70 text-gray-900 px-3 py-1 rounded-full text-sm">
+        <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
           {currentIndex + 1} / {images.length}
         </div>
       </div>
@@ -372,7 +372,7 @@ const ImageGallery = ({ images, title }: { images: string[]; title: string }) =>
         <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
           <button
             onClick={() => setIsFullscreen(false)}
-            className="absolute top-4 right-4 text-gray-900 hover:text-gray-300 z-10"
+            className="absolute top-4 right-4 text-white hover:text-white/70 z-10"
           >
             <X className="w-8 h-8" />
           </button>
@@ -385,13 +385,13 @@ const ImageGallery = ({ images, title }: { images: string[]; title: string }) =>
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-gray-900 p-4 rounded-full"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-4 rounded-full"
               >
                 <ChevronLeft className="w-8 h-8" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-gray-900 p-4 rounded-full"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-4 rounded-full"
               >
                 <ChevronRight className="w-8 h-8" />
               </button>
@@ -452,12 +452,12 @@ const PriceNegotiationModal = ({ room, isOpen, onClose }: { room: Room | null; i
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-50 rounded-2xl p-6 w-full max-w-md border border-gray-200">
+      <div className="bg-card rounded-2xl p-6 w-full max-w-md border border-border">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900">Negotiate Price</h3>
+          <h3 className="text-2xl font-semibold text-foreground">Negotiate Price</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-900"
+            className="text-muted-foreground hover:text-foreground"
           >
             <X className="w-6 h-6" />
           </button>
@@ -465,13 +465,13 @@ const PriceNegotiationModal = ({ room, isOpen, onClose }: { room: Room | null; i
 
         <div className="space-y-4">
           {/* Price Summary */}
-          <div className="bg-gray-100 p-4 rounded-lg border border-gray-300">
+          <div className="bg-muted p-4 rounded-lg border border-border">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm text-gray-400">Original Price:</span>
-              <span className="text-gray-900 font-semibold">₹{room?.price.toLocaleString()}/month</span>
+              <span className="text-sm text-muted-foreground">Original Price:</span>
+              <span className="text-foreground font-semibold">₹{room?.price.toLocaleString()}/month</span>
             </div>
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm text-gray-400">Your Offer:</span>
+              <span className="text-sm text-muted-foreground">Your Offer:</span>
               <span className="text-blue-400 font-semibold">₹{offerPrice.toLocaleString()}/month</span>
             </div>
             {savingsAmount > 0 && (
@@ -486,7 +486,7 @@ const PriceNegotiationModal = ({ room, isOpen, onClose }: { room: Room | null; i
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Your Offer Price <span className="text-red-400">*</span>
             </label>
             <input
@@ -495,27 +495,27 @@ const PriceNegotiationModal = ({ room, isOpen, onClose }: { room: Room | null; i
               onChange={(e) => setOfferPrice(Number(e.target.value))}
               min="1"
               max={room?.price ? room.price - 1 : undefined}
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-green-500"
+              className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-green-500"
               placeholder="Enter your offer"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Must be less than ₹{room?.price.toLocaleString()}
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Message to Owner <span className="text-gray-500">(Optional)</span>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Message to Owner <span className="text-muted-foreground">(Optional)</span>
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-green-500"
+              className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-green-500"
               rows={3}
               placeholder="Explain why you're offering this price..."
               maxLength={500}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {message.length}/500 characters
             </p>
           </div>
@@ -524,7 +524,7 @@ const PriceNegotiationModal = ({ room, isOpen, onClose }: { room: Room | null; i
             <Button
               onClick={onClose}
               variant="outline"
-              className="flex-1 border-zinc-600 text-gray-300 hover:bg-gray-100"
+              className="flex-1 border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
@@ -604,12 +604,12 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-50 rounded-2xl p-6 w-full max-w-md border border-gray-200">
+      <div className="bg-card rounded-2xl p-6 w-full max-w-md border border-border">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900">Schedule Visit</h3>
+          <h3 className="text-2xl font-semibold text-foreground">Schedule Visit</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-900"
+            className="text-muted-foreground hover:text-foreground"
           >
             <X className="w-6 h-6" />
           </button>
@@ -617,7 +617,7 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Meeting Type
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -626,7 +626,7 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
                 onClick={() => setMeetingType('physical')}
                 className={`px-4 py-3 rounded-xl border-2 transition-all ${meetingType === 'physical'
                   ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                  : 'border-gray-300 bg-gray-100 text-gray-400 hover:border-zinc-600'
+                  : 'border-border bg-muted text-muted-foreground hover:border-border'
                   }`}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -639,7 +639,7 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
                 onClick={() => setMeetingType('virtual')}
                 className={`px-4 py-3 rounded-xl border-2 transition-all ${meetingType === 'virtual'
                   ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                  : 'border-gray-300 bg-gray-100 text-gray-400 hover:border-zinc-600'
+                  : 'border-border bg-muted text-muted-foreground hover:border-border'
                   }`}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -652,21 +652,21 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
 
           {meetingType === 'virtual' && (
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Meeting Link (Optional)
               </label>
               <input
                 type="url"
                 value={meetingLink}
                 onChange={(e) => setMeetingLink(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-blue-500"
                 placeholder="Google Meet or Zoom link..."
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Preferred Date
             </label>
             <input
@@ -674,18 +674,18 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
               value={visitDate}
               onChange={(e) => setVisitDate(e.target.value)}
               min={today}
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Preferred Time
             </label>
             <select
               value={visitTime}
               onChange={(e) => setVisitTime(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a time</option>
               <option value="09:00">9:00 AM</option>
@@ -701,13 +701,13 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Message (Optional)
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-blue-500"
               rows={3}
               placeholder="Any specific requirements or questions..."
             />
@@ -717,7 +717,7 @@ const ScheduleVisitModal = ({ room, isOpen, onClose }: { room: Room | null; isOp
             <Button
               onClick={onClose}
               variant="outline"
-              className="flex-1 border-zinc-600 text-gray-300 hover:bg-gray-100"
+              className="flex-1 border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </Button>
@@ -1006,10 +1006,10 @@ export default function RoomDetailsPage() {
 
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Room Not Found</h1>
-          <p className="text-gray-400 mb-6">The room you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Room Not Found</h1>
+          <p className="text-muted-foreground mb-6">The room you're looking for doesn't exist.</p>
           <Link href="/dashboard">
             <Button className="bg-blue-600 hover:bg-blue-700">
               Back to Dashboard
@@ -1021,7 +1021,7 @@ export default function RoomDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Image Gallery */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <ImageGallery images={room.images || []} title={room.title} />
@@ -1038,20 +1038,20 @@ export default function RoomDetailsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              <h1 className="text-4xl font-bold text-foreground mb-4 leading-tight">
                 {room.title}
               </h1>
 
               <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center gap-2 text-gray-400">
-                  <MapPin className="w-4 h-4 text-gray-500" />
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
                   <span>{room.location.fullAddress || room.location.address}</span>
                 </div>
                 {room.rating && (
                   <div className="flex items-center gap-2 bg-yellow-900/50 px-3 py-1 rounded-full border border-yellow-700">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold text-yellow-400">{room.rating}</span>
-                    <span className="text-gray-400">({room.totalReviews} reviews)</span>
+                    <span className="text-muted-foreground">({room.totalReviews} reviews)</span>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
@@ -1078,14 +1078,14 @@ export default function RoomDetailsPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400">
-                <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
+              <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg border border-border">
                   <Maximize className="w-4 h-4 text-blue-400" />
-                  <span className="font-medium text-gray-900">{room.features.area} sq ft</span>
+                  <span className="font-medium text-foreground">{room.features.area} sq ft</span>
                 </div>
-                <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg border border-gray-300">
+                <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg border border-border">
                   <Home className="w-4 h-4 text-green-400" />
-                  <span className="font-medium text-gray-900">Floor {room.features.floor}/{room.features.totalFloors}</span>
+                  <span className="font-medium text-foreground">Floor {room.features.floor}/{room.features.totalFloors}</span>
                 </div>
                 {room.features.furnished && (
                   <div className="flex items-center gap-2 bg-green-900/50 text-green-400 px-3 py-2 rounded-lg border border-green-700">
@@ -1109,10 +1109,10 @@ export default function RoomDetailsPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="space-y-4"
             >
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-2xl font-semibold text-foreground">
                 About This Place
               </h3>
-              <p className="text-gray-300 leading-relaxed text-lg">{room.fullDescription || room.description}</p>
+              <p className="text-muted-foreground leading-relaxed text-lg">{room.fullDescription || room.description}</p>
 
               {/* Quick Highlights */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
@@ -1149,15 +1149,15 @@ export default function RoomDetailsPage() {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-purple-600 rounded-lg">
-                        <UserPlus className="w-5 h-5 text-gray-900" />
+                        <UserPlus className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900">Room Sharing Available</h3>
+                        <h3 className="text-xl font-semibold text-foreground">Room Sharing Available</h3>
                         <p className="text-purple-300 text-sm">Share this room with other students</p>
                       </div>
                     </div>
                     <Link href={`/dashboard/room-sharing/${roomSharingStatus._id}`}>
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-gray-900">
+                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                         View Details
                       </Button>
                     </Link>
@@ -1206,7 +1206,7 @@ export default function RoomDetailsPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="space-y-4"
             >
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-2xl font-semibold text-foreground">
                 Amenities & Facilities
               </h3>
 
@@ -1238,13 +1238,13 @@ export default function RoomDetailsPage() {
                 transition={{ duration: 0.6, delay: 0.6 }}
                 className="space-y-6"
               >
-                <h3 className="text-2xl font-semibold text-gray-900">
+                <h3 className="text-2xl font-semibold text-foreground">
                   Location & Nearby
                 </h3>
 
                 {/* Nearby Universities */}
                 <div>
-                  <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg text-gray-900">
+                  <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg text-foreground">
                     🏫 Nearby Universities
                   </h4>
                   <div className="space-y-3">
@@ -1254,11 +1254,11 @@ export default function RoomDetailsPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 * index }}
-                        className="flex justify-between items-center p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+                        className="flex justify-between items-center p-4 bg-card rounded-xl border border-border hover:shadow-md transition-shadow"
                       >
                         <div>
-                          <div className="font-semibold text-gray-900">{uni.name}</div>
-                          <div className="text-sm text-gray-400 flex items-center gap-1">
+                          <div className="font-semibold text-foreground">{uni.name}</div>
+                          <div className="text-sm text-muted-foreground flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
                             {uni.distance} km • {uni.commute} min by transport
                           </div>
@@ -1274,7 +1274,7 @@ export default function RoomDetailsPage() {
                 {/* Nearby Facilities */}
                 {room.location.nearbyFacilities && room.location.nearbyFacilities.length > 0 && (
                   <div>
-                    <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg text-gray-900">
+                    <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg text-foreground">
                       🏪 Nearby Facilities
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1284,13 +1284,13 @@ export default function RoomDetailsPage() {
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.1 * index }}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow"
+                          className="flex items-center justify-between p-4 bg-card rounded-xl border border-border hover:shadow-md transition-shadow"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-300">
-                              <MapPin className="w-4 h-4 text-gray-400" />
+                            <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center border border-border">
+                              <MapPin className="w-4 h-4 text-muted-foreground" />
                             </div>
-                            <span className="font-medium text-gray-900">{facility.name}</span>
+                            <span className="font-medium text-foreground">{facility.name}</span>
                           </div>
                           <span className="text-blue-400 font-medium">{facility.distance}m</span>
                         </motion.div>
@@ -1309,7 +1309,7 @@ export default function RoomDetailsPage() {
               className="space-y-6"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+                <h3 className="text-2xl font-semibold text-foreground flex items-center gap-2">
                   <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
                   Reviews ({room.totalReviews || room.reviews?.length || 0})
                 </h3>
@@ -1317,7 +1317,7 @@ export default function RoomDetailsPage() {
                   <div className="flex items-center gap-2 bg-yellow-900/50 px-4 py-2 rounded-full border border-yellow-700">
                     <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                     <span className="text-xl font-bold text-yellow-400">{room.rating}</span>
-                    <span className="text-gray-400">/ 5</span>
+                    <span className="text-muted-foreground">/ 5</span>
                   </div>
                 )}
               </div>
@@ -1326,18 +1326,18 @@ export default function RoomDetailsPage() {
                 <div className="space-y-6">
                   {/* Reviews Summary */}
                   {room.reviews[0]?.categories && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-4">Rating Breakdown</h4>
+                    <div className="bg-card border border-border rounded-xl p-6">
+                      <h4 className="font-semibold text-foreground mb-4">Rating Breakdown</h4>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {Object.entries(room.reviews[0].categories).map(([category, rating]) => (
                           <div key={category} className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-400 capitalize">
+                              <span className="text-sm text-muted-foreground capitalize">
                                 {category.replace(/([A-Z])/g, ' $1').trim()}
                               </span>
-                              <span className="text-sm font-semibold text-gray-900">{rating}/5</span>
+                              <span className="text-sm font-semibold text-foreground">{rating}/5</span>
                             </div>
-                            <div className="w-full bg-gray-100 rounded-full h-2">
+                            <div className="w-full bg-muted rounded-full h-2">
                               <div
                                 className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2 rounded-full transition-all"
                                 style={{ width: `${((rating as number) / 5) * 100}%` }}
@@ -1357,16 +1357,16 @@ export default function RoomDetailsPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 * index }}
-                        className="bg-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-shadow"
+                        className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-shadow"
                       >
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 text-gray-900 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                               {getInitials(review.userName)}
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
-                                <h5 className="font-semibold text-gray-900">{review.userName}</h5>
+                                <h5 className="font-semibold text-foreground">{review.userName}</h5>
                                 {review.verified && (
                                   <Badge variant="secondary" className="bg-green-900/50 text-green-400 text-xs">
                                     <CheckCircle className="w-3 h-3 mr-1" />
@@ -1374,9 +1374,9 @@ export default function RoomDetailsPage() {
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-500">{review.date}</p>
+                              <p className="text-sm text-muted-foreground">{review.date}</p>
                               {review.stayDuration && (
-                                <p className="text-xs text-gray-600 mt-1">Stayed for {review.stayDuration}</p>
+                                <p className="text-xs text-muted-foreground mt-1">Stayed for {review.stayDuration}</p>
                               )}
                             </div>
                           </div>
@@ -1386,13 +1386,13 @@ export default function RoomDetailsPage() {
                           </div>
                         </div>
 
-                        <p className="text-gray-300 leading-relaxed mb-4">{review.comment}</p>
+                        <p className="text-muted-foreground leading-relaxed mb-4">{review.comment}</p>
 
                         {review.categories && (
                           <div className="flex flex-wrap gap-2 mb-3">
                             {Object.entries(review.categories).slice(0, 4).map(([category, rating]) => (
-                              <div key={category} className="flex items-center gap-1 bg-gray-100 px-3 py-1 rounded-full text-xs">
-                                <span className="text-gray-400 capitalize">
+                              <div key={category} className="flex items-center gap-1 bg-muted px-3 py-1 rounded-full text-xs">
+                                <span className="text-muted-foreground capitalize">
                                   {category.replace(/([A-Z])/g, ' $1').trim()}
                                 </span>
                                 <span className="text-yellow-400 font-semibold">{rating}</span>
@@ -1402,7 +1402,7 @@ export default function RoomDetailsPage() {
                         )}
 
                         {review.helpfulCount && review.helpfulCount > 0 && (
-                          <div className="flex items-center gap-2 text-sm text-gray-500 border-t border-gray-200 pt-3 mt-3">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground border-t border-border pt-3 mt-3">
                             <ThumbsUp className="w-4 h-4" />
                             <span>{review.helpfulCount} people found this helpful</span>
                           </div>
@@ -1413,20 +1413,20 @@ export default function RoomDetailsPage() {
 
                   {room.totalReviews && room.totalReviews > room.reviews.length && (
                     <div className="text-center">
-                      <Button variant="outline" className="border-zinc-600 text-gray-300 hover:bg-gray-100">
+                      <Button variant="outline" className="border-border text-muted-foreground hover:bg-muted">
                         View All {room.totalReviews} Reviews
                       </Button>
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
+                <div className="bg-card border border-border rounded-xl p-8 text-center">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                      <Star className="w-8 h-8 text-gray-600" />
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                      <Star className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <p className="text-gray-400 text-lg">No reviews yet</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-muted-foreground text-lg">No reviews yet</p>
+                    <p className="text-sm text-muted-foreground">
                       Be the first to review this property after booking!
                     </p>
                   </div>
@@ -1438,15 +1438,15 @@ export default function RoomDetailsPage() {
           {/* Right Column - Booking Panel */}
           <div className="space-y-6">
             {/* Price & Booking Card */}
-            <Card className="bg-gray-50 border-gray-200 sticky top-6">
+            <Card className="bg-card border-border sticky top-6">
               <CardContent className="p-6">
                 <div className="flex items-baseline justify-between mb-4">
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-foreground">
                     ₹{room.price.toLocaleString()}
-                    <span className="text-lg font-normal text-gray-400">/month</span>
+                    <span className="text-lg font-normal text-muted-foreground">/month</span>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-500">Best Price</div>
+                    <div className="text-sm text-muted-foreground">Best Price</div>
                     <div className="text-green-400 font-medium text-sm flex items-center gap-1">
                       <Zap className="w-3 h-3" />
                       Great Deal
@@ -1458,11 +1458,11 @@ export default function RoomDetailsPage() {
                   <div className="flex items-center gap-2 mb-6">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold text-gray-900">{room.rating}</span>
+                      <span className="font-semibold text-foreground">{room.rating}</span>
                     </div>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-400">{room.totalReviews} reviews</span>
-                    <span className="text-gray-500">•</span>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground">{room.totalReviews} reviews</span>
+                    <span className="text-muted-foreground">•</span>
                     <div className="flex items-center gap-1 text-green-400">
                       <CheckCircle className="w-4 h-4" />
                       <span className="text-sm font-medium">Verified</span>
@@ -1472,7 +1472,7 @@ export default function RoomDetailsPage() {
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Move-in Date
                     </label>
                     <input
@@ -1480,7 +1480,7 @@ export default function RoomDetailsPage() {
                       value={selectedDate}
                       onChange={(e) => setSelectedDate(e.target.value)}
                       min={room.availability.availableFrom}
-                      className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-gray-900 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      className="w-full px-4 py-3 border border-border bg-muted text-foreground rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     />
                   </div>
                 </div>
@@ -1491,13 +1491,13 @@ export default function RoomDetailsPage() {
                     <>
                       <Button
                         onClick={() => router.push(`/owner/rooms/${id}/edit`)}
-                        className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-gray-900 py-4 rounded-xl font-semibold"
+                        className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-4 rounded-xl font-semibold"
                       >
                         Edit Property
                       </Button>
                       <Button
                         onClick={() => router.push(`/owner/bookings?roomId=${id}`)}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-gray-900 py-4 rounded-xl font-semibold"
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl font-semibold"
                       >
                         View Bookings
                       </Button>
@@ -1505,7 +1505,7 @@ export default function RoomDetailsPage() {
                   ) : hasExistingBooking ? (
                     <Button
                       onClick={() => router.push('/dashboard/bookings')}
-                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-gray-900 py-4 rounded-xl font-semibold"
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-semibold"
                     >
                       View My Booking
                     </Button>
@@ -1513,7 +1513,7 @@ export default function RoomDetailsPage() {
                     <Button
                       onClick={handleBookNow}
                       disabled={bookingLoading || !selectedDate}
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-gray-900 py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {bookingLoading ? (
                         <>
@@ -1529,7 +1529,7 @@ export default function RoomDetailsPage() {
                   {!isOwner && !hasExistingBooking && (
                     <Button
                       onClick={() => setShowNegotiationModal(true)}
-                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-gray-900 py-4 rounded-xl font-semibold"
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-semibold"
                     >
                       <DollarSign className="w-4 h-4 mr-2" />
                       Negotiate Price
@@ -1539,7 +1539,7 @@ export default function RoomDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={() => setShowScheduleVisitModal(true)}
-                    className="w-full py-4 rounded-xl font-semibold border-zinc-600 text-gray-300 hover:bg-gray-100"
+                    className="w-full py-4 rounded-xl font-semibold border-border text-muted-foreground hover:bg-muted"
                   >
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Visit
@@ -1550,7 +1550,7 @@ export default function RoomDetailsPage() {
                     onClick={handleSaveRoom}
                     className={`w-full py-4 rounded-xl font-semibold ${isFavorited
                       ? 'border-blue-500 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'
-                      : 'border-zinc-600 text-gray-300 hover:bg-gray-100'
+                      : 'border-border text-muted-foreground hover:bg-muted'
                       }`}
                   >
                     {isFavorited ? <BookmarkCheck className="w-4 h-4 mr-2" /> : <Bookmark className="w-4 h-4 mr-2" />}
@@ -1560,7 +1560,7 @@ export default function RoomDetailsPage() {
                   <Button
                     variant="outline"
                     onClick={handleShare}
-                    className="w-full py-4 rounded-xl font-semibold border-zinc-600 text-gray-300 hover:bg-gray-100"
+                    className="w-full py-4 rounded-xl font-semibold border-border text-muted-foreground hover:bg-muted"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Share Room
@@ -1577,43 +1577,43 @@ export default function RoomDetailsPage() {
                 </div>
 
                 {/* Cost Breakdown */}
-                <div className="border-t border-gray-300 pt-4 space-y-3 text-sm">
+                <div className="border-t border-border pt-4 space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Monthly Rent</span>
-                    <span className="font-medium text-gray-900">₹{room.price.toLocaleString()}</span>
+                    <span className="text-muted-foreground">Monthly Rent</span>
+                    <span className="font-medium text-foreground">₹{room.price.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Security Deposit</span>
-                    <span className="font-medium text-gray-900">₹{(room.price * 2).toLocaleString()}</span>
+                    <span className="text-muted-foreground">Security Deposit</span>
+                    <span className="font-medium text-foreground">₹{(room.price * 2).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center text-green-400">
                     <span>Maintenance</span>
                     <span className="font-medium">Included</span>
                   </div>
-                  <div className="flex justify-between items-center font-semibold pt-3 border-t border-gray-300 text-lg">
-                    <span className="text-gray-900">Total Initial Cost</span>
+                  <div className="flex justify-between items-center font-semibold pt-3 border-t border-border text-lg">
+                    <span className="text-foreground">Total Initial Cost</span>
                     <span className="text-blue-400">₹{(room.price * 3).toLocaleString()}</span>
                   </div>
                 </div>
 
-                <div className="mt-4 text-xs text-gray-500 text-center">
+                <div className="mt-4 text-xs text-muted-foreground text-center">
                   No booking fees • Cancel anytime
                 </div>
               </CardContent>
             </Card>
 
             {/* Owner Contact Card */}
-            <Card className="bg-gray-50 border-gray-200">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-gray-900">Property Owner</CardTitle>
+                <CardTitle className="text-foreground">Property Owner</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 text-gray-900 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
                     {getInitials(room.owner.name)}
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900 flex items-center gap-2">
+                    <div className="font-semibold text-foreground flex items-center gap-2">
                       {room.owner.name}
                       {room.owner.verified && (
                         <Badge variant="secondary" className="bg-green-900/50 text-green-400">
@@ -1622,7 +1622,7 @@ export default function RoomDetailsPage() {
                         </Badge>
                       )}
                     </div>
-                    <div className="text-sm text-gray-400">{room.owner.joinedDate}</div>
+                    <div className="text-sm text-muted-foreground">{room.owner.joinedDate}</div>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-yellow-500">
@@ -1633,26 +1633,26 @@ export default function RoomDetailsPage() {
                 </div>
 
                 {room.owner.responseRate && room.owner.responseTime && (
-                  <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-100 rounded-xl border border-gray-300">
+                  <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-muted rounded-xl border border-border">
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-green-400 mb-1">
                         <Clock className="w-4 h-4" />
                         <span className="font-semibold">{room.owner.responseRate}%</span>
                       </div>
-                      <div className="text-xs text-gray-500">Response Rate</div>
+                      <div className="text-xs text-muted-foreground">Response Rate</div>
                     </div>
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 text-blue-400 mb-1">
                         <Zap className="w-4 h-4" />
                         <span className="font-semibold">{room.owner.responseTime}</span>
                       </div>
-                      <div className="text-xs text-gray-500">Response Time</div>
+                      <div className="text-xs text-muted-foreground">Response Time</div>
                     </div>
                   </div>
                 )}
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="w-full border-gray-600 hover:bg-gray-700">
+                  <Button size="sm" variant="outline" className="w-full border-border hover:bg-muted">
                     <MessageCircle size={16} className="mr-2" />
                     Chat with Owner
                   </Button>
