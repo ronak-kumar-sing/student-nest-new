@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     // Create and send OTP
     const otp = await OTP.createOTP(email, 'email', purpose);
-    await sendOTPEmail(email, otp.code);
+    await sendOTPEmail(email, otp.plainCode || otp.code);
 
     return createSendSuccessResponse('email', email, 'sendgrid');
 

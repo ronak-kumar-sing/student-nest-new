@@ -1,4 +1,5 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 // Interface for OTP document
 interface IOTPDocument extends Document {
@@ -9,6 +10,8 @@ interface IOTPDocument extends Document {
   isUsed: boolean;
   attempts: number;
   createdAt: Date;
+  purpose: string;
+  plainCode?: string;
 }
 
 // Interface for OTP model with static methods
@@ -65,7 +68,10 @@ otpSchema.statics.createOTP = async function(
   purpose?: string
 ): Promise<IOTPDocument> {
   // Generate 6-digit OTP
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const plainCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Hash code before storing in DB
+  const hashedCode = await bcrypt.hash(plainCode, 10);
 
   // Set expiry to 10 minutes from now
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -74,11 +80,15 @@ otpSchema.statics.createOTP = async function(
   const otp = await this.create({
     identifier,
     type,
-    code,
+    code: hashedCode,
     expiresAt,
     isUsed: false,
-    attempts: 0
+    attempts: 0,
+    purpose: (purpose as any) || 'email_verification'
   });
+
+  // Attach unhashed code in-memory so sender can transmit it to user
+  otp.plainCode = plainCode;
 
   return otp;
 };
@@ -119,8 +129,10 @@ otpSchema.statics.verifyOTP = async function(
     };
   }
 
-  // Verify the code
-  if (otp.code !== code) {
+  // Verify the code (supports hashed and legacy unhashed codes)
+  const isMatch = await bcrypt.compare(code, otp.code).catch(() => false) || otp.code === code;
+
+  if (!isMatch) {
     // Increment attempts
     otp.attempts += 1;
     await otp.save();

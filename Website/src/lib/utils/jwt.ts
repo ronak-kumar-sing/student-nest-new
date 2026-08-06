@@ -106,3 +106,19 @@ export function isTokenExpired(token: string): boolean {
   if (!expiry) return true;
   return expiry < new Date();
 }
+
+/**
+ * Extract JWT access token from request (Authorization header or httpOnly cookie)
+ */
+export function extractTokenFromRequest(request: Request): string | null {
+  const authHeader = request.headers.get('authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+  const cookieHeader = request.headers.get('cookie');
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)accessToken=([^;]+)/);
+    if (match) return decodeURIComponent(match[1]);
+  }
+  return null;
+}

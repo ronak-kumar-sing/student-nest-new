@@ -6,25 +6,22 @@ import Student from '../../../lib/models/Student';
 import Room from '../../../lib/models/Room';
 import { verifyAccessToken } from '../../../lib/utils/jwt';
 
+import { extractTokenFromRequest } from '../../../lib/utils/jwt';
+
 // Helper function to verify JWT token
 async function verifyToken(request: NextRequest) {
-  try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      throw new Error('No token provided');
-    }
+  const token = extractTokenFromRequest(request);
+  if (!token) {
+    throw new Error('No token provided');
+  }
 
-    const token = authHeader.substring(7);
-    const decoded = await verifyAccessToken(token);
+  const decoded = await verifyAccessToken(token);
 
-    if (!decoded) {
-      throw new Error('Invalid token');
-    }
-
-    return decoded;
-  } catch (error) {
+  if (!decoded) {
     throw new Error('Invalid token');
   }
+
+  return decoded;
 }
 
 // GET - Get all saved rooms for the user
@@ -67,7 +64,19 @@ export async function GET(request: NextRequest) {
     } else {
       // For other users, check if they have a savedRooms field
       const userWithSaved = await User.findById(userId).select('savedRooms');
-      savedRoomIds = (userWithSaved as any)?.savedRooms || [];
+    }
+
+    const { searchParams } = new URL(request.url);
+    const checkRoomId = searchParams.get('roomId');
+    if (checkRoomId) {
+      const isSaved = savedRoomIds.map(String).includes(checkRoomId);
+      return NextResponse.json({
+        success: true,
+        data: {
+          isSaved,
+          roomId: checkRoomId,
+        },
+      });
     }
 
     // Populate saved rooms with full room details
@@ -106,7 +115,13 @@ export async function GET(request: NextRequest) {
         total: savedRooms.length,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message === 'No token provided' || error?.message === 'Invalid token') {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized - Please login' },
+        { status: 401 }
+      );
+    }
     console.error('Get saved rooms error:', error);
     return NextResponse.json(
       {

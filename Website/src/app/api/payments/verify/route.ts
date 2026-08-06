@@ -10,8 +10,8 @@ import { verifyRazorpaySignature } from '../../../../lib/utils/razorpay';
 function isMockMode(): boolean {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
-  const mockEnabled = process.env.MOCK_PAYMENTS === 'true' || process.env.NODE_ENV === 'development';
 
+  if (process.env.MOCK_PAYMENTS === 'true') return true;
   if (!keyId || !keySecret) return true;
   if (keyId.includes('xxxx') || keySecret === 'your_razorpay_key_secret') return true;
 

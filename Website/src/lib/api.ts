@@ -16,25 +16,17 @@ class ApiClient {
 
   setToken(token: string) {
     this.token = token;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', token);
-      localStorage.setItem('accessToken', token);
-    }
+    // SECURITY: Do not store access tokens in localStorage to prevent XSS exfiltration.
+    // In-memory token is used for current session; httpOnly cookies persist session securely.
   }
 
   getToken(): string | null {
-    if (this.token) return this.token;
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('accessToken') || localStorage.getItem('token');
-    }
-    return null;
+    return this.token;
   }
 
   clearToken() {
     this.token = null;
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
       localStorage.removeItem('isLoggedIn');
     }
@@ -55,6 +47,7 @@ class ApiClient {
     }
 
     const config: RequestInit = {
+      credentials: 'same-origin',
       ...options,
       headers: {
         ...defaultHeaders,
@@ -275,7 +268,7 @@ class ApiClient {
   async saveRoom(roomId: string) {
     return this.request('/saved-rooms', {
       method: 'POST',
-      body: { roomId } as any,
+      body: JSON.stringify({ roomId }) as any,
     });
   }
 
@@ -286,9 +279,9 @@ class ApiClient {
   }
 
   async isRoomSaved(roomId: string) {
-    const response = await this.getSavedRooms();
-    if (response.success) {
-      return response.data.savedRooms.some((room: any) => room.id === roomId);
+    const response = await this.request<{ isSaved: boolean }>(`/saved-rooms?roomId=${roomId}`);
+    if (response.success && response.data) {
+      return response.data.isSaved;
     }
     return false;
   }

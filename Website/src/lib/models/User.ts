@@ -249,6 +249,7 @@ userSchema.methods.toPublicProfile = function() {
   delete userObject.refreshTokens;
   delete userObject.loginAttempts;
   delete userObject.lockUntil;
+  delete userObject.__v;
   return userObject;
 };
 

@@ -57,15 +57,15 @@ export default function StudentSignupPage() {
       if (res.ok && data.success) {
         toast.success("Account created successfully! Welcome to Student Nest!")
 
-        // Store user data and redirect to home page
+        // Store user data and set token in memory (httpOnly cookie handles persistence)
         if (data.data) {
-          console.log("Storing token and user data...")
-          localStorage.setItem("accessToken", data.data.accessToken)
+          if (data.data.accessToken) {
+            api.setToken(data.data.accessToken);
+          }
           localStorage.setItem("user", JSON.stringify({
             ...data.data.user,
             userType: 'student'
           }))
-          console.log("Token and user data stored successfully")
         } else {
           console.error("No data.data in response:", data)
         }

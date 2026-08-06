@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     // Create and send OTP
     const otp = await OTP.createOTP(phone, 'phone', purpose);
-    await sendOTPSMS(phone, otp.code);
+    await sendOTPSMS(phone, otp.plainCode || otp.code);
 
     return createSendSuccessResponse('phone', phone, 'twilio');
 

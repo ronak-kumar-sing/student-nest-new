@@ -57,15 +57,13 @@ export default function OwnerSignupPage() {
       if (res.ok && data.success) {
         toast.success("Account created successfully! Welcome to Student Nest!")
 
-        // Store user data and tokens (owner API returns them directly, not nested in data)
+        // Store user data and set token in memory (httpOnly cookie handles persistence)
         if (data.accessToken) {
-          console.log("Storing token and user data...")
-          localStorage.setItem("accessToken", data.accessToken)
+          api.setToken(data.accessToken);
           localStorage.setItem("user", JSON.stringify({
             ...data.user,
             userType: 'owner'
           }))
-          console.log("Token and user data stored successfully")
         } else {
           console.error("No accessToken in response:", data)
         }
