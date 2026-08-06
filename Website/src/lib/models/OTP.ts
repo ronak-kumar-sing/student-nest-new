@@ -45,6 +45,11 @@ const otpSchema = new Schema<IOTPDocument, IOTPModel>({
   attempts: {
     type: Number,
     default: 0
+  },
+  purpose: {
+    type: String,
+    enum: ['email_verification', 'phone_verification', 'password_reset'],
+    default: 'email_verification'
   }
 }, {
   timestamps: true

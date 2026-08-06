@@ -163,8 +163,11 @@ export function verifyRazorpaySignature(options: VerifyPaymentOptions): boolean 
       .update(text)
       .digest('hex');
 
-    // Compare signatures
-    return generatedSignature === signature;
+    // Use constant-time comparison to prevent timing attacks
+    return crypto.timingSafeEqual(
+      Buffer.from(generatedSignature, 'hex'),
+      Buffer.from(signature, 'hex')
+    );
   } catch (error) {
     console.error('Signature verification error:', error);
     return false;
@@ -181,7 +184,11 @@ export function verifyWebhookSignature(body: string, signature: string, secret: 
       .update(body)
       .digest('hex');
 
-    return expectedSignature === signature;
+    // Use constant-time comparison to prevent timing attacks
+    return crypto.timingSafeEqual(
+      Buffer.from(expectedSignature, 'hex'),
+      Buffer.from(signature, 'hex')
+    );
   } catch (error) {
     console.error('Webhook signature verification error:', error);
     return false;

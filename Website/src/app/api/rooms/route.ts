@@ -328,8 +328,7 @@ export async function GET(request: NextRequest) {
           verified: room.owner?.isVerified || room.owner?.emailVerified || false,
           rating: room.owner?.averageRating || 0,
           responseRate: room.owner?.responseRate || 0,
-          email: room.owner?.email,
-          phone: room.owner?.phone,
+          // email and phone omitted from public listing — only shared post-booking
           profilePhoto: room.owner?.profilePhoto,
         },
         occupancyRate,
@@ -385,7 +384,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: 'Failed to fetch properties',
-        details: error.message,
+        ...(process.env.NODE_ENV === 'development' && { details: error.message }),
       },
       { status: 500 }
     );
@@ -421,7 +420,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    // SECURITY: Reject non-owners early from JWT claim (before any DB round-trip)
+    if (decoded.role !== 'owner') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Only property owners can create listings. Please register as an owner.',
+        },
+        { status: 403 }
+      );
+    }
+
 
     // Enhanced validation with detailed error messages
     const requiredFields = {

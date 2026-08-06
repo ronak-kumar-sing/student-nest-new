@@ -30,15 +30,17 @@ export function middleware(request: NextRequest) {
   if (request.method === 'OPTIONS') {
     const response = new NextResponse(null, { status: 204 });
     
-    // For allowed origins, echo back the origin; otherwise use wildcard
-    response.headers.set('Access-Control-Allow-Origin', isAllowed && origin ? origin : '*');
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, DELETE, PATCH, POST, PUT, OPTIONS');
-    response.headers.set(
-      'Access-Control-Allow-Headers',
-      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-    );
-    response.headers.set('Access-Control-Max-Age', '86400');
+    // Only allow trusted origins — do not set wildcard with credentials
+    if (isAllowed && origin) {
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      response.headers.set('Access-Control-Allow-Methods', 'GET, DELETE, PATCH, POST, PUT, OPTIONS');
+      response.headers.set(
+        'Access-Control-Allow-Headers',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+      );
+      response.headers.set('Access-Control-Max-Age', '86400');
+    }
     
     return response;
   }
@@ -46,14 +48,16 @@ export function middleware(request: NextRequest) {
   // For regular requests, add CORS headers to the response
   const response = NextResponse.next();
   
-  // For allowed origins, echo back the origin; otherwise use wildcard
-  response.headers.set('Access-Control-Allow-Origin', isAllowed && origin ? origin : '*');
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, DELETE, PATCH, POST, PUT, OPTIONS');
-  response.headers.set(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
-  );
+  // Only allow trusted origins — mixing wildcard with credentials is invalid per CORS spec
+  if (isAllowed && origin) {
+    response.headers.set('Access-Control-Allow-Origin', origin);
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, DELETE, PATCH, POST, PUT, OPTIONS');
+    response.headers.set(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+    );
+  }
 
   return response;
 }

@@ -146,8 +146,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         responseRate: (room.owner as any).responseRate || 95,
         responseTime: (room.owner as any).responseTime || 'within 2 hours',
         joinedDate: `Joined in ${ownerJoinDate}`,
-        email: (room.owner as any).email,
-        phone: (room.owner as any).phone,
+        // email and phone omitted from public response — only shared post-booking
       },
 
       reviews: formattedReviews,

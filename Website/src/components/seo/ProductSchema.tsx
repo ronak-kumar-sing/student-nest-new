@@ -1,5 +1,10 @@
 import Script from 'next/script';
 
+// Escape </script> to prevent script injection in JSON-LD blocks
+function safeJsonLd(obj: object): string {
+  return JSON.stringify(obj).replace(/<\/script>/gi, '\\u003c/script\\u003e');
+}
+
 interface ProductSchemaProps {
     name: string;
     description: string;
@@ -55,7 +60,7 @@ export default function ProductSchema({
         <Script
             id="product-schema"
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
         />
     );
 }

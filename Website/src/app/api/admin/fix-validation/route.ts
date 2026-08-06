@@ -53,6 +53,14 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
+    // SECURITY: Verify the caller has admin role
+    if (decoded.role !== 'admin') {
+      return NextResponse.json({
+        success: false,
+        error: 'Forbidden — Admin access required'
+      }, { status: 403 });
+    }
+
     await connectDB();
 
     const results = {

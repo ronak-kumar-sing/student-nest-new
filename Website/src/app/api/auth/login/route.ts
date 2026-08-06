@@ -7,9 +7,9 @@ import { loginSchema, normalizeEmail, sanitizePhone } from '../../../../lib/vali
 import { generateTokens } from '../../../../lib/utils/jwt';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 
-// Rate limiter: 100 attempts per 15 minutes (increased for testing)
+// Rate limiter: 5 attempts per 15 minutes per IP
 const rateLimiter = new RateLimiterMemory({
-  points: 100,
+  points: 5,
   duration: 15 * 60, // 15 minutes
 });
 
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       query.phone = sanitizePhone(identifier);
     }
 
-    console.log('Login attempt for:', query, 'Role:', role);
+    console.log('Login attempt received');
 
     let user = null;
 
@@ -71,11 +71,9 @@ export async function POST(request: Request) {
         role: { $in: roleVariants }
       }).select('+password').lean(false).exec();
 
-      console.log(role + ' search result:', user ? 'Found' : 'Not found');
     } else {
       // No role specified - search all users
       user = await User.findOne(query).select('+password').lean(false).exec();
-      console.log('User search result:', user ? 'Found' : 'Not found');
     }
 
     if (!user) {
@@ -106,13 +104,7 @@ export async function POST(request: Request) {
       }
     }
 
-    console.log('User found:', {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      isActive: user.isActive,
-      model: (user.constructor as any).modelName
-    });
+
 
     // Check if account is locked
     if (user.isLocked && user.isLocked()) {

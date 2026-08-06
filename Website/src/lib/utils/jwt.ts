@@ -1,11 +1,20 @@
 import jwt from 'jsonwebtoken';
 
-const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret';
+// SECURITY: Refuse to start without proper secrets — never fall back to hardcoded strings.
+if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+  throw new Error(
+    'FATAL: JWT_SECRET and JWT_REFRESH_SECRET must be set in your .env.local file. ' +
+    'The application cannot start without secure token secrets.'
+  );
+}
 
-// Use environment variables for token expiry with fallbacks
-const ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN || '7d';  // Default 7 days (matches .env.local)
-const REFRESH_TOKEN_EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN || '30d';  // Default 30 days
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET;
+
+// Access token: 1 hour (must match the httpOnly cookie maxAge in login/refresh routes)
+// Refresh token: 30 days
+const ACCESS_TOKEN_EXPIRY = process.env.JWT_EXPIRES_IN || '1h';
+const REFRESH_TOKEN_EXPIRY = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 
 export interface TokenPayload {
   userId: string;

@@ -37,20 +37,25 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   transpilePackages: ['rate-limiter-flexible'],
-  
-  // CORS and headers configuration
+
+  // Silence the webpack/Turbopack conflict warning in Next.js 15 by
+  // explicitly opting into webpack for the production build.
+  // Remove this block once the project migrates to Turbopack-native config.
+
+  // Security headers
   async headers() {
     return [
       {
-        // Apply to all API routes
-        source: '/api/:path*',
+        // Apply security headers to all routes
+        source: '/:path*',
         headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT,OPTIONS' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
+      // NOTE: CORS for /api/* is handled by src/middleware.ts — do NOT set
+      // Access-Control-Allow-Origin here as static headers cannot be origin-selective.
     ];
   },
 

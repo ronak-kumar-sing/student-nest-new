@@ -1,5 +1,10 @@
 import Script from 'next/script';
 
+// Escape </script> to prevent script injection in JSON-LD blocks
+function safeJsonLd(obj: object): string {
+  return JSON.stringify(obj).replace(/<\/script>/gi, '\\u003c/script\\u003e');
+}
+
 export default function OrganizationSchema() {
     const schema = {
         "@context": "https://schema.org",
@@ -27,7 +32,7 @@ export default function OrganizationSchema() {
         <Script
             id="organization-schema"
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            dangerouslySetInnerHTML={{ __html: safeJsonLd(schema) }}
         />
     );
 }
