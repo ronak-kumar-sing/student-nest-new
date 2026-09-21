@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #222222;
+  --studentnest-coral: #FF385C;
+  --studentnest-coral-dark: #E00B41;
+  --studentnest-charcoal: #222222;
+  --studentnest-gray: #717171;
+  --studentnest-light-gray: #F7F7F7;
+  --studentnest-border: #EBEBEB;
+}
+
+@theme inline {
+  --color-studentnest-coral: var(--studentnest-coral);
+  --color-studentnest-coral-dark: var(--studentnest-coral-dark);
+  --color-studentnest-charcoal: var(--studentnest-charcoal);
+  --color-studentnest-gray: var(--studentnest-gray);
+  --color-studentnest-light-gray: var(--studentnest-light-gray);
+  --color-studentnest-border: var(--studentnest-border);
+}
+
+body {
+  background: #ffffff;
+  color: #222222;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar for category carousel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* StudentNest Pill Shadows */
+.shadow-studentnest-pill {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.shadow-studentnest-pill-hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.18), 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.shadow-studentnest-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-studentnest-floating {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}

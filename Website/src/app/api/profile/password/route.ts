@@ -18,7 +18,7 @@ const passwordChangeSchema = z.object({
 });
 
 // Helper function to verify JWT token and get user
-async function getAuthenticatedUser(request: NextRequest) {
+async function getAuthenticatedUser(request: NextRequest): Promise<{ user?: any; error?: string }> {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -29,10 +29,11 @@ async function getAuthenticatedUser(request: NextRequest) {
     const decoded = await verifyAccessToken(token);
 
     if (!decoded || !decoded.userId) {
-      return { error: 'Invalid token' };
+      return { error: 'Invalid token or unauthorized access' };
     }
 
     await connectDB();
+    
     const user = await User.findById(decoded.userId);
 
     if (!user) {
@@ -51,10 +52,10 @@ export async function PUT(request: NextRequest) {
   try {
     const { user, error } = await getAuthenticatedUser(request);
 
-    if (error) {
+    if (error || !user) {
       return NextResponse.json({
         success: false,
-        error
+        error: error || 'User not found'
       }, { status: 401 });
     }
 

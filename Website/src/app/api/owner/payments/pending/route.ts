@@ -54,21 +54,21 @@ export async function GET(request: NextRequest) {
     .lean();
 
     // Format response
-    const formattedPayments = pendingPayments.map(booking => ({
+    const formattedPayments = pendingPayments.map((booking: any) => ({
       bookingId: booking._id,
       student: {
-        id: booking.student._id,
-        name: booking.student.fullName,
-        email: booking.student.email,
-        phone: booking.student.phone,
-        profilePhoto: booking.student.profilePhoto
+        id: booking.student?._id,
+        name: booking.student?.fullName,
+        email: booking.student?.email,
+        phone: booking.student?.phone,
+        profilePhoto: booking.student?.profilePhoto
       },
       room: {
-        id: booking.room._id,
-        title: booking.room.title,
-        location: booking.room.location,
-        price: booking.room.price,
-        images: booking.room.images
+        id: booking.room?._id,
+        title: booking.room?.title,
+        location: booking.room?.location,
+        price: booking.room?.price,
+        images: booking.room?.images
       },
       amount: booking.totalAmount,
       paymentMethod: booking.offlinePaymentStatus?.paymentMethod || booking.paymentMethod || 'offline',

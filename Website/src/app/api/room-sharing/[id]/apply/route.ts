@@ -42,9 +42,10 @@ async function verifyUser(request: NextRequest) {
 // POST: Apply to join a room share
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify user
     const verification = await verifyUser(request);
     if ('error' in verification) {
@@ -55,7 +56,7 @@ export async function POST(
     }
 
     const { userId } = verification;
-    const shareId = params.id;
+    const shareId = id;
     const body = await request.json();
     const { message } = body;
 
@@ -139,9 +140,10 @@ export async function POST(
 // DELETE: Withdraw application
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify user
     const verification = await verifyUser(request);
     if ('error' in verification) {
@@ -152,7 +154,7 @@ export async function DELETE(
     }
 
     const { userId } = verification;
-    const shareId = params.id;
+    const shareId = id;
 
     await connectDB();
 

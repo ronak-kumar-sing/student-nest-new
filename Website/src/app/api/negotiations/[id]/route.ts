@@ -251,9 +251,10 @@ export async function PATCH(
 // DELETE: Delete negotiation (admin only or expired negotiations)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -274,7 +275,7 @@ export async function DELETE(
 
     await connectDB();
 
-    const negotiation = await Negotiation.findById(params.id);
+    const negotiation = await Negotiation.findById(id);
 
     if (!negotiation) {
       return NextResponse.json(

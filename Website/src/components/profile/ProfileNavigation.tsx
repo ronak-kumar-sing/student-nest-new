@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import apiClient from '../../lib/api';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -22,7 +23,7 @@ import {
 
 const ProfileNavigation = ({ userType = "student" }) => {
   const pathname = usePathname();
-  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [verificationStatus, setVerificationStatus] = useState<any>(null);
 
   useEffect(() => {
     fetchVerificationStatus();
@@ -30,18 +31,8 @@ const ProfileNavigation = ({ userType = "student" }) => {
 
   const fetchVerificationStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
+      const result = await apiClient.getVerificationRequirements();
+      if (result.success && result.data) {
         setVerificationStatus(result.data);
       }
     } catch (error) {
@@ -124,7 +115,7 @@ const ProfileNavigation = ({ userType = "student" }) => {
 
   const navItems = userType === "student" ? studentNavItems : ownerNavItems;
 
-  const isActivePath = (href) => {
+  const isActivePath = (href: string) => {
     if (href === `/${userType}/profile`) {
       return pathname === href;
     }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import apiClient from '../../lib/api';
 import VerificationPrompt from './VerificationPrompt';
 
 interface VerificationGuardProps {
@@ -67,21 +68,9 @@ export default function VerificationGuard({
 
   const checkVerificationRequirements = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      const result = await apiClient.getVerificationRequirements();
 
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
+      if (result.success && result.data) {
         setVerificationStatus(result.data);
 
         const { user, requirements } = result.data;
@@ -162,22 +151,10 @@ export function useVerificationStatus(): VerificationStatusHook {
 
   const fetchVerificationStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      const result = await apiClient.getVerificationRequirements();
 
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setVerificationStatus(result.data);
+      if (result.success && result.data) {
+        setVerificationStatus(result.data as any);
       }
     } catch (error) {
       console.error('Error fetching verification status:', error);

@@ -8,44 +8,16 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import TrustBadges from './TrustBadges';
 
-// MacOS Navigation Bar Component
-function MacOSNavBar() {
-  const [currentTime, setCurrentTime] = useState('');
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('en-US', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-      setCurrentTime(timeString);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
+// Clean Application Preview Bar Component
+function ApplicationPreviewBar({ title = "StudentNest Verified Portal" }: { title?: string }) {
   return (
-    <div className="w-full h-8 bg-[#1e1e1e] flex items-center justify-between px-3 text-xs text-white/80 border-b border-white/10">
-      {/* Left side - Traffic lights */}
+    <div className="w-full h-9 bg-card/90 border-b border-border/60 flex items-center justify-between px-4 text-xs text-muted-foreground backdrop-blur-md">
       <div className="flex items-center gap-2">
-        <div className="w-3 h-3 rounded-full bg-[#ff5f57]"></div>
-        <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-        <div className="w-3 h-3 rounded-full bg-[#28ca42]"></div>
+        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="font-semibold text-foreground text-[11px] tracking-wide">{title}</span>
       </div>
-
-      {/* Center - Window title */}
-      <div className="text-white/70 font-medium">
-        StudentNest
-      </div>
-
-      {/* Right side - Time */}
-      <div className="text-white/80 font-mono">
-        {currentTime}
+      <div className="flex items-center gap-2 font-mono text-[10px] bg-muted/60 px-2 py-0.5 rounded text-muted-foreground">
+        <span>Verified Accommodation</span>
       </div>
     </div>
   );
@@ -53,9 +25,9 @@ function MacOSNavBar() {
 
 export default function ModernHeroSection() {
   return (
-    <section className="relative min-h-screen bg-[#0a0a0b] overflow-hidden" aria-label="Hero section">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed]/20 via-transparent to-[#3b82f6]/20" aria-hidden="true"></div>
+    <section className="relative min-h-screen bg-background text-foreground overflow-hidden" aria-label="Hero section">
+      {/* Subtle ambient light glow */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[500px] bg-primary/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
 
       {/* Content container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 overflow-visible">
@@ -64,28 +36,28 @@ export default function ModernHeroSection() {
           {/* Left side - Text content */}
           <div className="space-y-8">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a1a1b] border border-[#2a2a2b]">
-              <div className="w-2 h-2 bg-[#10b981] rounded-full animate-pulse"></div>
-              <span className="text-sm text-[#a1a1aa]">New Launch - Join Early Adopters</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-xs">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium text-muted-foreground">Verified Student Housing • 100% Broker-Free</span>
             </div>
 
             {/* Main headline */}
             <div className="space-y-4">
-              <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-                <span className="bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] bg-clip-text text-transparent">
+              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight">
+                <span className="text-primary">
                   Find Your
                 </span>
                 <br />
-                <span className="text-white">Perfect</span>
+                <span className="text-foreground">Perfect</span>
                 <br />
-                <span className="bg-gradient-to-r from-[#3b82f6] to-[#10b981] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary to-emerald-500 bg-clip-text text-transparent">
                   Student Home
                 </span>
               </h1>
 
-              <p className="text-xl text-[#a1a1aa] max-w-lg leading-relaxed">
-                Connect with verified property owners near your college.
-                Secure, transparent, and student-focused accommodation platform.
+              <p className="text-xl text-muted-foreground max-w-lg leading-relaxed">
+                Connect directly with verified property owners near your campus.
+                Zero brokerage, transparent pricing, and instant booking with student-friendly amenities.
               </p>
             </div>
 
@@ -94,11 +66,11 @@ export default function ModernHeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] hover:from-[#6d28d9] hover:to-[#2563eb] text-white border-0 h-14 px-8 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground h-14 px-8 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                 aria-label="Sign up and find student accommodation"
               >
-                <Link href="/student/signup">
-                  Find Accommodation
+                <Link href="/rooms">
+                  Browse Rooms
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
@@ -107,10 +79,10 @@ export default function ModernHeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-[#2a2a2b] bg-[#1a1a1b] hover:bg-[#2a2a2b] text-white h-14 px-8 text-lg rounded-xl transition-all duration-300"
+                className="border-border bg-card hover:bg-muted/80 text-foreground h-14 px-8 text-lg font-semibold rounded-xl transition-all duration-200"
               >
                 <Link href="/pricing">
-                  View Pricing
+                  View Plans
                 </Link>
               </Button>
             </div>
@@ -125,15 +97,17 @@ export default function ModernHeroSection() {
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-r from-[#7c3aed] to-[#3b82f6] border-2 border-[#0a0a0b]"></div>
+                    <div key={i} className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-[10px] font-bold text-primary">
+                      {String.fromCharCode(64 + i)}
+                    </div>
                   ))}
                 </div>
-                <span className="text-[#a1a1aa] text-sm">500+ Students Joined</span>
+                <span className="text-muted-foreground text-sm font-medium">500+ Verified Students</span>
               </div>
 
               <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-[#10b981] fill-current" />
-                <span className="text-[#a1a1aa] text-sm">Early Access Program</span>
+                <Star className="w-4 h-4 text-emerald-500 fill-current" />
+                <span className="text-muted-foreground text-sm font-medium">Verified Owner Guarantee</span>
               </div>
             </div>
           </div>
@@ -153,7 +127,7 @@ export default function ModernHeroSection() {
               >
                 <Card customClass="bg-[#2a2a2a] border-[#3a3a3a] shadow-2xl overflow-hidden rounded-xl">
                   <div className="w-full h-full flex flex-col">
-                    <MacOSNavBar />
+                    <ApplicationPreviewBar />
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/dashboard-view.svg"
@@ -176,7 +150,7 @@ export default function ModernHeroSection() {
 
                 <Card customClass="bg-[#2a2a2a] border-[#3a3a3a] shadow-2xl overflow-hidden rounded-xl">
                   <div className="w-full h-full flex flex-col">
-                    <MacOSNavBar />
+                    <ApplicationPreviewBar />
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/room-search.svg"
@@ -199,7 +173,7 @@ export default function ModernHeroSection() {
 
                 <Card customClass="bg-[#2a2a2a] border-[#3a3a3a] shadow-2xl overflow-hidden rounded-xl">
                   <div className="w-full h-full flex flex-col">
-                    <MacOSNavBar />
+                    <ApplicationPreviewBar />
                     <div className="flex-1 relative">
                       <Image
                         src="/screenshots/property-details.svg"

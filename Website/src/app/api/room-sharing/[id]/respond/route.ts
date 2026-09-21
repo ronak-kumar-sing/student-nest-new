@@ -41,9 +41,10 @@ async function verifyUser(request: NextRequest) {
 // PUT: Respond to an application (accept/reject)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Verify user
     const verification = await verifyUser(request);
     if ('error' in verification) {
@@ -54,7 +55,7 @@ export async function PUT(
     }
 
     const { userId } = verification;
-    const shareId = params.id;
+    const shareId = id;
     const body = await request.json();
     const { applicationId, status, message } = body;
 

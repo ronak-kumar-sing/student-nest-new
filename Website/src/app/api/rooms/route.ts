@@ -431,9 +431,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const body: any = await request.json();
 
     // Enhanced validation with detailed error messages
-    const requiredFields = {
+    const requiredFields: Record<string, string> = {
       title: 'Property title',
       description: 'Property description',
       price: 'Monthly rent',

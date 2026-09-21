@@ -39,15 +39,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     // Normalize role to lowercase and create sidebar user
     const normalizedRole = (authUser.role?.toLowerCase() || 'student') as "student" | "owner";
 
+    const u = authUser as any;
     setSidebarUser({
-      id: authUser.id || authUser._id || '',
-      name: authUser.fullName || authUser.email || 'User',
-      email: authUser.email || '',
+      id: u?.id || u?._id || '',
+      name: u?.fullName || u?.email || 'User',
+      email: u?.email || '',
       role: normalizedRole,
-      image: authUser.avatar,
+      image: u?.avatar || u?.profilePhoto,
       signedIn: true,
-      isIdentityVerified: authUser.isIdentityVerified,
-      identityVerificationSkipped: authUser.identityVerificationSkipped
+      isIdentityVerified: u?.isIdentityVerified,
+      identityVerificationSkipped: u?.identityVerificationSkipped
     });
   }, [loading, isAuthenticated, authUser, router]);
 

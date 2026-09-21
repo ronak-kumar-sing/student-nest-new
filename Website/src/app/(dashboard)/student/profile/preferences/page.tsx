@@ -12,6 +12,7 @@ import { Badge } from '../../../../../components/ui/badge';
 import ProfileNavigation from '../../../../../components/profile/ProfileNavigation';
 import { Heart, Home, MapPin, DollarSign, Users, Wifi, Car, Coffee, Save, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api';
 
 const PreferencesPage = () => {
   const [loading, setLoading] = useState(true);
@@ -38,23 +39,11 @@ const PreferencesPage = () => {
   const fetchPreferences = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/student', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
+      const result = await apiClient.getStudentProfile();
 
       if (result.success && result.data) {
-        const profile = result.data.profile;
-        if (profile.preferences) {
+        const profile = (result.data as any).profile || (result.data as any).studentProfile || result.data;
+        if (profile?.preferences) {
           setPreferences({
             budgetMin: profile.preferences.budgetMin || 5000,
             budgetMax: profile.preferences.budgetMax || 15000,
@@ -71,9 +60,9 @@ const PreferencesPage = () => {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching preferences:', error);
-      toast.error('Failed to load preferences');
+      toast.error(error.message || 'Failed to load preferences');
     } finally {
       setLoading(false);
     }
@@ -82,31 +71,16 @@ const PreferencesPage = () => {
   const handleSavePreferences = async () => {
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/student', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ preferences })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updateStudentProfile({ preferences });
 
       if (result.success) {
         toast.success('Preferences saved successfully!');
       } else {
         toast.error(result.error || 'Failed to save preferences');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving preferences:', error);
-      toast.error('Failed to save preferences');
+      toast.error(error.message || 'Failed to save preferences');
     } finally {
       setSaving(false);
     }

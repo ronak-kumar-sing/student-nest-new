@@ -1,2 +1,114 @@
-.vercel
-.env*
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ==========================================
+# Production & Build Outputs
+# ==========================================
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+**/.next/
+web-build/
+**/web-build/
+.expo/
+**/.expo/
+expo-env.d.ts
+.turbo/
+**/.turbo/
+
+# ==========================================
+# TypeScript & Build Caches
+# ==========================================
+*.tsbuildinfo
+**/*.tsbuildinfo
+next-env.d.ts
+
+# ==========================================
+# Environment Variables & Credentials
+# ==========================================
+.env
+.env.*
+.env*.local
+**/.env
+**/.env.*
+**/.env*.local
+!.env.example
+!**/.env.example
+!.env.template
+!**/.env.template
+DEMO_CREDENTIALS.md
+*.credentials.md
+
+# ==========================================
+# Logs & Debug
+# ==========================================
+logs/
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.metro-health-check*
+
+# ==========================================
+# Testing & Coverage
+# ==========================================
+coverage/
+**/coverage/
+.nyc_output/
+
+# ==========================================
+# Mobile / Native Generated (Expo / React Native)
+# ==========================================
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+
+# ==========================================
+# Operating System & IDE Files
+# ==========================================
+.DS_Store
+**/.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.idea/
+**/.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+*.sublime-project
+
+# ==========================================
+# Deployments & Cloud
+# ==========================================
+.vercel/
+**/.vercel/

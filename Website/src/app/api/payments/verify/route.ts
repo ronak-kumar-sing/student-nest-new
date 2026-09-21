@@ -132,12 +132,12 @@ export async function POST(request: NextRequest) {
           booking.status = 'confirmed';
           booking.confirmedAt = new Date();
           booking.paymentStatus = 'paid';
-          booking.paymentMethod = 'online';
+          (booking as any).paymentMethod = 'online';
           await booking.save();
 
           // Create notification for student (booking confirmed)
           await Notification.create({
-            userId: booking.student._id || booking.student,
+            userId: (booking.student as any)?._id || booking.student,
             type: 'booking',
             title: 'Booking Confirmed!',
             message: `Your booking for "${(booking.room as any)?.title}" has been confirmed with payment.`,
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
 
           // Create notification for owner (payment received)
           await Notification.create({
-            userId: booking.owner._id || booking.owner,
+            userId: (booking.owner as any)?._id || booking.owner,
             type: 'payment',
             title: 'Payment Received',
             message: `Payment received for "${(booking.room as any)?.title}" from ${(booking.student as any)?.fullName}`,

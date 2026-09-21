@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import apiClient from '../../lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -49,12 +50,11 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from 'sonner';
-import apiClient from '../../lib/api';
 
 interface Property {
   _id: string;
@@ -108,21 +108,13 @@ export default function OwnerPropertiesPage() {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('No access token found. Please log in.');
-      }
+      const result = await apiClient.getMyProperties();
 
-      const response = await fetch('/api/properties/my-properties', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setProperties(result.data.properties || []);
+      if (result.success && result.data) {
+        const props = Array.isArray(result.data)
+          ? result.data
+          : (result.data.properties || result.data.listings || []);
+        setProperties(props);
       } else {
         throw new Error(result.error || 'Failed to load properties');
       }
@@ -138,23 +130,22 @@ export default function OwnerPropertiesPage() {
   const filterProperties = () => {
     let filtered = properties;
 
-    // Filter by status tab
-    if (activeTab !== 'all') {
-      filtered = filtered.filter(p => {
-        if (activeTab === 'active') return p.status === 'active' && p.availability.isAvailable;
-        if (activeTab === 'inactive') return !p.availability.isAvailable;
-        if (activeTab === 'occupied') return p.occupiedRooms > 0;
-        return true;
-      });
+    // Filter by tab
+    if (activeTab === 'active') {
+      filtered = filtered.filter(p => p.availability.isAvailable);
+    } else if (activeTab === 'inactive') {
+      filtered = filtered.filter(p => !p.availability.isAvailable);
+    } else if (activeTab === 'occupied') {
+      filtered = filtered.filter(p => p.occupiedRooms > 0);
     }
 
-    // Filter by search term
+    // Filter by search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(term) ||
-        p.location.city?.toLowerCase().includes(term) ||
-        p.location.address?.toLowerCase().includes(term)
+        (p.location?.address && p.location.address.toLowerCase().includes(term)) ||
+        (p.location?.city && p.location.city.toLowerCase().includes(term))
       );
     }
 
@@ -163,22 +154,10 @@ export default function OwnerPropertiesPage() {
 
   const handlePropertyAction = async (propertyId: string, action: string) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        toast.error('Please log in to perform this action');
-        return;
-      }
-
-      const response = await fetch('/api/properties/my-properties', {
+      const result = await apiClient.request('/properties/my-properties', {
         method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ propertyId, action }),
+        body: { propertyId, action },
       });
-
-      const result = await response.json();
 
       if (result.success) {
         toast.success(`Property ${action}d successfully`);

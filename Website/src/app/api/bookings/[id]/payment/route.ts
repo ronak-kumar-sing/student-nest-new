@@ -27,9 +27,10 @@ async function verifyUser(request: NextRequest) {
 // POST: Process payment (online or offline)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const verification = await verifyUser(request);
     if ('error' in verification) {
       return NextResponse.json(
@@ -52,7 +53,7 @@ export async function POST(
     await connectDB();
 
     // Find booking
-    const booking = await Booking.findById(params.id)
+    const booking = await Booking.findById(id)
       .populate('student', 'fullName email phone')
       .populate('owner', 'fullName email phone')
       .populate('room', 'title location price');
@@ -147,9 +148,10 @@ export async function POST(
 // PATCH: Confirm offline payment (owner only)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const verification = await verifyUser(request);
     if ('error' in verification) {
       return NextResponse.json(
@@ -161,7 +163,7 @@ export async function PATCH(
     const { userId } = verification;
     await connectDB();
 
-    const booking = await Booking.findById(params.id)
+    const booking = await Booking.findById(id)
       .populate('student', 'fullName email')
       .populate('owner', 'fullName email')
       .populate('room', 'title');

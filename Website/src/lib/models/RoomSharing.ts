@@ -467,7 +467,9 @@ roomSharingSchema.methods.respondToApplication = async function(
   status: string,
   responseMessage?: string
 ): Promise<IRoomSharing> {
-  const application = this.applications.id(applicationId);
+  const application = (this.applications as any).id
+    ? (this.applications as any).id(applicationId)
+    : this.applications.find((a: any) => a._id?.toString() === applicationId || a.id === applicationId);
   if (!application) {
     throw new Error('Application not found');
   }
@@ -534,7 +536,7 @@ roomSharingSchema.methods.calculateCompatibility = function(
 
 // Static methods
 roomSharingSchema.statics.findMatches = function(
-  this: IRoomSharingModel,
+  this: any,
   userPreferences: any,
   limit: number = 10
 ): Promise<IRoomSharing[]> {

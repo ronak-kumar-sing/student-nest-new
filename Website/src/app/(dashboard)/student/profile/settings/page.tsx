@@ -11,6 +11,8 @@ import { Settings, Lock, Bell, Shield, Trash2, Eye, EyeOff, Save } from 'lucide-
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
+import apiClient from '@/lib/api';
+
 const SettingsPage = () => {
   const router = useRouter();
   const [showOldPassword, setShowOldPassword] = useState(false);
@@ -63,25 +65,7 @@ const SettingsPage = () => {
 
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/password', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          oldPassword: passwordData.oldPassword,
-          newPassword: passwordData.newPassword
-        })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.changePassword(passwordData.oldPassword, passwordData.newPassword);
 
       if (result.success) {
         toast.success('Password changed successfully!');
@@ -93,9 +77,9 @@ const SettingsPage = () => {
       } else {
         toast.error(result.error || 'Failed to change password');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error changing password:', error);
-      toast.error('Failed to change password');
+      toast.error(error.message || 'Failed to change password');
     } finally {
       setSaving(false);
     }
@@ -104,33 +88,16 @@ const SettingsPage = () => {
   const handleSaveNotifications = async () => {
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/student', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          notificationSettings
-        })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updateStudentProfile({ notificationSettings });
 
       if (result.success) {
         toast.success('Notification settings saved!');
       } else {
         toast.error(result.error || 'Failed to save settings');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
+      toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -139,33 +106,16 @@ const SettingsPage = () => {
   const handleSavePrivacy = async () => {
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/student', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          privacySettings
-        })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updateStudentProfile({ privacySettings });
 
       if (result.success) {
         toast.success('Privacy settings saved!');
       } else {
         toast.error(result.error || 'Failed to save settings');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving settings:', error);
-      toast.error('Failed to save settings');
+      toast.error(error.message || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -189,32 +139,18 @@ const SettingsPage = () => {
 
     setSaving(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        return;
-      }
-
-      const response = await fetch('/api/profile/student', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
+      const result = await apiClient.deleteStudentAccount();
 
       if (result.success) {
         toast.success('Account deleted successfully');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        apiClient.clearToken();
         router.push('/');
       } else {
         toast.error(result.error || 'Failed to delete account');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting account:', error);
-      toast.error('Failed to delete account');
+      toast.error(error.message || 'Failed to delete account');
     } finally {
       setSaving(false);
     }

@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: student_nest_api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - DATABASE_URL=postgresql://studentnest:nestsecret@postgres:5432/studentnest_dev?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_ACCESS_SECRET=student_nest_super_secret_jwt_access_key_2026
+      - JWT_REFRESH_SECRET=student_nest_super_secret_jwt_refresh_key_2026
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:4000
+      - TYPESENSE_HOST=typesense
+      - TYPESENSE_PORT=8108
+      - TYPESENSE_PROTOCOL=http
+      - TYPESENSE_API_KEY=xyz123
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - student_nest_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: student_nest_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: studentnest
+      POSTGRES_PASSWORD: nestsecret
+      POSTGRES_DB: studentnest_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studentnest -d studentnest_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - student_nest_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: student_nest_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - student_nest_net
+
+  typesense:
+    image: typesense/typesense:27.1
+    container_name: student_nest_typesense
+    restart: unless-stopped
+    ports:
+      - "8108:8108"
+    environment:
+      - TYPESENSE_DATA_DIR=/data
+      - TYPESENSE_API_KEY=xyz123
+      - TYPESENSE_ENABLE_CORS=true
+    volumes:
+      - typesense_data:/data
+    networks:
+      - student_nest_net
+
+volumes:
+  postgres_data:
+  redis_data:
+  typesense_data:
+
+networks:
+  student_nest_net:
+    driver: bridge

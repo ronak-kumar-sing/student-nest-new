@@ -33,9 +33,10 @@ async function verifyUser(request: NextRequest) {
 // POST: Perform booking actions
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const verification = await verifyUser(request);
     if ('error' in verification) {
       return NextResponse.json(
@@ -45,7 +46,7 @@ export async function POST(
     }
 
     const { userId } = verification;
-    const bookingId = params.id;
+    const bookingId = id;
     const body = await request.json();
     const { action, reason, extensionDuration, refundAmount } = body;
 

@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api';
 
 interface Transaction {
   id: string;
@@ -63,26 +64,16 @@ export default function PaymentHistory() {
     try {
       setLoading(true);
 
-      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const token = apiClient.getToken();
       if (!token) {
         throw new Error('Please login to view payment history');
       }
 
-      const statusFilter = activeTab !== 'all' ? `&status=${activeTab}` : '';
-      const response = await fetch(
-        `/api/payments/history?page=${currentPage}&limit=10${statusFilter}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
+      const result = await apiClient.getPaymentHistory(currentPage, 10, activeTab);
 
-      const result = await response.json();
-
-      if (result.success) {
-        setTransactions(result.data.transactions);
-        setTotalPages(result.data.pagination.totalPages);
+      if (result.success && result.data) {
+        setTransactions(result.data.transactions || []);
+        setTotalPages(result.data.pagination?.totalPages || 1);
       } else {
         throw new Error(result.error || 'Failed to load payment history');
       }

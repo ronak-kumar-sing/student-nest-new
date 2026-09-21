@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Loader2, Heart, MapPin, Star, Users, Eye, Filter, Navigation, Map, List } from 'lucide-react';
+import { Loader2, Heart, MapPin, Star, Users, Eye, Filter, Navigation, Map, List, AlertCircle, RefreshCw } from 'lucide-react';
+import { Skeleton } from '../ui/skeleton';
 import apiClient from '../../lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -57,6 +58,7 @@ function RoomBrowser() {
   const [allRooms, setAllRooms] = useState<Room[]>([]);
   const [displayedRooms, setDisplayedRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false); // Hidden by default
   const [savedRooms, setSavedRooms] = useState<Set<string>>(new Set());
   const [savingRoom, setSavingRoom] = useState<string | null>(null);
@@ -107,6 +109,7 @@ function RoomBrowser() {
   const loadRooms = async () => {
     try {
       setLoading(true);
+      setLoadError(null);
       console.log('📡 Loading rooms from API...');
 
       const response = await apiClient.getRooms();
@@ -120,11 +123,13 @@ function RoomBrowser() {
         setDisplayedRooms(rooms);
       } else {
         console.error('Failed to load rooms:', response.error);
+        setLoadError(response.error || 'Unable to retrieve accommodation listings from server.');
         setAllRooms([]);
         setDisplayedRooms([]);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading rooms:', error);
+      setLoadError(error.message || 'Unable to connect to backend server. Please check your connection.');
       setAllRooms([]);
       setDisplayedRooms([]);
     } finally {
@@ -571,13 +576,38 @@ function RoomBrowser() {
             </div>
           </div>
 
-          {/* Loading State */}
+          {/* Loading Skeleton State */}
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-500" />
-                <p className="text-muted-foreground">Loading available rooms...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <Card key={i} className="overflow-hidden border border-border/60 shadow-sm rounded-xl">
+                  <Skeleton className="h-48 w-full rounded-none" />
+                  <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex items-center justify-between pt-1">
+                      <Skeleton className="h-6 w-24" />
+                      <Skeleton className="h-4 w-14" />
+                    </div>
+                    <div className="flex items-center gap-2 pt-2">
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                      <Skeleton className="h-5 w-12 rounded-full" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : loadError ? (
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center my-6">
+              <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-3">
+                <AlertCircle className="w-6 h-6" />
               </div>
+              <h3 className="font-semibold text-lg text-foreground mb-1">Unable to Load Accommodations</h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto mb-4">{loadError}</p>
+              <Button onClick={loadRooms} variant="outline" className="gap-2">
+                <RefreshCw className="w-4 h-4" /> Try Again
+              </Button>
             </div>
           ) : (
             <>

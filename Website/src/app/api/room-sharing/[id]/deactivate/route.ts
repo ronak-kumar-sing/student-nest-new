@@ -6,9 +6,10 @@ import { verifyAccessToken } from '../../../../../lib/utils/jwt';
 // PATCH: Deactivate room sharing (initiator only)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -31,7 +32,7 @@ export async function PATCH(
     await connectDB();
 
     // Find the room sharing request
-    const roomSharing = await RoomSharing.findById(params.id)
+    const roomSharing = await RoomSharing.findById(id)
       .populate('property', 'title')
       .populate('initiator', 'fullName');
 

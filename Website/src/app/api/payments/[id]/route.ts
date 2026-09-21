@@ -14,7 +14,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     const token = authHeader.substring(7);
     const decoded = verifyAccessToken(token);
 
-    if (!decoded.userId) {
+    if (!decoded || !decoded.userId) {
       return { error: 'Invalid token payload' };
     }
 
@@ -43,7 +43,7 @@ export async function GET(
 
     await connectDB();
 
-    const payment = await Payment.findById(id)
+    const payment: any = await Payment.findById(id)
       .populate('bookingId', 'startDate endDate status monthlyRent')
       .populate('studentId', 'fullName email phone')
       .populate('ownerId', 'fullName email phone')
