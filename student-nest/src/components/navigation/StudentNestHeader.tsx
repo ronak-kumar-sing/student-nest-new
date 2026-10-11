@@ -128,23 +128,22 @@ export default function StudentNestHeader({ onSearch, activeFilters }: Props) {
               </Link>
             )}
             {user?.role === 'student' && (
-              <>
-                <Link
-                  href="/bookings"
-                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200/80 text-xs font-semibold text-neutral-800 transition-colors"
-                >
-                  <CalendarCheck className="w-3.5 h-3.5 text-neutral-500" />
-                  My Bookings
-                </Link>
-                <Link
-                  href="/roommates"
-                  className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-100 hover:bg-violet-200/80 text-xs font-semibold text-violet-800 transition-colors"
-                >
-                  <Users className="w-3.5 h-3.5 text-violet-500" />
-                  Find Roommate
-                </Link>
-              </>
+              <Link
+                href="/bookings"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200/80 text-xs font-semibold text-neutral-800 transition-colors"
+              >
+                <CalendarCheck className="w-3.5 h-3.5 text-neutral-500" />
+                My Bookings
+              </Link>
             )}
+
+            <Link
+              href="/roommates"
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-violet-50 hover:bg-violet-100 text-xs font-bold text-violet-700 transition-colors border border-violet-200/60 shadow-2xs"
+            >
+              <Users className="w-3.5 h-3.5 text-violet-600" />
+              <span>Room Partner</span>
+            </Link>
 
             <Link
               href="/wishlists"
@@ -449,9 +448,17 @@ export default function StudentNestHeader({ onSearch, activeFilters }: Props) {
                         </button>
                       </div>
                       <div className="h-px bg-neutral-100 my-1" />
+                      <Link
+                        href="/roommates"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="w-full text-left px-5 py-2.5 hover:bg-violet-50 text-violet-700 flex items-center gap-2 transition-colors font-bold text-xs"
+                      >
+                        <Users className="w-4 h-4 text-violet-600" />
+                        Find Room Partner (AI Match)
+                      </Link>
                       <button
                         onClick={() => openAuthModal('signup')}
-                        className="w-full text-left px-5 py-2.5 hover:bg-neutral-50 font-bold text-[#FF385C] transition-colors"
+                        className="w-full text-left px-5 py-2 hover:bg-neutral-50 font-bold text-[#FF385C] transition-colors text-xs"
                       >
                         Create New Account (Student / Owner)
                       </button>

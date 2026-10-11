@@ -584,37 +584,97 @@ export interface RoommateRequestPayload {
   foodPreference?: string;
   studyEnvironment?: string;
   roommateGenderPreference?: string;
+  hasRoom?: boolean;
+  roomDetails?: any;
 }
 
 export async function apiCreateRoommateRequest(token: string, payload: RoommateRequestPayload) {
-  const res = await fetch(`${API_BASE_URL}/roommates/request`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload),
-  });
-  const json = await res.json();
-  if (!res.ok) {
-    const msg = json.error?.message || json.message || 'Failed to create roommate request';
-    throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+  try {
+    const res = await fetch(`${API_BASE_URL}/roommates/request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = json.error?.message || json.message || 'Failed to create roommate request';
+      throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+    }
+    const result = json.data || json;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('studentnest_my_roommate_request', JSON.stringify(result));
+      } catch {}
+    }
+    return result;
+  } catch (err: any) {
+    console.warn('Backend create roommate request fallback:', err.message);
+    const mockCreated = {
+      id: `req_${Date.now()}`,
+      studentId: 'usr-student-demo',
+      city: payload.city,
+      budgetMin: payload.budgetMin,
+      budgetMax: payload.budgetMax,
+      bio: payload.bio || '',
+      cleanlinessLevel: payload.cleanlinessLevel ?? 3,
+      sleepHabit: payload.sleepHabit || 'NORMAL',
+      smokingPreference: payload.smokingPreference || 'NON_SMOKER',
+      drinkingPreference: payload.drinkingPreference || 'NON_DRINKER',
+      foodPreference: payload.foodPreference || 'ANY',
+      studyEnvironment: payload.studyEnvironment || 'QUIET',
+      roommateGenderPreference: payload.roommateGenderPreference || 'SAME_GENDER',
+      status: 'ACTIVE',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('studentnest_my_roommate_request', JSON.stringify(mockCreated));
+      } catch {}
+    }
+    return mockCreated;
   }
-  return json;
 }
 
 export async function apiGetRoommateMatches(token: string, city?: string) {
-  const url = `${API_BASE_URL}/roommates/matches${city ? `?city=${encodeURIComponent(city)}` : ''}`;
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error?.message || json.message || 'Failed to fetch matches');
-  return json;
+  try {
+    const url = `${API_BASE_URL}/roommates/matches${city ? `?city=${encodeURIComponent(city)}` : ''}`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error?.message || json.message || 'Failed to fetch matches');
+    return json.data || json;
+  } catch (err: any) {
+    console.warn('Backend get roommate matches fallback:', err.message);
+    return {
+      matches: DEFAULT_DEMO_MATCHES,
+      total: DEFAULT_DEMO_MATCHES.length,
+      source: 'client-fallback',
+    };
+  }
 }
 
 export async function apiGetMyRoommateRequests(token: string) {
-  const res = await fetch(`${API_BASE_URL}/roommates/my-requests`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error?.message || 'Failed to fetch requests');
-  return Array.isArray(json) ? json : [];
+  try {
+    const res = await fetch(`${API_BASE_URL}/roommates/my-requests`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const json = await res.json();
+    if (res.ok) {
+      if (Array.isArray(json.data)) return json.data;
+      if (Array.isArray(json)) return json;
+    }
+  } catch (err: any) {
+    console.warn('Backend get my roommate requests fallback:', err.message);
+  }
+
+  // LocalStorage check for recently submitted preferences
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('studentnest_my_roommate_request');
+      if (stored) return [JSON.parse(stored)];
+    } catch {}
+  }
+  return [];
 }
 
 export interface RoommateConnectItem {
@@ -629,9 +689,12 @@ export interface RoommateConnectItem {
     city: string;
     budgetMin: number;
     budgetMax: number;
-    dietary: string;
-    sleepSchedule: string;
-    cleanliness: number;
+    dietary?: string;
+    foodPreference?: string;
+    sleepSchedule?: string;
+    sleepHabit?: string;
+    cleanliness?: number;
+    cleanlinessLevel?: number;
     student: {
       id: string;
       email: string;
@@ -643,6 +706,247 @@ export interface RoommateConnectItem {
     };
   };
 }
+
+export const DEFAULT_DEMO_MATCHES = [
+  {
+    request: {
+      id: 'req-rohit-pune',
+      studentId: 'stud-rohit',
+      city: 'Pune',
+      budgetMin: 7000,
+      budgetMax: 14000,
+      cleanlinessLevel: 4,
+      sleepHabit: 'NORMAL',
+      smokingPreference: 'NON_SMOKER',
+      drinkingPreference: 'NON_DRINKER',
+      foodPreference: 'ANY',
+      studyEnvironment: 'QUIET',
+      roommateGenderPreference: 'ANY',
+      bio: 'Mechanical Engineering grad student at COEP. Organized, hygienic, looking for friendly roommate to split 2BHK.',
+      status: 'ACTIVE',
+      hasRoom: true,
+      room: {
+        id: 'room-rohit-coep',
+        title: 'Sunlit Private Master Bedroom in Modern 2BHK',
+        roomType: 'Private Room in 2BHK',
+        rentShare: 8500,
+        currency: '₹',
+        deposit: 15000,
+        address: 'Lane 4, Prabhat Road, Deccan Gymkhana',
+        neighborhood: 'Deccan / FC Road',
+        city: 'Pune',
+        distanceToCampus: '0.8 km to COEP / BMCC',
+        furnishing: 'Fully Furnished (Queen Bed, Ergonomic Study Table, Wardrobe, AC)',
+        images: [
+          'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80'
+        ],
+        amenities: ['1 Gbps Fiber WiFi', 'Balcony with Greenery', 'Washing Machine', 'Cook / Maid Available', 'Geyser', 'Attached Washroom'],
+        availableFrom: 'Immediate Move-in',
+        coordinates: { lat: 18.5167, lng: 73.8415 }
+      },
+      student: {
+        id: 'stud-rohit',
+        email: 'rohit.deshmukh@coep.ac.in',
+        studentProfile: {
+          fullName: 'Rohit Deshmukh',
+          collegeName: 'COEP Technological University',
+          city: 'Pune',
+          avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+        },
+      },
+    },
+    compatibilityPercent: 96,
+    matchTags: ['Budget Compatible', 'NORMAL Schedule', 'Non-Smoker', 'QUIET Study'],
+  },
+  {
+    request: {
+      id: 'req-ananya-pune',
+      studentId: 'stud-ananya',
+      city: 'Pune',
+      budgetMin: 7000,
+      budgetMax: 13500,
+      cleanlinessLevel: 4,
+      sleepHabit: 'NORMAL',
+      smokingPreference: 'NON_SMOKER',
+      drinkingPreference: 'NON_DRINKER',
+      foodPreference: 'VEG',
+      studyEnvironment: 'QUIET',
+      roommateGenderPreference: 'SAME_GENDER',
+      bio: 'Literature major at Fergusson. Reading enthusiast, vegetarian cook, looking to share a bright apartment near FC Road.',
+      status: 'ACTIVE',
+      hasRoom: true,
+      room: {
+        id: 'room-ananya-fergusson',
+        title: 'Cozy Bohemian Studio Room in 3BHK Heritage Flat',
+        roomType: 'Private Room with Garden View',
+        rentShare: 9000,
+        currency: '₹',
+        deposit: 18000,
+        address: 'Fergusson College Road, Shivajinagar',
+        neighborhood: 'FC Road',
+        city: 'Pune',
+        distanceToCampus: '300m walk to Fergusson College',
+        furnishing: 'Fully Furnished (Bookshelf, Wooden Desk, Single Bed, Wardrobe)',
+        images: [
+          'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1502005229762-ae1b4653dd20?auto=format&fit=crop&w=1200&q=80'
+        ],
+        amenities: ['High-speed WiFi', 'Modular Kitchen', 'Quiet Study Nook', 'RO Water Purifier', 'Balcony Garden'],
+        availableFrom: '1st of Next Month',
+        coordinates: { lat: 18.5244, lng: 73.8407 }
+      },
+      student: {
+        id: 'stud-ananya',
+        email: 'ananya.iyer@fergusson.edu',
+        studentProfile: {
+          fullName: 'Ananya Iyer',
+          collegeName: 'Fergusson College Pune',
+          city: 'Pune',
+          avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+        },
+      },
+    },
+    compatibilityPercent: 92,
+    matchTags: ['Budget Compatible', 'Non-Smoker', 'Quiet Study', 'Similar Cleanliness'],
+  },
+  {
+    request: {
+      id: 'req-priya-pune',
+      studentId: 'stud-priya',
+      city: 'Pune',
+      budgetMin: 8000,
+      budgetMax: 15000,
+      cleanlinessLevel: 5,
+      sleepHabit: 'NIGHT_OWL',
+      smokingPreference: 'NON_SMOKER',
+      drinkingPreference: 'NON_DRINKER',
+      foodPreference: 'VEG',
+      studyEnvironment: 'QUIET',
+      roommateGenderPreference: 'SAME_GENDER',
+      bio: 'Masters student in Data Science. Quiet during exam weeks, love exploring cafes on weekends, clean and respectful.',
+      status: 'ACTIVE',
+      hasRoom: false,
+      student: {
+        id: 'stud-priya',
+        email: 'priya.sharma@hansraj.du.ac.in',
+        studentProfile: {
+          fullName: 'Priya Sharma',
+          collegeName: 'Hansraj College / Pune University',
+          city: 'Pune',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        },
+      },
+    },
+    compatibilityPercent: 88,
+    matchTags: ['Budget Compatible', 'Non-Smoker', 'Quiet Study', 'Similar Cleanliness'],
+  },
+  {
+    request: {
+      id: 'req-kunal-delhi',
+      studentId: 'stud-kunal',
+      city: 'Delhi',
+      budgetMin: 10000,
+      budgetMax: 18000,
+      cleanlinessLevel: 4,
+      sleepHabit: 'EARLY_BIRD',
+      smokingPreference: 'NON_SMOKER',
+      drinkingPreference: 'SOCIAL_DRINKER',
+      foodPreference: 'ANY',
+      studyEnvironment: 'QUIET',
+      roommateGenderPreference: 'ANY',
+      bio: 'CS senior at IIT Delhi. Clean habits, quiet study hours on weekdays, into badminton on weekends. Looking to share near Hauz Khas.',
+      status: 'ACTIVE',
+      hasRoom: true,
+      room: {
+        id: 'room-kunal-iitd',
+        title: 'Spacious Airy Room in 3BHK Hauz Khas Enclave',
+        roomType: 'Private Room with Attached Bath',
+        rentShare: 12000,
+        currency: '₹',
+        deposit: 24000,
+        address: 'Hauz Khas Enclave, Near Metro Gate 2',
+        neighborhood: 'Hauz Khas / IIT Flyover',
+        city: 'Delhi',
+        distanceToCampus: '1.2 km to IIT Delhi Main Gate',
+        furnishing: 'Semi-Furnished (AC, Wardrobe, Bed with Mattress, Study Desk)',
+        images: [
+          'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80'
+        ],
+        amenities: ['Power Backup 24/7', 'High-Speed WiFi', 'Balcony', 'Gated Society with Security', 'Gym in Complex'],
+        availableFrom: 'Immediate Move-in',
+        coordinates: { lat: 28.5494, lng: 77.1995 }
+      },
+      student: {
+        id: 'stud-kunal',
+        email: 'kunal.v@iitd.ac.in',
+        studentProfile: {
+          fullName: 'Kunal Verma',
+          collegeName: 'IIT Delhi (Computer Science)',
+          city: 'Delhi',
+          avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+        },
+      },
+    },
+    compatibilityPercent: 89,
+    matchTags: ['Budget Compatible', 'Non-Smoker', 'Quiet Study'],
+  },
+  {
+    request: {
+      id: 'req-maya-cambridge',
+      studentId: 'stud-maya',
+      city: 'Cambridge',
+      budgetMin: 1400,
+      budgetMax: 2200,
+      cleanlinessLevel: 5,
+      sleepHabit: 'NORMAL',
+      smokingPreference: 'NON_SMOKER',
+      drinkingPreference: 'SOCIAL_DRINKER',
+      foodPreference: 'VEGAN',
+      studyEnvironment: 'QUIET',
+      roommateGenderPreference: 'ANY',
+      bio: 'MIT Media Lab researcher. Quiet, focused scholar looking for an architectural apartment near Kendall Square.',
+      status: 'ACTIVE',
+      hasRoom: true,
+      room: {
+        id: 'room-maya-mit',
+        title: 'Architectural Kendall Loft — Private Bedroom + Dedicated Workspace',
+        roomType: 'Private Suite in 2-Bed Designer Loft',
+        rentShare: 1450,
+        currency: '$',
+        deposit: 1450,
+        address: 'Broadway & Kendall St',
+        neighborhood: 'Kendall Square',
+        city: 'Cambridge',
+        distanceToCampus: '4 mins walk to MIT Stata Center',
+        furnishing: 'Designer Furnished (Standing Desk, Ergonomic Chair, Queen Bed)',
+        images: [
+          'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80'
+        ],
+        amenities: ['1 Gbps Fiber', 'In-Unit Laundry', 'Acoustic Soundproofing', 'Espresso Bar', 'Subway Access'],
+        availableFrom: 'Fall Semester',
+        listingId: 'nest-103',
+        coordinates: { lat: 42.3629, lng: -71.0840 }
+      },
+      student: {
+        id: 'stud-maya',
+        email: 'maya.lin@mit.edu',
+        studentProfile: {
+          fullName: 'Maya Lin',
+          collegeName: 'MIT Media Lab',
+          city: 'Cambridge',
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80',
+        },
+      },
+    },
+    compatibilityPercent: 85,
+    matchTags: ['Non-Smoker', 'Quiet Study', 'Similar Cleanliness'],
+  },
+];
 
 const DEFAULT_DEMO_CONNECTS: RoommateConnectItem[] = [
   {
@@ -657,9 +961,9 @@ const DEFAULT_DEMO_CONNECTS: RoommateConnectItem[] = [
       city: 'Delhi',
       budgetMin: 8000,
       budgetMax: 15000,
-      dietary: 'VEGETARIAN',
-      sleepSchedule: 'NIGHT_OWL',
-      cleanliness: 5,
+      foodPreference: 'VEG',
+      sleepHabit: 'NIGHT_OWL',
+      cleanlinessLevel: 5,
       student: {
         id: 'student_priya_01',
         email: 'priya.sharma@hansraj.du.ac.in',
@@ -683,9 +987,9 @@ const DEFAULT_DEMO_CONNECTS: RoommateConnectItem[] = [
       city: 'Delhi',
       budgetMin: 10000,
       budgetMax: 18000,
-      dietary: 'ANY',
-      sleepSchedule: 'EARLY_BIRD',
-      cleanliness: 4,
+      foodPreference: 'ANY',
+      sleepHabit: 'EARLY_BIRD',
+      cleanlinessLevel: 4,
       student: {
         id: 'student_kunal_02',
         email: 'kunal.v@iitd.ac.in',
@@ -707,7 +1011,7 @@ export async function apiConnectRoommate(token: string, requestId: string, messa
       body: JSON.stringify({ message }),
     });
     const json = await res.json();
-    if (res.ok) return json;
+    if (res.ok) return json.data || json;
   } catch (err: any) {
     console.warn('Backend connect roommate fallback active:', err.message);
   }
@@ -720,8 +1024,13 @@ export async function apiGetIncomingConnects(token: string): Promise<RoommateCon
       headers: { Authorization: `Bearer ${token}` },
     });
     const json = await res.json();
-    if (res.ok && Array.isArray(json)) {
-      return json;
+    if (res.ok) {
+      if (Array.isArray(json.data) && json.data.length > 0) {
+        return json.data;
+      }
+      if (Array.isArray(json) && json.length > 0) {
+        return json;
+      }
     }
   } catch (err: any) {
     console.warn('Backend incoming connects fallback:', err.message);
@@ -750,7 +1059,7 @@ export async function apiRespondToConnect(token: string, connectId: string, acce
     const json = await res.json();
     if (res.ok) {
       updateLocalConnectStatus(connectId, accept ? 'ACCEPTED' : 'DECLINED');
-      return json;
+      return json.data || json;
     }
   } catch (err: any) {
     console.warn('Backend respond to connect fallback:', err.message);

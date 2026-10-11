@@ -37,6 +37,7 @@ import {
   MessageSquare,
   GraduationCap,
   Video,
+  Users,
 } from 'lucide-react';
 import { Listing } from '@/types/listing';
 import StudentNestBookingSidebar from './StudentNestBookingSidebar';
@@ -48,6 +49,7 @@ import { useChat } from '@/context/ChatContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { apiGetListingReviews } from '@/lib/api';
 import { subscribeToListingReviews } from '@/lib/firebase';
+import StudentNestSingleLocationMap from '@/components/map/StudentNestSingleLocationMap';
 
 interface Props {
   listing: Listing;
@@ -355,6 +357,28 @@ export default function StudentNestRoomDetailView({ listing }: Props) {
               </div>
             </div>
 
+            {/* Room Partner / Split Rent Card */}
+            <div className="bg-gradient-to-br from-violet-50 to-indigo-50 border border-violet-100 rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <Users className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-neutral-900">Looking for a Room Partner?</h4>
+                  <p className="text-xs text-neutral-600 mt-0.5">
+                    Split rent (~₹{Math.round(listing.pricePerMonth / 2).toLocaleString('en-IN')}/mo each) with a verified student in {listing.location.city}.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/roommates"
+                className="shrink-0 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+              >
+                <span>Find Matches</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
             {/* Sleeping Arrangements */}
             <div className="pb-6 border-b border-neutral-200">
               <h3 className="text-lg font-bold text-neutral-900 mb-4">Where you’ll sleep</h3>
@@ -374,6 +398,7 @@ export default function StudentNestRoomDetailView({ listing }: Props) {
             </div>
 
             {/* Amenities Grid */}
+            {/* WHAT THIS PLACE OFFERS */}
             <div className="pb-6 border-b border-neutral-200">
               <h3 className="text-lg font-bold text-neutral-900 mb-4">What this place offers</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -387,6 +412,19 @@ export default function StudentNestRoomDetailView({ listing }: Props) {
                   );
                 })}
               </div>
+            </div>
+
+            {/* WHERE YOU'LL BE INTERACTIVE MAP SECTION */}
+            <div className="pb-8 border-b border-neutral-200">
+              <StudentNestSingleLocationMap
+                lat={listing.location?.lat || 42.3736}
+                lng={listing.location?.lng || -71.1189}
+                title={listing.title}
+                address={listing.address}
+                neighborhood={listing.location?.neighborhood}
+                city={listing.city || listing.location?.city}
+                distanceToCampus={listing.location?.distanceToCampus}
+              />
             </div>
 
             {/* REVIEWS SECTION */}

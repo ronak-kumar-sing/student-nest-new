@@ -19,7 +19,7 @@ import {
 import { apiCreateRoommateRequest, type RoommateRequestPayload } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 
-const CITIES = ['Pune', 'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata'];
+const CITIES = ['Pune', 'Mumbai', 'Delhi', 'Bangalore', 'Cambridge', 'Boston', 'Somerville', 'Hyderabad', 'Chennai', 'Kolkata'];
 
 type QuizOption = { value: string; label: string; emoji?: string };
 
@@ -270,9 +270,42 @@ export default function PreferenceQuiz({ onComplete }: Props) {
         </div>
       )}
 
-      {/* Step 4: Bio */}
+      {/* Step 4: About You & Room */}
       {step === 4 && (
         <div className="space-y-4">
+          {/* Room Availability Toggle */}
+          <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+            <label className="block text-xs font-bold text-neutral-800 uppercase tracking-wider">
+              Do you currently have a room/apartment?
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => set('hasRoom', false)}
+                className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                  !prefs.hasRoom
+                    ? 'border-violet-600 bg-violet-50 text-violet-700 shadow-2xs'
+                    : 'border-neutral-200 bg-white text-neutral-700'
+                }`}
+              >
+                <span>🔍</span>
+                <span>Seeking Room to Team Up</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => set('hasRoom', true)}
+                className={`p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                  prefs.hasRoom
+                    ? 'border-violet-600 bg-violet-50 text-violet-700 shadow-2xs'
+                    : 'border-neutral-200 bg-white text-neutral-700'
+                }`}
+              >
+                <span>🛏️</span>
+                <span>I Have a Room Available</span>
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-neutral-700 mb-1.5">About You (optional)</label>
             <textarea

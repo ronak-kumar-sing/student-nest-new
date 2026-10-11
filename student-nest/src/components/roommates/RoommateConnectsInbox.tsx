@@ -145,18 +145,22 @@ export default function RoommateConnectsInbox() {
       {/* Requests List */}
       <div className="space-y-4">
         {connects.map((conn) => {
-          const req = conn.fromRequest;
-          const student = req.student;
-          const profile = student.studentProfile;
+          const req = conn.fromRequest || ({} as any);
+          const student = req.student || ({} as any);
+          const profile = student.studentProfile || ({} as any);
           const isPending = conn.status === 'PENDING';
           const isAccepted = conn.status === 'ACCEPTED';
           const isDeclined = conn.status === 'DECLINED';
           const isCurrentAction = actionLoadingId === conn.id;
 
-          const studentName = profile?.fullName || student.email.split('@')[0];
+          const studentName = profile?.fullName || (student?.email ? student.email.split('@')[0] : 'Student Scholar');
           const studentAvatar =
             profile?.avatar ||
             'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+
+          const sleepScheduleStr = req.sleepHabit || req.sleepSchedule || 'NORMAL';
+          const foodPrefStr = req.foodPreference || req.dietary || 'ANY';
+          const cleanLevel = req.cleanlinessLevel ?? req.cleanliness ?? 4;
 
           return (
             <div
@@ -188,13 +192,13 @@ export default function RoommateConnectsInbox() {
                     <div className="flex items-center gap-3 text-xs text-neutral-500 mt-1 flex-wrap">
                       <div className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-neutral-400" />
-                        <span>{req.city}</span>
+                        <span>{req.city || 'Campus Hub'}</span>
                       </div>
                       <span>•</span>
                       <div className="flex items-center gap-1">
                         <IndianRupee className="w-3.5 h-3.5 text-emerald-600" />
                         <span className="font-bold text-neutral-800">
-                          ₹{req.budgetMin?.toLocaleString('en-IN')} – ₹{req.budgetMax?.toLocaleString('en-IN')}
+                          ₹{req.budgetMin?.toLocaleString('en-IN') || '8,000'} – ₹{req.budgetMax?.toLocaleString('en-IN') || '15,000'}
                         </span>
                         <span className="text-[11px] text-neutral-400">/mo</span>
                       </div>
@@ -203,13 +207,13 @@ export default function RoommateConnectsInbox() {
                     {/* Compatibility Tags */}
                     <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                        {req.sleepSchedule.replace('_', ' ')}
+                        {sleepScheduleStr.replace('_', ' ')}
                       </span>
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                        {req.dietary}
+                        {foodPrefStr.replace('_', ' ')}
                       </span>
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-neutral-100 text-neutral-700">
-                        Cleanliness: {req.cleanliness}/5
+                        Cleanliness: {cleanLevel}/5
                       </span>
                     </div>
                   </div>

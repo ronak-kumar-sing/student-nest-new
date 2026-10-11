@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Search, MapPin, Calendar, Users, X } from 'lucide-react';
 import { SearchFilters } from '@/types/listing';
 
@@ -63,9 +64,14 @@ export default function StudentNestSearchWidget({ onSearch, isOpen, onClose }: P
           <button className="text-neutral-500 hover:text-neutral-800 transition-colors">
             Monthly Sublets
           </button>
-          <button className="text-neutral-500 hover:text-neutral-800 transition-colors">
+          <Link
+            href="/roommates"
+            onClick={onClose}
+            className="text-violet-600 hover:text-violet-800 font-semibold transition-colors flex items-center gap-1.5"
+          >
+            <Users className="w-4 h-4 text-violet-500" />
             Campus Roommates
-          </button>
+          </Link>
         </div>
 
         {/* Search Bar Segment Bar */}

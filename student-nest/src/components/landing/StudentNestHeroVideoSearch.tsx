@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import {
   Search,
   MapPin,
@@ -193,6 +194,13 @@ export default function StudentNestHeroVideoSearch({ onSearch }: Props) {
               {camp.label}
             </button>
           ))}
+          <Link
+            href="/roommates"
+            className="px-3 py-1.5 rounded-full bg-violet-600/40 hover:bg-violet-600/70 backdrop-blur-md text-violet-100 border border-violet-400/40 transition-all font-semibold flex items-center gap-1 active:scale-95"
+          >
+            <Users className="w-3.5 h-3.5 text-violet-300" />
+            <span>Find Room Partner</span>
+          </Link>
         </div>
 
         {/* TRUST BADGES */}

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
   --background: #ffffff;
@@ -57,4 +58,101 @@ body {
 
 .shadow-studentnest-floating {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Leaflet Map Custom Marker Styles */
+.studentnest-price-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.studentnest-marker-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  color: #171717;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.studentnest-marker-pill:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  background-color: #ffffff;
+  z-index: 1000 !important;
+}
+
+.studentnest-marker-pill.selected {
+  background-color: #171717;
+  color: #ffffff;
+  border-color: #171717;
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 1001 !important;
+}
+
+.studentnest-campus-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 5px 9px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  border: 1.5px solid #ffffff;
+  pointer-events: auto;
+}
+
+.studentnest-roommate-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #7c3aed;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 9999px;
+  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.35);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.studentnest-roommate-pill:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.leaflet-container {
+  font-family: inherit;
+  z-index: 1;
+}
+
+/* Fix leaflet popup style */
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+.leaflet-popup-content {
+  margin: 0;
+  line-height: inherit;
 }
