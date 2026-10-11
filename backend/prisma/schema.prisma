@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  OWNER
+  ADMIN
+}
+
+enum ListingStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TRIPLE
+  APARTMENT
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CONFIRMED
+  PAID
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  HELD
+  RELEASED
+  REFUNDED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  EXPIRED
+}
+
+model User {
+  id            String          @id @default(uuid())
+  email         String          @unique
+  passwordHash  String
+  role          Role            @default(STUDENT)
+  isEmailVerified Boolean       @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  refreshTokens RefreshToken[]
+  studentProfile StudentProfile?
+  ownerProfile   OwnerProfile?
+  listings      Listing[]       @relation("OwnerListings")
+  bookings      Booking[]       @relation("StudentBookings")
+  reviews       Review[]
+  roommateRequests RoommateRequest[] @relation("StudentRoommateRequests")
+
+  conversationsAsUser1 Conversation[] @relation("User1Conversations")
+  conversationsAsUser2 Conversation[] @relation("User2Conversations")
+  sentMessages         ChatMessage[]  @relation("SentMessages")
+  receivedMessages     ChatMessage[]  @relation("ReceivedMessages")
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model StudentProfile {
+  id                        String   @id @default(uuid())
+  userId                    String   @unique
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName                  String
+  phone                     String?
+  collegeName               String?
+  studyYear                 Int?
+  budgetMin                 Int?
+  budgetMax                 Int?
+  city                      String   @default("Pune")
+  
+  // Roommate matching quiz dimensions (Part C commitment)
+  cleanlinessLevel          Int      @default(3)
+  sleepHabit                String   @default("NORMAL")
+  smokingPreference         String   @default("NON_SMOKER")
+  drinkingPreference        String   @default("NON_DRINKER")
+  foodPreference            String   @default("ANY")
+  studyEnvironment          String   @default("QUIET")
+  roommateGenderPreference  String   @default("SAME_GENDER")
+  bio                       String?
+
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}
+
+model OwnerProfile {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName             String
+  phone                String?
+  isPhoneVerified      Boolean            @default(false)
+  isAadhaarVerified    Boolean            @default(false)
+  aadhaarNumberHash    String?
+  subscriptionStatus   SubscriptionStatus @default(INACTIVE)
+  subscriptionExpiresAt DateTime?
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model Listing {
+  id              String        @id @default(uuid())
+  ownerId         String
+  owner           User          @relation("OwnerListings", fields: [ownerId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  address         String
+  city            String        @default("Pune")
+  latitude        Float
+  longitude       Float
+  pricePerMonth   Int
+  securityDeposit Int           @default(0)
+  roomType        RoomType      @default(SINGLE)
+  amenities       String[]      @default([])
+  photoUrls       String[]      @default([])
+  status          ListingStatus @default(PENDING)
+  rejectionReason String?
+  isAvailable     Boolean       @default(true)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  bookings        Booking[]
+  reviews         Review[]
+  conversations   Conversation[]
+
+  @@index([ownerId])
+  @@index([city])
+  @@index([status])
+  @@index([pricePerMonth])
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  listingId   String
+  listing     Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     User          @relation("StudentBookings", fields: [studentId], references: [id], onDelete: Cascade)
+  startDate   DateTime
+  endDate     DateTime
+  totalAmount Int
+  status      BookingStatus @default(PENDING)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  payments    Payment[]
+  review      Review?
+
+  @@index([listingId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  bookingId         String
+  booking           Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  amount            Int
+  currency          String        @default("INR")
+  provider          String        @default("RAZORPAY")
+  providerOrderId   String?
+  providerPaymentId String?
+  providerSignature String?
+  status            PaymentStatus @default(PENDING)
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  bookingId String   @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([listingId])
+  @@index([studentId])
+}
+
+// -----------------------------------------------
+// Roommate Matching System
+// -----------------------------------------------
+
+enum RoommateRequestStatus {
+  ACTIVE
+  MATCHED
+  CLOSED
+}
+
+enum RoommateConnectStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model RoommateRequest {
+  id                       String                @id @default(uuid())
+  studentId                String
+  student                  User                  @relation("StudentRoommateRequests", fields: [studentId], references: [id], onDelete: Cascade)
+  city                     String                @default("Pune")
+  budgetMin                Int
+  budgetMax                Int
+  moveInDate               DateTime?
+  bio                      String?
+  status                   RoommateRequestStatus @default(ACTIVE)
+
+  // Lifestyle preferences (used for matching score)
+  cleanlinessLevel         Int                   @default(3)  // 1-5
+  sleepHabit               String                @default("NORMAL")   // EARLY_BIRD | NIGHT_OWL | NORMAL
+  smokingPreference        String                @default("NON_SMOKER")
+  drinkingPreference       String                @default("NON_DRINKER")
+  foodPreference           String                @default("ANY")
+  studyEnvironment         String                @default("QUIET")
+  roommateGenderPreference String                @default("SAME_GENDER")
+
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+
+  sentConnects             RoommateConnect[]     @relation("SentConnects")
+  receivedConnects         RoommateConnect[]     @relation("ReceivedConnects")
+
+  @@index([studentId])
+  @@index([city])
+  @@index([status])
+}
+
+model RoommateConnect {
+  id               String                @id @default(uuid())
+  fromRequestId    String
+  fromRequest      RoommateRequest       @relation("SentConnects", fields: [fromRequestId], references: [id], onDelete: Cascade)
+  toRequestId      String
+  toRequest        RoommateRequest       @relation("ReceivedConnects", fields: [toRequestId], references: [id], onDelete: Cascade)
+  status           RoommateConnectStatus @default(PENDING)
+  message          String?
+
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([fromRequestId, toRequestId])
+  @@index([fromRequestId])
+  @@index([toRequestId])
+  @@index([status])
+}
+
+// -----------------------------------------------
+// Real-time Chat & Direct Messaging
+// -----------------------------------------------
+
+model Conversation {
+  id             String        @id @default(uuid())
+  user1Id        String
+  user1          User          @relation("User1Conversations", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id        String
+  user2          User          @relation("User2Conversations", fields: [user2Id], references: [id], onDelete: Cascade)
+  listingId      String?
+  listing        Listing?      @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  lastMessage    String?
+  lastMessageAt  DateTime      @default(now())
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  messages       ChatMessage[]
+
+  @@unique([user1Id, user2Id, listingId])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@index([lastMessageAt])
+}
+
+model ChatMessage {
+  id             String        @id @default(uuid())
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId     String
+  receiver       User          @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  content        String
+  isRead         Boolean       @default(false)
+
+  createdAt      DateTime      @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([isRead])
+}
+
+

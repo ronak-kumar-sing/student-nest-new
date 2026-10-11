@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import api from "../../../../lib/api"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { studentSignupSchema } from "../../../../lib/validation/authSchemas"
@@ -44,17 +45,14 @@ export default function StudentSignupPage() {
     console.log("Starting signup API call...")
     setLoading(true)
     try {
-      const res = await fetch("/api/auth/student/signup", {
+      const data = await api.request("/auth/student/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: values,
       })
 
-      console.log("API response status:", res.status, res.statusText)
-      const data = await res.json()
       console.log("API response data:", data)
 
-      if (res.ok && data.success) {
+      if (data.success) {
         toast.success("Account created successfully! Welcome to Student Nest!")
 
         // Store user data and set token in memory (httpOnly cookie handles persistence)
@@ -139,20 +137,17 @@ export default function StudentSignupPage() {
 
     setSendingOtp(true)
     try {
-      const res = await fetch(`/api/otp/${kind}/send`, {
+      const res = await api.request(`/otp/${kind}/send`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ value })
+        body: { value },
       })
 
-      const data = await res.json()
-
-      if (res.ok) {
+      if (res.success) {
         setOtpChannel(kind)
         setOtpOpen(true)
         toast.success(`OTP sent to your ${kind}.`)
       } else {
-        toast.error(data.error || data.message || `Failed to send OTP to ${kind}.`)
+        toast.error(res.error || `Failed to send OTP to ${kind}.`)
       }
     } catch (error) {
       console.error("OTP send error:", error)
@@ -164,22 +159,26 @@ export default function StudentSignupPage() {
 
   async function verifyOtp(code: string) {
     const value = otpChannel === "email" ? watch("email") : watch("phone")
-    const res = await fetch(`/api/otp/${otpChannel}/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value, code })
-    })
+    try {
+      const res = await api.request(`/otp/${otpChannel}/verify`, {
+        method: "POST",
+        body: { value, code },
+      })
 
-    if (res.ok) {
-      if (otpChannel === "email") {
-        setEmailVerified(true)
-        toast.success("Email verified successfully!")
+      if (res.success) {
+        if (otpChannel === "email") {
+          setEmailVerified(true)
+          toast.success("Email verified successfully!")
+        } else {
+          setPhoneVerified(true)
+          toast.success("Phone verified successfully!")
+        }
+        setOtpOpen(false)
       } else {
-        setPhoneVerified(true)
-        toast.success("Phone verified successfully!")
+        toast.error(res.error || "Invalid OTP code.")
       }
-    } else {
-      throw new Error("Invalid OTP code.")
+    } catch (error) {
+      toast.error("Failed to verify OTP.")
     }
   }
 

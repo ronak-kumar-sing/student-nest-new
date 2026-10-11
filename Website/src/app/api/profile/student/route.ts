@@ -50,7 +50,7 @@ const studentProfileSchema = z.object({
 });
 
 // Helper function to verify JWT token and get user
-async function getAuthenticatedUser(request: NextRequest) {
+async function getAuthenticatedUser(request: NextRequest): Promise<{ user?: any; error?: string }> {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -83,10 +83,10 @@ export async function GET(request: NextRequest) {
   try {
     const { user, error } = await getAuthenticatedUser(request);
 
-    if (error) {
+    if (error || !user) {
       return NextResponse.json({
         success: false,
-        error
+        error: error || 'User not found'
       }, { status: 401 });
     }
 
@@ -168,10 +168,10 @@ export async function PUT(request: NextRequest) {
   try {
     const { user, error } = await getAuthenticatedUser(request);
 
-    if (error) {
+    if (error || !user) {
       return NextResponse.json({
         success: false,
-        error
+        error: error || 'User not found'
       }, { status: 401 });
     }
 
@@ -191,7 +191,7 @@ export async function PUT(request: NextRequest) {
 
     // Check if phone is being updated and if it's unique
     if (updateData.phone && updateData.phone !== user.phone) {
-      const existingUser = await User.findOne({
+      const existingUser = await Student.findOne({
         phone: updateData.phone,
         _id: { $ne: user._id }
       });
@@ -256,10 +256,10 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { user, error } = await getAuthenticatedUser(request);
-    if (error) {
+    if (error || !user) {
       return NextResponse.json({
         success: false,
-        error
+        error: error || 'User not found'
       }, { status: 401 });
     }
 
@@ -278,7 +278,7 @@ export async function DELETE(request: NextRequest) {
     console.log(`Deleting student account: ${user.email} (${user._id})`);
 
     // Delete the user account
-    await User.findByIdAndDelete(user._id);
+    await Student.findByIdAndDelete(user._id);
 
     return NextResponse.json({
       success: true,

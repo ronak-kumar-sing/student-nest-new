@@ -16,14 +16,14 @@ const getApiUrl = () => {
     if (Platform.OS === 'android') {
       // Android emulator uses 10.0.2.2 to access host machine's localhost
       // Change this to your computer's IP for physical device testing
-      return 'http://10.0.2.2:3000/api';
+      return 'http://10.0.2.2:4000/api/v1';
     }
-    // iOS simulator can use localhost
-    return 'http://localhost:3000/api';
+    // iOS simulator and local web can use localhost
+    return 'http://localhost:4000/api/v1';
   }
   
-  // Production URL
-  return 'https://www.student-nest.live/api';
+  // Production fallback URL
+  return 'http://localhost:4000/api/v1';
 };
 
 export const API_URL = getApiUrl();

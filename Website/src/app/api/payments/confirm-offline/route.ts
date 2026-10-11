@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if payment is already confirmed
-    if (booking.paymentStatus === 'completed' || booking.offlinePaymentStatus?.ownerConfirmed) {
+    if ((booking.paymentStatus as any) === 'completed' || (booking.paymentStatus as any) === 'paid' || booking.offlinePaymentStatus?.ownerConfirmed) {
       return NextResponse.json({
         success: false,
         error: 'Payment has already been confirmed'
@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update booking with offline payment details
-    booking.paymentMethod = paymentMethod || 'offline';
-    booking.paymentStatus = 'pending_confirmation'; // Waiting for owner to confirm
+    (booking as any).paymentMethod = paymentMethod || 'offline';
+    booking.paymentStatus = 'pending_confirmation' as any; // Waiting for owner to confirm
 
     // Initialize or update offline payment status
     booking.offlinePaymentStatus = {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Generate order ID for tracking
-    booking.orderId = `offline_${booking._id}_${Date.now()}`;
+    (booking as any).orderId = `offline_${booking._id}_${Date.now()}`;
 
     await booking.save();
 

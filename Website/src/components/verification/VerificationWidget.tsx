@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import apiClient from '../../lib/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -66,30 +67,10 @@ export default function VerificationWidget({ userRole, compact = false }: Verifi
 
     try {
       setLoading('fetching');
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      const result = await apiClient.getVerificationRequirements();
 
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.status === 401) {
-        console.log('Authentication failed for verification requirements');
-        setLoading(false);
-        return;
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
+      if (result.success && result.data) {
         setVerificationStatus(result.data);
-      } else {
-        console.log('Verification requirements fetch failed:', result.error);
       }
     } catch (error) {
       console.error('Error fetching verification status:', error);

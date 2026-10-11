@@ -40,9 +40,10 @@ async function getUserRole(userId: string): Promise<'student' | 'owner'> {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
     // Verify authentication
@@ -50,7 +51,7 @@ export async function PUT(
     const userId = decoded.userId;
     const userRole = await getUserRole(userId);
 
-    const visitRequestId = params.id;
+    const visitRequestId = id;
     const body = await request.json();
 
     const { action, selectedSlot, counterProposal, message } = body;
@@ -318,9 +319,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
     // Verify authentication
@@ -328,7 +330,7 @@ export async function GET(
     const userId = decoded.userId;
     const userRole = await getUserRole(userId);
 
-    const visitRequestId = params.id;
+    const visitRequestId = id;
 
     // Find visit request
     const visitRequest = await VisitRequest.findById(visitRequestId)
@@ -393,9 +395,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
     // Verify authentication
@@ -403,7 +406,7 @@ export async function PATCH(
     const userId = decoded.userId;
     const userRole = await getUserRole(userId);
 
-    const visitRequestId = params.id;
+    const visitRequestId = id;
     const body = await request.json();
 
     const { attended, rating, feedback } = body;

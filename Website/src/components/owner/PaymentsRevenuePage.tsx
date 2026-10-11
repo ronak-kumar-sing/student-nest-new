@@ -40,9 +40,10 @@ import {
   Filter,
   Eye,
   FileText,
-  Wallet
+  Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import apiClient from '@/lib/api';
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Bar, BarChart } from 'recharts';
 
 interface PaymentStats {
@@ -139,36 +140,30 @@ export default function PaymentsRevenuePage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = apiClient.getToken();
       if (!token) {
         toast.error('Please log in to view payments');
         return;
       }
 
       // Fetch statistics
-      const statsResponse = await fetch(`/api/payments/statistics?period=${period}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      const statsResult = await statsResponse.json();
-
-      if (statsResult.success) {
-        setStats(statsResult.data);
+      try {
+        const statsResult = await apiClient.getPaymentStatistics(period);
+        if (statsResult.success && statsResult.data) {
+          setStats(statsResult.data);
+        }
+      } catch (statsErr) {
+        console.warn('Payment statistics unavailable:', statsErr);
       }
 
       // Fetch payments list
-      const paymentsResponse = await fetch('/api/payments', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      const paymentsResult = await paymentsResponse.json();
-
-      if (paymentsResult.success) {
-        setPayments(paymentsResult.data.payments);
+      try {
+        const paymentsResult = await apiClient.getPayments();
+        if (paymentsResult.success && (paymentsResult.data as any)?.payments) {
+          setPayments((paymentsResult.data as any).payments);
+        }
+      } catch (payErr) {
+        console.warn('Payment list unavailable:', payErr);
       }
 
     } catch (error) {
@@ -181,17 +176,7 @@ export default function PaymentsRevenuePage() {
 
   const handleStatusUpdate = async (paymentId: string, newStatus: string) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(`/api/payments/${paymentId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updatePaymentStatus(paymentId, newStatus);
 
       if (result.success) {
         toast.success('Payment status updated successfully');
@@ -199,9 +184,9 @@ export default function PaymentsRevenuePage() {
       } else {
         toast.error(result.error || 'Failed to update payment');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating payment:', error);
-      toast.error('Failed to update payment');
+      toast.error(error.message || 'Failed to update payment');
     }
   };
 

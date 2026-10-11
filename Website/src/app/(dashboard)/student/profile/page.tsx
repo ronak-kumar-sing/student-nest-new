@@ -9,7 +9,7 @@ import ProfileHeader from '../../../../components/profile/ProfileHeader';
 import ProfileNavigation from '../../../../components/profile/ProfileNavigation';
 import ProfileEditForm from '../../../../components/forms/ProfileEditForm';
 import VerificationWidget from '../../../../components/verification/VerificationWidget';
-import { getStudentProfile, updateStudentProfile, uploadAvatar } from '../../../../lib/api';
+import apiClient, { getStudentProfile, updateStudentProfile, uploadAvatar } from '../../../../lib/api';
 import { Camera, Edit, RefreshCw, Shield, ShieldCheck, AlertTriangle, ArrowRight, Clock, Info, X } from 'lucide-react';
 
 // Verification Profile Section Component
@@ -34,17 +34,7 @@ function VerificationProfileSection({ verificationDetails, onRefresh }: any) {
 
   const handleSkipVerification = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/verify/requirements', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ action: 'skip' })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updateVerificationRequirements('skip');
 
       if (result.success) {
         alert('Identity verification skipped. You can enable it later.');
@@ -52,25 +42,15 @@ function VerificationProfileSection({ verificationDetails, onRefresh }: any) {
       } else {
         alert(result.error || 'Failed to skip verification');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error skipping verification:', error);
-      alert('Failed to skip verification');
+      alert(error.message || 'Failed to skip verification');
     }
   };
 
   const handleEnableVerification = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/verify/requirements', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ action: 'require' })
-      });
-
-      const result = await response.json();
+      const result = await apiClient.updateVerificationRequirements('require');
 
       if (result.success) {
         alert('Identity verification enabled. Redirecting to verification page...');
@@ -78,9 +58,9 @@ function VerificationProfileSection({ verificationDetails, onRefresh }: any) {
       } else {
         alert(result.error || 'Failed to enable verification');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error enabling verification:', error);
-      alert('Failed to enable verification');
+      alert(error.message || 'Failed to enable verification');
     }
   };
 
@@ -341,16 +321,7 @@ function StudentProfilePage() {
 
   const fetchVerificationDetails = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
+      const result = await apiClient.getVerificationRequirements();
 
       if (result.success) {
         setVerificationDetails(result.data);

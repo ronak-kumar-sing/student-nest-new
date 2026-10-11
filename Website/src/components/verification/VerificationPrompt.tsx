@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import apiClient from '../../lib/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -59,22 +60,10 @@ export default function VerificationPrompt({
 
   const fetchVerificationRequirements = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+      const result = await apiClient.getVerificationRequirements();
 
-      const response = await fetch('/api/verify/requirements', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setRequirements(result.data);
+      if (result.success && result.data) {
+        setRequirements(result.data as any);
       } else {
         console.error('Failed to fetch verification requirements:', result.error);
       }
@@ -93,17 +82,10 @@ export default function VerificationPrompt({
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-      const response = await fetch('/api/verify/requirements', {
+      const result = await apiClient.request('/verify/requirements', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ action: 'skip' })
+        body: { action: 'skip' },
       });
-
-      const result = await response.json();
 
       if (result.success) {
         toast.success('Identity verification skipped. You can enable it later from your profile.');

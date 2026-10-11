@@ -6,9 +6,9 @@ import roomsData from '@/data/demo-rooms.json';
 import type { Review, Student, Room } from '@/types';
 
 export default function ReviewsDemo() {
-    const reviews = reviewsData.reviews as Review[];
-    const students = studentsData.students as Student[];
-    const rooms = roomsData.rooms as Room[];
+    const reviews = reviewsData.reviews as unknown as Review[];
+    const students = studentsData.students as unknown as Student[];
+    const rooms = roomsData.rooms as unknown as Room[];
 
     const getStudent = (id: string) => students.find(s => s._id === id);
     const getRoom = (id: string) => rooms.find(r => r._id === id);

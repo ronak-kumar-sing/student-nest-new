@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import apiClient from '../../lib/api';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Loader2, CreditCard, CheckCircle, XCircle } from 'lucide-react';
@@ -84,34 +85,17 @@ export default function RazorpayCheckout({
         description
       });
 
-      const orderResponse = await fetch('/api/payments/create-order', {
+      const orderResult = await apiClient.request('/payments/create-order', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+        body: {
           amount,
           bookingId,
           propertyId,
           description,
-        }),
+        },
       });
 
-      // Check if response is OK
-      if (!orderResponse.ok) {
-        const contentType = orderResponse.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const errorData = await orderResponse.json();
-          throw new Error(errorData.error || `Server error: ${orderResponse.status}`);
-        } else {
-          throw new Error(`Server error: ${orderResponse.status} - ${orderResponse.statusText}`);
-        }
-      }
-
-      const orderResult = await orderResponse.json();
-
-      if (!orderResult.success) {
+      if (!orderResult.success || !orderResult.data) {
         throw new Error(orderResult.error || 'Failed to create order');
       }
 
@@ -140,20 +124,14 @@ export default function RazorpayCheckout({
         handler: async (response: any) => {
           // Payment successful - verify signature
           try {
-            const verifyResponse = await fetch('/api/payments/verify', {
+            const verifyResult = await apiClient.request('/payments/verify', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-              },
-              body: JSON.stringify({
+              body: {
                 orderId: response.razorpay_order_id,
                 paymentId: response.razorpay_payment_id,
                 signature: response.razorpay_signature,
-              }),
+              },
             });
-
-            const verifyResult = await verifyResponse.json();
 
             if (verifyResult.success) {
               setPaymentStatus('success');

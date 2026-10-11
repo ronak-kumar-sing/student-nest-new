@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import api from "../../../../lib/api"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ownerSignupSchema } from "../../../../lib/validation/authSchemas"
@@ -44,24 +45,25 @@ export default function OwnerSignupPage() {
     console.log("Starting owner signup API call...")
     setLoading(true)
     try {
-      const res = await fetch("/api/auth/owner/signup", {
+      const data = await api.request("/auth/owner/signup", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: values,
       })
 
-      console.log("API response status:", res.status, res.statusText)
-      const data = await res.json()
       console.log("API response data:", data)
 
-      if (res.ok && data.success) {
+      if (data.success) {
         toast.success("Account created successfully! Welcome to Student Nest!")
 
-        // Store user data and set token in memory (httpOnly cookie handles persistence)
-        if (data.accessToken) {
-          api.setToken(data.accessToken);
+        const responseData: any = data.data || data;
+        const accessToken = responseData.accessToken || responseData.tokens?.accessToken;
+        const user = responseData.user;
+
+        // Store user data and set token in memory
+        if (accessToken) {
+          api.setToken(accessToken);
           localStorage.setItem("user", JSON.stringify({
-            ...data.user,
+            ...user,
             userType: 'owner'
           }))
         } else {
@@ -69,7 +71,7 @@ export default function OwnerSignupPage() {
         }
 
         // Check if verification is required
-        if (data.nextStep === 'verification') {
+        if (responseData.nextStep === 'verification') {
           toast.info("Please complete verification to activate all features.")
           console.log("Redirecting to verification in 500ms...")
           setTimeout(() => {
@@ -142,19 +144,17 @@ export default function OwnerSignupPage() {
 
     setSendingOtp(true)
     try {
-      const res = await fetch(`/api/otp/${kind}/send`, {
+      const res = await api.request(`/otp/${kind}/send`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ value })
+        body: { value },
       })
 
-      if (res.ok) {
+      if (res.success) {
         setOtpChannel(kind)
         setOtpOpen(true)
         toast.success(`OTP sent to your ${kind}.`)
       } else {
-        const data = await res.json()
-        toast.error(data.message || `Failed to send OTP to ${kind}.`)
+        toast.error(res.error || `Failed to send OTP to ${kind}.`)
       }
     } catch (error) {
       toast.error("Network error. Please try again.")
@@ -165,22 +165,26 @@ export default function OwnerSignupPage() {
 
   async function verifyOtp(code: string) {
     const value = otpChannel === "email" ? watch("email") : watch("phone")
-    const res = await fetch(`/api/otp/${otpChannel}/verify`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value, code })
-    })
+    try {
+      const res = await api.request(`/otp/${otpChannel}/verify`, {
+        method: "POST",
+        body: { value, code },
+      })
 
-    if (res.ok) {
-      if (otpChannel === "email") {
-        setEmailVerified(true)
-        toast.success("Email verified successfully!")
+      if (res.success) {
+        if (otpChannel === "email") {
+          setEmailVerified(true)
+          toast.success("Email verified successfully!")
+        } else {
+          setPhoneVerified(true)
+          toast.success("Phone verified successfully!")
+        }
+        setOtpOpen(false)
       } else {
-        setPhoneVerified(true)
-        toast.success("Phone verified successfully!")
+        toast.error(res.error || "Invalid OTP code.")
       }
-    } else {
-      throw new Error("Invalid OTP code.")
+    } catch (error) {
+      toast.error("Failed to verify OTP.")
     }
   }
 

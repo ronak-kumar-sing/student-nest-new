@@ -19,7 +19,14 @@ import {
   Award
 } from 'lucide-react';
 
-const ProfileHeader = ({
+interface ProfileHeaderProps {
+  user: any;
+  userType?: string;
+  onEditClick?: () => void;
+  onUploadAvatar?: (file?: any) => void;
+}
+
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   user,
   userType = "student",
   onEditClick,
@@ -47,7 +54,7 @@ const ProfileHeader = ({
     );
   }
 
-  const getInitials = (firstName, lastName) => {
+  const getInitials = (firstName?: string, lastName?: string) => {
     if (!firstName && !lastName) {
       // Fallback to fullName if firstName/lastName not available
       const fullName = user.fullName || user.businessName || 'User';
@@ -59,7 +66,7 @@ const ProfileHeader = ({
     return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase();
   };
 
-  const formatJoinDate = (dateString) => {
+  const formatJoinDate = (dateString?: string) => {
     if (!dateString) return 'Recently joined';
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'long',
@@ -209,7 +216,7 @@ const ProfileHeader = ({
               className="relative group cursor-pointer"
               onMouseEnter={() => setAvatarHover(true)}
               onMouseLeave={() => setAvatarHover(false)}
-              onClick={onUploadAvatar}
+              onClick={() => onUploadAvatar?.()}
             >
               <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
                 <AvatarImage

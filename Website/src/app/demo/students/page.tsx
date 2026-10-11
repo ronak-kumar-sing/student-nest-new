@@ -4,7 +4,7 @@ import studentsData from '@/data/demo-students.json';
 import type { Student } from '@/types';
 
 export default function StudentsDemo() {
-    const students = studentsData.students as Student[];
+    const students = studentsData.students as unknown as Student[];
 
     const getVerificationBadge = (status: string) => {
         switch (status) {

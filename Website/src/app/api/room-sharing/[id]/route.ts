@@ -28,11 +28,12 @@ async function verifyUser(request: NextRequest) {
 // GET: Get detailed room share information
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await verifyUser(request);
-    const shareId = params.id;
+    const shareId = id;
 
     await connectDB();
 
@@ -205,9 +206,10 @@ function isCompatible(pref1: string, pref2: string, category: string): boolean {
 // PUT: Update room share details (initiator only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await verifyUser(request);
 
     if (!userId) {
@@ -217,7 +219,7 @@ export async function PUT(
       }, { status: 401 });
     }
 
-    const shareId = params.id;
+    const shareId = id;
     const body = await request.json();
 
     await connectDB();
@@ -283,9 +285,10 @@ export async function PUT(
 // DELETE: Cancel/Delete room share (initiator only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await verifyUser(request);
 
     if (!userId) {
@@ -295,7 +298,7 @@ export async function DELETE(
       }, { status: 401 });
     }
 
-    const shareId = params.id;
+    const shareId = id;
 
     await connectDB();
 

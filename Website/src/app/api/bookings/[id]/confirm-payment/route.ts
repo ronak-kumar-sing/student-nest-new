@@ -7,9 +7,10 @@ import { verifyAccessToken } from '../../../../../lib/utils/jwt';
 // PATCH: Confirm offline payment by owner
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await connectDB();
 
     const authHeader = request.headers.get('authorization');
@@ -30,7 +31,7 @@ export async function PATCH(
       );
     }
 
-    const bookingId = params.id;
+    const bookingId = id;
     const body = await request.json();
     const { ownerConfirmed } = body;
 

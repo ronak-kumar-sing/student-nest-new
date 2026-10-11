@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       console.log('[Create Order] 9. Razorpay order result:', {
         success: orderResult.success,
         hasData: !!orderResult.data,
-        error: orderResult.error
+        error: (orderResult as any).error
       });
     } catch (razorpayError: any) {
       console.error('[Create Order] Razorpay order creation threw error:', razorpayError.message);
@@ -134,9 +134,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!orderResult.success || !orderResult.data) {
-      console.error('[Create Order] Razorpay order creation failed:', orderResult.error);
+      console.error('[Create Order] Razorpay order creation failed:', (orderResult as any).error);
       return NextResponse.json(
-        { success: false, error: orderResult.error || 'Failed to create Razorpay order' },
+        { success: false, error: (orderResult as any).error || 'Failed to create Razorpay order' },
         { status: 500 }
       );
     }

@@ -244,7 +244,7 @@ export interface Review {
 
 // Booking Types
 export type BookingStatus = 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled' | 'rejected';
-export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'refunded' | 'failed';
+export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'completed' | 'pending_confirmation' | 'refunded' | 'failed';
 export type PaymentMethod = 'online' | 'cash' | 'bank_transfer' | 'upi';
 export type AgreementType = 'monthly' | 'quarterly' | 'half_yearly' | 'yearly';
 

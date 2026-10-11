@@ -8,6 +8,7 @@ import { Button } from '../../../../../../components/ui/button';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import apiClient from '@/lib/api';
 
 export default function EditPropertyPage() {
   const params = useParams();
@@ -28,22 +29,16 @@ export default function EditPropertyPage() {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const token = apiClient.getToken();
       if (!token) {
         toast.error('Please login to continue');
         router.push('/');
         return;
       }
 
-      const response = await fetch(`/api/rooms/${propertyId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const result = await apiClient.getRoomById(propertyId);
 
-      const result = await response.json();
-
-      if (result.success) {
+      if (result.success && result.data) {
         setProperty(result.data);
       } else {
         throw new Error(result.error || 'Failed to load property');

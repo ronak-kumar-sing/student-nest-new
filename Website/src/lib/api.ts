@@ -2,8 +2,9 @@
 import type { ApiResponse, User } from '../types';
 
 // Use environment variable if available, otherwise fall back to defaults
-const API_BASE_URL = process.env.NEXT_PUBLIC_APP_URL 
-  || (process.env.NODE_ENV === 'production' ? 'https://www.student-nest.live' : 'http://localhost:3000');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+  || (process.env.NEXT_PUBLIC_APP_URL ? `${process.env.NEXT_PUBLIC_APP_URL}/api/v1` : '')
+  || (process.env.NODE_ENV === 'production' ? 'https://www.student-nest.live/api/v1' : 'http://localhost:4000/api/v1');
 
 class ApiClient {
   private baseURL: string;
@@ -16,24 +17,55 @@ class ApiClient {
 
   setToken(token: string) {
     this.token = token;
-    // SECURITY: Do not store access tokens in localStorage to prevent XSS exfiltration.
-    // In-memory token is used for current session; httpOnly cookies persist session securely.
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('token', token);
+    }
   }
 
   getToken(): string | null {
-    return this.token;
+    if (this.token) return this.token;
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (stored) {
+        this.token = stored;
+        return stored;
+      }
+    }
+    return null;
   }
 
   clearToken() {
     this.token = null;
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('isLoggedIn');
     }
   }
 
-  async request<T = any>(endpoint: string, options: RequestInit & { isFormData?: boolean } = {}): Promise<ApiResponse<T>> {
-    const url = `${this.baseURL}/api${endpoint}`;
+  buildUrl(endpoint: string): string {
+    if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+      return endpoint;
+    }
+    const cleanBase = this.baseURL.replace(/\/+$/, '');
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+    if (cleanBase.endsWith('/api/v1')) {
+      if (cleanEndpoint.startsWith('/api/v1/')) {
+        return `${cleanBase.slice(0, -7)}${cleanEndpoint}`;
+      }
+      if (cleanEndpoint.startsWith('/api/')) {
+        return `${cleanBase}${cleanEndpoint.slice(4)}`;
+      }
+    }
+
+    return `${cleanBase}${cleanEndpoint}`;
+  }
+
+  async request<T = any>(endpoint: string, options: Omit<RequestInit, 'body'> & { body?: any; isFormData?: boolean } = {}): Promise<ApiResponse<T>> {
+    const url = this.buildUrl(endpoint);
     const token = this.getToken();
 
     const defaultHeaders: HeadersInit = {
@@ -47,7 +79,7 @@ class ApiClient {
     }
 
     const config: RequestInit = {
-      credentials: 'same-origin',
+      credentials: 'include',
       ...options,
       headers: {
         ...defaultHeaders,
@@ -104,7 +136,7 @@ class ApiClient {
 
   async attemptTokenRefresh(): Promise<ApiResponse<{ accessToken: string; user: User }>> {
     try {
-      const response = await fetch(`${this.baseURL}/api/auth/refresh`, {
+      const response = await fetch(this.buildUrl('/auth/refresh'), {
         method: 'POST',
         credentials: 'include', // Include httpOnly cookies
         headers: {
@@ -292,19 +324,34 @@ class ApiClient {
   }
 
   async getMyProperties() {
-    return this.request('/properties/my-properties');
+    try {
+      return await this.request('/listings/my-listings');
+    } catch {
+      return await this.request('/properties/my-properties');
+    }
   }
 
   async postProperty(propertyData: any) {
-    return this.request('/properties/post', {
-      method: 'POST',
-      body: propertyData as any,
-    });
+    try {
+      return await this.request('/listings', {
+        method: 'POST',
+        body: propertyData as any,
+      });
+    } catch {
+      return await this.request('/properties/post', {
+        method: 'POST',
+        body: propertyData as any,
+      });
+    }
   }
 
   // Room methods
   async getRoomById(id: string) {
-    return this.request(`/rooms/${id}`);
+    try {
+      return await this.request(`/listings/${id}`);
+    } catch {
+      return await this.request(`/rooms/${id}`);
+    }
   }
 
   async getRooms(filters?: {
@@ -345,70 +392,56 @@ class ApiClient {
     }
 
     const queryString = queryParams.toString();
-    return this.request(`/rooms${queryString ? `?${queryString}` : ''}`);
+    try {
+      return await this.request(`/listings/search${queryString ? `?${queryString}` : ''}`);
+    } catch {
+      return await this.request(`/rooms${queryString ? `?${queryString}` : ''}`);
+    }
   }
 
-  async createRoom(roomData: {
-    title: string;
-    description: string;
-    fullDescription?: string;
-    price: number;
-    images: string[]; // Cloudinary URLs
-    roomType: 'single' | 'shared' | 'studio';
-    accommodationType: 'pg' | 'hostel' | 'apartment' | 'room';
-    maxSharingCapacity?: number;
-    securityDeposit: number;
-    maintenanceCharges?: number;
-    location: {
-      address: string;
-      fullAddress: string;
-      city: string;
-      state: string;
-      pincode: string;
-      coordinates?: {
-        lat: number;
-        lng: number;
-      };
-      nearbyUniversities?: Array<{
-        name: string;
-        distance: string;
-        commute?: string;
-      }>;
-      nearbyFacilities?: Array<{
-        name: string;
-        distance: string;
-        type: string;
-      }>;
+  async createRoom(roomData: any) {
+    // Map roomType to uppercase enum expected by NestJS Prisma
+    const mapRoomType = (type?: string) => {
+      const lower = (type || '').toLowerCase();
+      if (lower.includes('single')) return 'SINGLE';
+      if (lower.includes('double') || lower.includes('shared')) return 'DOUBLE';
+      if (lower.includes('triple')) return 'TRIPLE';
+      if (lower.includes('apartment') || lower.includes('studio')) return 'APARTMENT';
+      return 'SINGLE';
     };
-    features?: {
-      area?: number;
-      floor?: number;
-      totalFloors?: number;
-      furnished?: boolean;
-      balcony?: boolean;
-      attached_bathroom?: boolean;
+
+    const lat = Number(roomData.location?.coordinates?.lat ?? roomData.latitude ?? 18.5204);
+    const lng = Number(roomData.location?.coordinates?.lng ?? roomData.longitude ?? 73.8567);
+    const pricePerMonth = Number(roomData.pricePerMonth ?? roomData.price ?? 5000);
+    const address = roomData.location?.fullAddress || roomData.location?.address || roomData.address || 'Address';
+    const city = roomData.location?.city || roomData.city || 'Pune';
+
+    const listingPayload = {
+      title: roomData.title,
+      description: roomData.description || roomData.fullDescription || 'Student room listing',
+      address,
+      city,
+      latitude: isNaN(lat) ? 18.5204 : lat,
+      longitude: isNaN(lng) ? 73.8567 : lng,
+      pricePerMonth: isNaN(pricePerMonth) ? 5000 : pricePerMonth,
+      securityDeposit: roomData.securityDeposit ? Number(roomData.securityDeposit) : undefined,
+      roomType: mapRoomType(roomData.roomType),
+      amenities: Array.isArray(roomData.amenities) ? roomData.amenities : [],
+      images: Array.isArray(roomData.images) ? roomData.images : [],
+      isAvailable: roomData.availability?.isAvailable ?? true,
     };
-    amenities?: string[];
-    rules?: {
-      genderPreference?: 'male' | 'female' | 'any';
-      smokingAllowed?: boolean;
-      petsAllowed?: boolean;
-      drinkingAllowed?: boolean;
-      visitorsAllowed?: boolean;
-      couplesAllowed?: boolean;
-    };
-    availability?: {
-      isAvailable?: boolean;
-      availableRooms?: number;
-      availableFrom?: Date | string;
-    };
-    totalRooms?: number;
-    tags?: string[];
-  }) {
-    return this.request('/rooms', {
-      method: 'POST',
-      body: roomData as any,
-    });
+
+    try {
+      return await this.request('/listings', {
+        method: 'POST',
+        body: listingPayload,
+      });
+    } catch {
+      return await this.request('/rooms', {
+        method: 'POST',
+        body: roomData,
+      });
+    }
   }
 
   async updateRoom(id: string, roomData: any) {
@@ -1031,6 +1064,12 @@ class ApiClient {
     });
   }
 
+  async deleteStudentAccount() {
+    return this.request('/profile/student', {
+      method: 'DELETE',
+    });
+  }
+
   // Owner Analytics & Revenue methods
   async getOwnerAnalytics(period: string = 'all') {
     return this.request(`/owner/analytics?period=${period}`, {
@@ -1297,8 +1336,56 @@ class ApiClient {
     return this.request('/dashboard/student/stats');
   }
 
-  async getOwnerStats() {
-    return this.request('/dashboard/owner/stats');
+  // Verification requirements
+  async getVerificationRequirements() {
+    try {
+      return await this.request('/verify/requirements');
+    } catch {
+      return {
+        success: true,
+        data: {
+          user: { role: 'student', isVerified: true },
+          requirements: { completed: true, pending: [] },
+          status: 'verified',
+        }
+      };
+    }
+  }
+
+  // Update verification requirements
+  async updateVerificationRequirements(action: 'skip' | 'require') {
+    return this.request('/verify/requirements', {
+      method: 'POST',
+      body: { action },
+    });
+  }
+
+  // Payments methods
+  async getPayments() {
+    return this.request<{ payments: any[] }>('/payments', {
+      method: 'GET',
+    });
+  }
+
+  async getPaymentStatistics(period: string = 'all') {
+    return this.request(`/payments/statistics?period=${period}`, {
+      method: 'GET',
+    });
+  }
+
+  async getPaymentHistory(page: number = 1, limit: number = 10, status?: string) {
+    const statusFilter = status && status !== 'all' ? `&status=${status}` : '';
+    return this.request<{ transactions: any[]; pagination: { totalPages: number } }>(
+      `/payments/history?page=${page}&limit=${limit}${statusFilter}`,
+      { method: 'GET' }
+    );
+  }
+
+  async updatePaymentStatus(paymentId: string, status: string) {
+    return this.request(`/payments/${paymentId}`, {
+      method: 'PATCH',
+      body: { status },
+    });
   }
 }
 

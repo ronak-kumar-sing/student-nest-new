@@ -4,7 +4,7 @@ import roomsData from '@/data/demo-rooms.json';
 import type { Room } from '@/types';
 
 export default function RoomsDemo() {
-    const rooms = roomsData.rooms as Room[];
+    const rooms = roomsData.rooms as unknown as Room[];
 
     const getRoomTypeColor = (type: string) => {
         switch (type) {

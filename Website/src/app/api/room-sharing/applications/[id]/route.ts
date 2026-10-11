@@ -7,9 +7,10 @@ import { verifyAccessToken } from '../../../../../lib/utils/jwt';
 // GET: Get specific application details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -30,7 +31,7 @@ export async function GET(
 
     await connectDB();
 
-    const application = await RoomSharingApplication.findById(params.id)
+    const application = await RoomSharingApplication.findById(id)
       .populate('applicant', 'fullName email phone collegeId course yearOfStudy')
       .populate('roomSharing', 'totalBeds bedsAvailable monthlyRent securityDeposit studyHabits lifestyle')
       .populate({
@@ -88,9 +89,10 @@ export async function GET(
 // PATCH: Accept or reject application (room sharing initiator only)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -122,7 +124,7 @@ export async function PATCH(
 
     await connectDB();
 
-    const application = await RoomSharingApplication.findById(params.id)
+    const application = await RoomSharingApplication.findById(id)
       .populate('roomSharing', 'initiator totalBeds bedsAvailable')
       .populate('applicant', 'fullName email');
 
@@ -233,9 +235,10 @@ export async function PATCH(
 // DELETE: Cancel application (applicant only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -257,7 +260,7 @@ export async function DELETE(
     const userId = decoded.userId;
     await connectDB();
 
-    const application = await RoomSharingApplication.findById(params.id);
+    const application = await RoomSharingApplication.findById(id);
 
     if (!application) {
       return NextResponse.json(

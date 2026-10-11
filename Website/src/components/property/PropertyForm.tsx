@@ -45,6 +45,11 @@ interface PropertyFormData {
       distance: string;
       commute: string;
     }>;
+    nearbyFacilities?: Array<{
+      type: string;
+      name: string;
+      distance: number;
+    }>;
   };
 
   // Pricing
@@ -127,52 +132,107 @@ const ACCOMMODATION_TYPES = [
   { value: 'room', label: 'Room', description: 'Single room for rent' },
 ];
 
-export function PropertyForm() {
+interface PropertyFormProps {
+  initialData?: any;
+  isEditMode?: boolean;
+  propertyId?: string;
+}
+
+export function PropertyForm({ initialData, isEditMode, propertyId }: PropertyFormProps = {}) {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState<PropertyFormData>({
-    title: '',
-    description: '',
-    fullDescription: '',
-    roomType: '',
-    accommodationType: '',
-    maxSharingCapacity: 1,
-    location: {
-      address: '',
-      fullAddress: '',
-      city: '',
-      state: '',
-      pincode: '',
-      nearbyUniversities: [],
-    },
-    price: 0,
-    securityDeposit: 0,
-    maintenanceCharges: 0,
-    features: {
-      area: 50,
-      floor: 0,
-      totalFloors: 0,
-      furnished: false,
-      balcony: false,
-      attached_bathroom: false,
-    },
-    amenities: [],
-    rules: {
-      genderPreference: 'any',
-      smokingAllowed: false,
-      petsAllowed: false,
-      drinkingAllowed: false,
-      visitorsAllowed: true,
-      couplesAllowed: false,
-    },
-    availability: {
-      isAvailable: true,
-      availableRooms: 1,
-      availableFrom: new Date().toISOString().split('T')[0],
-    },
-    totalRooms: 1,
-    images: [],
+  const [formData, setFormData] = useState<PropertyFormData>(() => {
+    if (initialData) {
+      return {
+        title: initialData.title || '',
+        description: initialData.description || '',
+        fullDescription: initialData.fullDescription || initialData.description || '',
+        roomType: initialData.roomType?.toLowerCase() || '',
+        accommodationType: initialData.accommodationType || 'apartment',
+        maxSharingCapacity: initialData.maxSharingCapacity || 1,
+        location: {
+          address: initialData.location?.address || '',
+          fullAddress: initialData.location?.fullAddress || initialData.location?.address || '',
+          city: initialData.location?.city || '',
+          state: initialData.location?.state || '',
+          pincode: initialData.location?.pincode || '',
+          coordinates: initialData.location?.coordinates,
+          nearbyUniversities: initialData.location?.nearbyUniversities || [],
+          nearbyFacilities: initialData.location?.nearbyFacilities || [],
+        },
+        price: initialData.price || 0,
+        securityDeposit: initialData.securityDeposit || 0,
+        maintenanceCharges: initialData.maintenanceCharges || 0,
+        features: {
+          area: initialData.features?.area || 50,
+          floor: initialData.features?.floor || 0,
+          totalFloors: initialData.features?.totalFloors || 0,
+          furnished: initialData.features?.furnished || false,
+          balcony: initialData.features?.balcony || false,
+          attached_bathroom: initialData.features?.attached_bathroom || false,
+        },
+        amenities: initialData.amenities || [],
+        rules: {
+          genderPreference: initialData.rules?.genderPreference || 'any',
+          smokingAllowed: initialData.rules?.smokingAllowed || false,
+          petsAllowed: initialData.rules?.petsAllowed || false,
+          drinkingAllowed: initialData.rules?.drinkingAllowed || false,
+          visitorsAllowed: initialData.rules?.visitorsAllowed !== undefined ? initialData.rules.visitorsAllowed : true,
+          couplesAllowed: initialData.rules?.couplesAllowed || false,
+        },
+        availability: {
+          isAvailable: initialData.availability?.isAvailable !== undefined ? initialData.availability.isAvailable : true,
+          availableRooms: initialData.availability?.availableRooms || 1,
+          availableFrom: initialData.availability?.availableFrom ? new Date(initialData.availability.availableFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        },
+        totalRooms: initialData.totalRooms || 1,
+        images: initialData.images || [],
+      };
+    }
+    return {
+      title: '',
+      description: '',
+      fullDescription: '',
+      roomType: '',
+      accommodationType: '',
+      maxSharingCapacity: 1,
+      location: {
+        address: '',
+        fullAddress: '',
+        city: '',
+        state: '',
+        pincode: '',
+        nearbyUniversities: [],
+      },
+      price: 0,
+      securityDeposit: 0,
+      maintenanceCharges: 0,
+      features: {
+        area: 50,
+        floor: 0,
+        totalFloors: 0,
+        furnished: false,
+        balcony: false,
+        attached_bathroom: false,
+      },
+      amenities: [],
+      rules: {
+        genderPreference: 'any',
+        smokingAllowed: false,
+        petsAllowed: false,
+        drinkingAllowed: false,
+        visitorsAllowed: true,
+        couplesAllowed: false,
+      },
+      availability: {
+        isAvailable: true,
+        availableRooms: 1,
+        availableFrom: new Date().toISOString().split('T')[0],
+      },
+      totalRooms: 1,
+      images: [],
+    };
   });
 
   const steps = [

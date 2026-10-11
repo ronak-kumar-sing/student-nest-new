@@ -73,7 +73,7 @@ async function getAuthenticatedUser(request: NextRequest) {
     const token = authHeader.substring(7);
     const decoded = verifyAccessToken(token);
 
-    if (!decoded.userId) {
+    if (!decoded || !decoded.userId) {
       return { error: 'Invalid token payload' };
     }
 
@@ -255,8 +255,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has access to this booking
-    const isStudent = role === 'student' && booking.student._id.toString() === userId;
-    const isOwner = role === 'owner' && booking.owner._id.toString() === userId;
+    const studentId = (booking.student as any)?._id?.toString() || (booking.student as any)?.toString();
+    const ownerId = (booking.owner as any)?._id?.toString() || (booking.owner as any)?.toString();
+    const propertyId = (booking.room as any)?._id?.toString() || (booking.room as any)?.toString();
+
+    const isStudent = role === 'student' && studentId === userId;
+    const isOwner = role === 'owner' && ownerId === userId;
 
     if (!isStudent && !isOwner) {
       return NextResponse.json({
@@ -268,9 +272,9 @@ export async function POST(request: NextRequest) {
     // Create payment record
     const payment = await Payment.create({
       bookingId: booking._id,
-      studentId: booking.student._id,
-      ownerId: booking.owner._id,
-      propertyId: booking.room._id,
+      studentId,
+      ownerId,
+      propertyId,
       amount,
       type,
       paymentMethod,
